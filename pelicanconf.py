@@ -18,7 +18,7 @@ HOME_HIDE_TAGS = False
 
 DELETE_OUTPUT_DIRECTORY = False
 PATH = 'content'
-STATIC_PATHS = ['images','static','pages']
+STATIC_PATHS = ['images','pages']
 
 THEME = 'Flex'
 
