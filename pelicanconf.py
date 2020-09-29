@@ -1,11 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- #
-THEME = 'Flex'
-AUTHOR = 'Antonio Victor Campos Coelho'
-SITENAME = 'Data Science Portfolio by Antonio Victor Campos Coelho'
-SITEURL = ''
 
+AUTHOR = 'Antonio Victor Campos Coelho'
+SITENAME = "Antonio's Portfolio"
+RELATIVE_URLS = False
+SITEURL = 'https://antoniocampos13.github.io/'
+SITETITLE = SITENAME
+SITEDESCRIPTION = "Data Science Portfolio by Antonio Victor Campos Coelho"
+SITESUBTITLE = 'PhD in Genetics'
+SITELOGO = 'https://avatars.githubusercontent.com/antoniocampos13'
+BROWSER_COLOR = '#333333'
+PYGMENTS_STYLE = 'monokai'
+
+USE_FOLDER_AS_CATEGORY = True
+MAIN_MENU = True
+HOME_HIDE_TAGS = False
+
+DELETE_OUTPUT_DIRECTORY = False
 PATH = 'content'
+STATIC_PATHS = ['images','static','pages']
+
+THEME = 'Flex'
 
 TIMEZONE = 'America/Recife'
 
@@ -19,16 +34,25 @@ AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
 # Blogroll
-LINKS = (('Pelican', 'https://getpelican.com/'),
-         ('Python.org', 'https://www.python.org/'),
-         ('Jinja2', 'https://palletsprojects.com/p/jinja/'),
-         ('You can modify those links in your config file', '#'),)
+LINKS = (
+('Brazilian Lattes CV', 'http://lattes.cnpq.br/2986394950644755'),
+('ORCID', 'https://orcid.org/0000-0003-2143-9701'),
+('Researcher ID/Publons', 'https://publons.com/researcher/2414076/antonio-victor-c-coelho/'),
+)
 
 # Social widget
-SOCIAL = (('You can add links in your config file', '#'),
-          ('Another social link', '#'),)
+SOCIAL = (
+('github', 'https://github.com/antoniocampos13'),
+('linkedin', 'https://www.linkedin.com/in/antonio-coelho-9aa338164/'),
+)
 
-DEFAULT_PAGINATION = 10
+DEFAULT_PAGINATION = 30
 
-# Uncomment following line if you want document-relative URLs when developing
-#RELATIVE_URLS = True
+CC_LICENSE = {
+    'name': 'Creative Commons Attribution-ShareAlike',
+    'version': '4.0',
+    'slug': 'by-sa'
+}
+
+COPYRIGHT_NAME = AUTHOR
+COPYRIGHT_YEAR = 2020
