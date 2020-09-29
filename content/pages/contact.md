@@ -3,10 +3,8 @@ title: Contact
 date: 2020-09-29 13:00
 ---
 
-<form
-  action="https://formspree.io/moqpvnen"
-  method="POST"
->
+<form  action="https://formspree.io/moqpvnen"
+  method="POST">
   <label>
     Your email:
     <input type="text" name="_replyto">
