@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- #
-
+THEME = 'Flex'
 AUTHOR = 'Antonio Victor Campos Coelho'
 SITENAME = 'Data Science Portfolio by Antonio Victor Campos Coelho'
 SITEURL = ''
