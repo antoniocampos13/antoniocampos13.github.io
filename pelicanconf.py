@@ -17,8 +17,8 @@ MAIN_MENU = True
 HOME_HIDE_TAGS = False
 
 MENUITEMS = (('Archives', '/archives.html'),
-             ('Categories', '/categories.html'),
-             ,)
+('Categories', '/categories.html'),
+)
 
 DELETE_OUTPUT_DIRECTORY = False
 PATH = 'content'
