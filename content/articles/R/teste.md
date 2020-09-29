@@ -4,4 +4,4 @@ Author: Antonio Victor Campos Coelho
 
 ## Welcome to Pelican
 
-Hello!
+Hello! Hello!
