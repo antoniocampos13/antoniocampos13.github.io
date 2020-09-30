@@ -129,10 +129,10 @@ The `-f` flag means you are creating an environment using the configurations in 
 This is how I configured my system so I could use the major Bioinformatics tools out there. In summary, I:
 
 * Prepared an Unix (Ubuntu) system;
-* Installed miniconda, a environment manager;
+* Installed miniconda, an environment manager;
 * Configured channels so I could retrieve desired software;
 * Created an environment, showed how to activate and deactivate it, and finally installed software in it;
-* Showed how to backup your environment for safekeeping or share with others.
+* Showed how to backup your environment for safekeeping or sharing with others.
 
 In future posts I will demo some uses of the programs I installed in the new environment.
 
