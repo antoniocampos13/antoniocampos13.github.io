@@ -72,7 +72,7 @@ conda config --add channels conda-forge
 
 &lt;p&gt;Simply &lt;strong&gt;activate&lt;/strong&gt; it again when needed.&lt;/p&gt;
 &lt;h2&gt;Installing programs&lt;/h2&gt;
-&lt;p&gt;Now we can finally install our programs. Activate the environment again (only if you have deactivated it). Download the &lt;a href="https://raw.githubusercontent.com/antoniocampos13/portfolio/master/Unix/2020-09-30_Setting%20Up%20Your%20Unix%20Computer%20for%20Bioinformatics%20Analysis/bioenv.txt &amp;gt; bioenv.txt"&gt;&lt;code&gt;bioenv.txt&lt;/code&gt; file&lt;/a&gt; in my GitHub repository. This file contains a selection of most used Bioinformatics programs (hat tip to &lt;a href="https://www.biostarhandbook.com/index.html"&gt;Dr. István Albert&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;Now we can finally install our programs. Activate the environment again (only if you have deactivated it). Download the &lt;a href="https://raw.githubusercontent.com/antoniocampos13/portfolio/master/Unix/2020-09-30_Setting%20Up%20Your%20Unix%20Computer%20for%20Bioinformatics%20Analysis/bioenv.txt"&gt;&lt;code&gt;bioenv.txt&lt;/code&gt; file&lt;/a&gt; in my GitHub repository. This file contains a selection of most used Bioinformatics programs (hat tip to &lt;a href="https://www.biostarhandbook.com/index.html"&gt;Dr. István Albert&lt;/a&gt;)&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;cat bioenv.txt &lt;span class="p"&gt;|&lt;/span&gt; xargs conda install -y
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
