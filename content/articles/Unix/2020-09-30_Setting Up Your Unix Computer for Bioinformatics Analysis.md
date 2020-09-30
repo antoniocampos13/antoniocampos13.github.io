@@ -9,6 +9,8 @@ Tags: Bioinformatics
 
 In this post I will show how I set up my Unix machine to use Bioinformatics programs and tools. I am currently using Ubuntu 20.04 LTS (Focal Fossa) on a [Windows Subsystem for Linux (WSL2)](https://www.digitalocean.com/community/posts/trying-the-new-wsl-2-its-fast-windows-subsystem-for-linux) on Windows 10, so no GUI today!
 
+The code and files used here can be retrieved from [this post corresponding folder on my portfolio](https://github.com/antoniocampos13/portfolio/tree/master/Unix/2020-09-30_Setting%20Up%20Your%20Unix%20Computer%20for%20Bioinformatics%20Analysis).
+
 ## Preparing the system
 
 First, it is recommended that we upgrade the system. Open the command line terminal in your machine and copy and paste or type the following commands, pressing Enter after each one (make sure you type your password correctly whenever asked):
@@ -98,8 +100,7 @@ conda deactivate
 Simply **activate** it again when needed.
 
 ## Installing programs
-<!-- COLOCAR LINK DO REPOSITÓRIO AQUI E NO CODE BLOCK-->
-Now we can finally install our programs. Activate the environment again (only if you have deactivated it). Download the `bioenv.txt` file in my GitHub repository. This file contains a selection of most used Bioinformatics programs (hat tip to [Dr. István Albert](https://www.biostarhandbook.com/index.html))
+Now we can finally install our programs. Activate the environment again (only if you have deactivated it). Download the [`bioenv.txt` file](https://raw.githubusercontent.com/antoniocampos13/portfolio/master/Unix/2020-09-30_Setting%20Up%20Your%20Unix%20Computer%20for%20Bioinformatics%20Analysis/bioenv.txt > bioenv.txt) in my GitHub repository. This file contains a selection of most used Bioinformatics programs (hat tip to [Dr. István Albert](https://www.biostarhandbook.com/index.html))
 
 ```bash
 cat bioenv.txt | xargs conda install -y
@@ -136,6 +137,8 @@ This is how I configured my system so I could use the major Bioinformatics tools
 In future posts I will demo some uses of the programs I installed in the new environment.
 
 ## References
+
+[My Portfolio](https://github.com/antoniocampos13/portfolio)
 
 [Trying the New WSL 2. It's Fast! (Windows Subsystem for Linux) | DigitalOcean](https://www.digitalocean.com/community/posts/trying-the-new-wsl-2-its-fast-windows-subsystem-for-linux)
 
