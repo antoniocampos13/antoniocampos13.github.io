@@ -5,8 +5,6 @@ Author: Antonio Victor Campos Coelho
 Tags: Bioinformatics
 ---
 
-<!-- TOC -->autoauto- [Introduction](#introduction)auto- [Preparing the system](#preparing-the-system)auto- [Installing (mini)conda](#installing-miniconda)auto- [Configuring miniconda channels](#configuring-miniconda-channels)auto- [Create an environment for Bioinformatics programs](#create-an-environment-for-bioinformatics-programs)auto- [Activating and deactivating an environment](#activating-and-deactivating-an-environment)auto- [Installing programs](#installing-programs)auto- [Backing up and restoring your environment configuration](#backing-up-and-restoring-your-environment-configuration)auto- [Conclusion](#conclusion)auto- [References](#references)autoauto<!-- /TOC -->
-
 ## Introduction
 
 In this post I will show how I set up my Unix machine to use Bioinformatics programs and tools. I am currently using Ubuntu 20.04 LTS (Focal Fossa) on a [Windows Subsystem for Linux (WSL2)](https://www.digitalocean.com/community/posts/trying-the-new-wsl-2-its-fast-windows-subsystem-for-linux) on Windows 10, so no GUI today!
