@@ -94,10 +94,10 @@ conda config --add channels conda-forge
 &lt;p&gt;This is how I configured my system so I could use the major Bioinformatics tools out there. In summary, I:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Prepared an Unix (Ubuntu) system;&lt;/li&gt;
-&lt;li&gt;Installed miniconda, a environment manager;&lt;/li&gt;
+&lt;li&gt;Installed miniconda, an environment manager;&lt;/li&gt;
 &lt;li&gt;Configured channels so I could retrieve desired software;&lt;/li&gt;
 &lt;li&gt;Created an environment, showed how to activate and deactivate it, and finally installed software in it;&lt;/li&gt;
-&lt;li&gt;Showed how to backup your environment for safekeeping or share with others.&lt;/li&gt;
+&lt;li&gt;Showed how to backup your environment for safekeeping or sharing with others.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;In future posts I will demo some uses of the programs I installed in the new environment.&lt;/p&gt;
 &lt;h2&gt;References&lt;/h2&gt;
