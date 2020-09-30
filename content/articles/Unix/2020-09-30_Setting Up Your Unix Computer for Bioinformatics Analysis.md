@@ -100,7 +100,7 @@ conda deactivate
 Simply **activate** it again when needed.
 
 ## Installing programs
-Now we can finally install our programs. Activate the environment again (only if you have deactivated it). Download the [`bioenv.txt` file](https://raw.githubusercontent.com/antoniocampos13/portfolio/master/Unix/2020-09-30_Setting%20Up%20Your%20Unix%20Computer%20for%20Bioinformatics%20Analysis/bioenv.txt > bioenv.txt) in my GitHub repository. This file contains a selection of most used Bioinformatics programs (hat tip to [Dr. István Albert](https://www.biostarhandbook.com/index.html))
+Now we can finally install our programs. Activate the environment again (only if you have deactivated it). Download the [`bioenv.txt` file](https://raw.githubusercontent.com/antoniocampos13/portfolio/master/Unix/2020-09-30_Setting%20Up%20Your%20Unix%20Computer%20for%20Bioinformatics%20Analysis/bioenv.txt) in my GitHub repository. This file contains a selection of most used Bioinformatics programs (hat tip to [Dr. István Albert](https://www.biostarhandbook.com/index.html))
 
 ```bash
 cat bioenv.txt | xargs conda install -y
