@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source /mnt/c/Users/victo/Documents/antonio_github_io/pelican/bin/activate
+
 pelican content -o output -s publishconf.py
 ghp-import -m "${1}" --no-jekyll -b master output
 git push origin master

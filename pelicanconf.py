@@ -18,6 +18,7 @@ HOME_HIDE_TAGS = False
 
 MENUITEMS = (('Archives', '/archives.html'),
 ('Categories', '/categories.html'),
+('Tags', '/tags.html'),
 )
 
 DELETE_OUTPUT_DIRECTORY = False
