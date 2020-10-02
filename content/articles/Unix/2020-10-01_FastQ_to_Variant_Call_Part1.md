@@ -100,7 +100,7 @@ esearch -db bioproject -query '(((vorinostat) AND "bioproject sra"[Filter]) AND 
 
 Remember: single quotes enclosing the query. Turns out that this refined search was rather restrictive: it resulted in a single record. Checking the `vorinostat_refined.txt` I see in the abstract that the project dealt with "DNA Seq data: biopsy samples from patients pre- and post- treated with Vorinostat; check mutations related to MAPKi-resistance" (MAPKi: Mitogen Activated Protein Kinase inhibitors). Although I had HIV-1-related projects in mind, that's fine for now, since it is suitable to `FasQ_to_VariantCall.sh` script: identify and annotate genetic variation.
 
-Then, I take note of the project ID: `PRJNA436005`. I will use it to retrieve samples from this project by searching the SRA with it. 
+Then, I take note of the project ID: `PRJNA436005`. I will use it to retrieve samples from this project by searching the SRA with it.
 
 ## Conclusion of Part 1
 
@@ -110,4 +110,16 @@ In this part I showed how to:
 * refine searches;
 * save search results into local, human-readable text files.
 
-[Go to FASTQ to Variant Call (Part 2)]({filename}/articles/Unix/2020-10-02_FastQ_to_Variant_Call_Part2.md)
+*Go to [FASTQ to Variant Call (Part 2)](https://antoniocampos13.github.io/fastq-to-variant-call-part-2.html)*
+
+## References
+
+[Setting Up Your Unix Computer for Bioinformatics Analysis](https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html)
+
+[National Center for Biotechnology Information](https://www.ncbi.nlm.nih.gov/)
+
+[Entrez Unique Identifiers (UIDs) for selected databases](https://www.ncbi.nlm.nih.gov/books/NBK25497/table/chapter2.T._entrez_unique_identifiers_ui/?report=objectonly)
+
+[Home - BioProject - NCBI](https://www.ncbi.nlm.nih.gov/bioproject/)
+
+[Home - SRA - NCBI](https://www.ncbi.nlm.nih.gov/sra)

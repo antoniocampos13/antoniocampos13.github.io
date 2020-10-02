@@ -6,9 +6,19 @@ Author: Antonio Victor Campos Coelho
 Tags: Bioinformatics, genomic variation, entrez-direct, EDirect
 ---
 
-obtain raw reads from human genomes samples deposited in 
+## Introduction
 
-## The FASTQ format
+*On my [previous post](https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html), I showed how to configure an Ubuntu system to install Bioinformatics programs.*
+
+*Now, using the environment I created, I will demonstrate a bash script, `FasQ_to_VariantCall.sh` that takes next generation sequencing (NGS) raw reads from human whole genome sequencing as input and produces variant annotation as output. Variant annotation is the process of identifying genetic variants in some genomic DNA sample, and assess, for example, if any of the found variants have any effect on phenotype, such as increased susceptibility to certain diseases.*
+
+*In the first part, I showed how to search for NGS projects deposited in [National Center for Biotechnology Information (NCBI) databases](https://www.ncbi.nlm.nih.gov/) from which I can download sequencing reads later to use with the script.*
+
+Here in the second part, I will show how to retrieve raw genome sequencing reads in the form of `FASTQ` files, which are deposited in [SRA](https://www.ncbi.nlm.nih.gov/sra).
+
+But first, let's review what `FASTQ` files are.
+
+## What is the the FASTQ format
 
 The `FASTQ` file format is how we store the output of whole genome or transcriptomic sequencing (sequences of nucleotides). It inherits its name from the `FASTA` format that stores and the word `Qualities`, because a `FASTQ` file not only contains the nucleotide sequence, but also contains the quality of the sequencing procedure.
 
@@ -20,10 +30,53 @@ Because during use of these kind of files, it is important that we have confiden
 
 ### Obtaining FASTQ files
 
-We obtain `FASTQ` after sequencing of genomic samples in platforms such as [Illumina](https://www.illumina.com). Normally, researchers deposit raw `FASTQ` files on public databases to share their discoveries with other scientists. Thus, I will demonstrate how we download publicly-available `FASTQ` files using the recently created `miniconda` environment.
+We obtain `FASTQ` after sequencing of genomic samples in platforms such as [Illumina](https://www.illumina.com), which practically dominates the NGS market nowadays. Check the fundamentals of Illumina's NGS platform [here](https://www.illumina.com/science/technology/next-generation-sequencing/beginners.html). Normally, researchers deposit raw `FASTQ` files on public databases to share their discoveries with other scientists. This is why I took note of the `BioProject` accession ID during the demonstration of Part 1. With this ID, I can retrieve sequencing reads associated with the project.
 
-## A Warning
+### A Warning
 
 `FASTQ` files, especially from human samples, have very big sizes, in the gigabytes range. Since they are so big, considerable computing power and storage are needed to process these kind of files. Common domestic desktop PCs or laptops are inadequate, because they lack sufficient RAM and CPU processing power to perform smoothly during most Bioinformatic uses.
 
 However, do not despair! I will demonstrate the script using especial `FASTQ` (and other) files that have sufficiently small size so your PC can process it on a timely manner. The logic is: if the script is working in these small files, it should work with the "real deal".
+
+## Retrieving reads from a BioProject
+
+**Activate** the environment, if needed, and connect to `SRA` database via `EDirect esearch` command using the `PRJNA436005` as keyword for query. Then, we pipe the results to the `efetch` command. With the `-format` flag, it will format the results into the `runinfo` format (more on that later). Finally, will save it into the `PRJNA436005_runinfo.csv` file. You can choose other name if wish.
+
+```bash
+conda activate bioenv
+
+esearch -db sra -query 'PRJNA436005' | efetch -format runinfo > PRJNA436005_runinfo.csv
+```
+
+The `runinfo` format displays metadata of read sets. Reads are inferred sequences of base pairs corresponding to DNA fragments produced during procedures for NGS. The collection of DNA fragments from a given sample is called a **library**, which are sequenced to produce the set of **reads**.
+
+Checking the `CSV` file, I can see that there are seven read sets, each displayed on a row, and are identified by the `SRR` prefix followed by some numbers. With this ID is possible to retrieve `FASTQ` files for each read set. Now I check the `LibraryLayout` column to see that they are all **PAIRED** reads, meaning that the researchers sequenced both ends of a fragment. Thus, each read set will produce two `FASTQ`files, containing the sequences and qualities from all reads obtained from the library of the original sample. This is important to check because I will have to input this information in the next commands.
+
+Other interesting columns that I like to check are:
+
+* `spots`, which are the number of physical locations in the sequencing flowcells where the sequencing adapters are fixed. A spot contains several nucleotide bases from several, possibly millions, of reads;
+* `avgLength`, which as the name implies, is the average length, in nucleotides, of reads in the set;
+* `size_MB`, the size in megabytes of the read set;
+* `LibrarySource`, which indicates if the sample source is GENOMIC, TRANSCRIPTOMIC and so on;
+* `Platform`, the vendor of NGS procedure;
+* `Model`, the model of the `Platform`;
+* `Sex`, `Disease` and `Tumor`: descriptors of sample phenotype.
+
+For now, I will use only the first read, which has the `SRR6784104` ID. Finally, let's download the read set with the `EDirect fastq-dump` command. Here, I use a "trick" to reduce the size of the file: download only a subset of the spots (the first 10,000 spots from the more than 25 million spots in the read set, with the `-X` flag). Additionally, I will split it into two files (`--split-files` flag), one with reads from each end of DNA fragments in the original library, and compress them with `--gzip`:
+
+```bash
+fastq-dump -X 10000 --split-files SRR6784104 --gzip
+```
+
+After a moment, two `fastq.gz` files will be downloaded to the current working directory and are ready to be used as the input for the `FasQ_to_VariantCall.sh`.
+
+## Conclusion (Part 2)
+
+In this part I showed how to:
+
+* obtain and inspect metadata from projects via their `BioProjects` accession ID;
+* download read sets via their `SRR` accession ID via `fastq-dump`.
+
+### Post-scriptum
+
+*There is an updated version of `fastq-dump`, aptly named [`fasterq-dump`](https://github.com/ncbi/sra-tools/wiki/HowTo:-fasterq-dump), but as it does not support the `-X` and `--gzip` flags anymore (at least for now), I did not use it in this demonstration.*
