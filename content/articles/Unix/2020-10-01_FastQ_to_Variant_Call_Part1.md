@@ -60,7 +60,7 @@ Thus, I will once again pipe the results, this time to `xtract` command. As its 
 ```bash
 # ...almost there ... (3/4)
 esearch -db bioproject -query 'vorinostat' | efetch -format native -mode xml | xtract -pattern DocumentSummary -element ArchiveID@accession ID Title Description Reference
- ```
+```
 
 Here is the tab-separated output of the same record displayed on my terminal:
 
