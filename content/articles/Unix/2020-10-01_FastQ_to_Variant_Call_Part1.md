@@ -57,8 +57,8 @@ The output is in `XML` format, and it is unfortunately not very much human-reada
   
 Thus, I will once again pipe the results, this time to `xtract` command. As its name implies, it extracts information from the `XML` and formats into a tab-separated format that is easier to understand. I must input the flag `-pattern` with the part of the `XML` files that contains the desired information, which are `elements`. In this example, I will search inside the `DocumentSummary` for `ArchiveID@accession` (project unique accession number), `ID` (an auxiliary ID code to search for samples of said project), `Title`(the title of the project),  `Description` (normally an abstract of the project) and `Reference` (a list of project-related papers in PubMed ids -- PMIDs, if available). Note that I am separating each argument with spaces, no quotes are necessary in this command.
 
- ```bash
-# ... almost there ... (3/4)
+```bash
+# ...almost there ... (3/4)
 esearch -db bioproject -query 'vorinostat' | efetch -format native -mode xml | xtract -pattern DocumentSummary -element ArchiveID@accession ID Title Description Reference
  ```
 
