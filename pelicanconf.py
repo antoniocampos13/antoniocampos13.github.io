@@ -59,5 +59,7 @@ CC_LICENSE = {
     'slug': 'by-sa'
 }
 
+TYPOGRIFY = True
+
 COPYRIGHT_NAME = AUTHOR
 COPYRIGHT_YEAR = 2020

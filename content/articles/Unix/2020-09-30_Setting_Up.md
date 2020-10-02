@@ -1,5 +1,6 @@
 ---
 Title: Setting Up Your Unix Computer for Bioinformatics Analysis
+Status: published
 Date: 2020-09-30 18:00
 Author: Antonio Victor Campos Coelho
 Tags: Bioinformatics

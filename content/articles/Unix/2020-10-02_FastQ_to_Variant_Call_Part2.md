@@ -1,5 +1,6 @@
 ---
 Title: FASTQ to Variant Call (Part 2)
+Status: draft
 Date: 2020-10-02 18:00
 Author: Antonio Victor Campos Coelho
 Tags: Bioinformatics, genomic variation, entrez-direct, EDirect
