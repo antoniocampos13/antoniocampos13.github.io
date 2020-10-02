@@ -37,17 +37,28 @@
     <!-- Microsoft EDGE -->
     <meta name="msapplication-TileColor" content="#333333">
 
-    <meta name="author" content="Antonio Victor Campos Coelho" />
-    <meta name="description" content="Data Science Portfolio by Antonio Victor Campos Coelho" />
+<meta name="author" content="Antonio Victor Campos Coelho" />
+<meta name="description" content="obtain raw reads from human genomes samples deposited in The FASTQ format The FASTQ file format is how we store the output of whole genome or transcriptomic sequencing (sequences of nucleotides). It inherits its name from the FASTA format that stores and the word Qualities, because a FASTQ file not …" />
+<meta name="keywords" content="Bioinformatics, genomic variation, entrez-direct, EDirect">
+
+
 <meta property="og:site_name" content="Antonio's Portfolio"/>
-<meta property="og:type" content="blog"/>
-<meta property="og:title" content="Antonio's Portfolio"/>
-<meta property="og:description" content="Data Science Portfolio by Antonio Victor Campos Coelho"/>
+<meta property="og:title" content="FASTQ to Variant Call (Part 2)"/>
+<meta property="og:description" content="obtain raw reads from human genomes samples deposited in The FASTQ format The FASTQ file format is how we store the output of whole genome or transcriptomic sequencing (sequences of nucleotides). It inherits its name from the FASTA format that stores and the word Qualities, because a FASTQ file not …"/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://antoniocampos13.github.io"/>
+<meta property="og:url" content="https://antoniocampos13.github.io/drafts/fastq-to-variant-call-part-2.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2020-10-02 18:00:00-03:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
+<meta property="article:section" content="Unix"/>
+<meta property="article:tag" content="Bioinformatics"/>
+<meta property="article:tag" content="genomic variation"/>
+<meta property="article:tag" content="entrez-direct"/>
+<meta property="article:tag" content="EDirect"/>
 <meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
 
-  <title>Antonio's Portfolio &ndash; Tag entrez-direct</title>
+  <title>Antonio's Portfolio &ndash; FASTQ to Variant Call (Part 2)</title>
 
 </head>
 <body class="light-theme">
@@ -120,56 +131,44 @@
 
     </nav>
 
-
-
-<article>
+<article class="single">
   <header>
-    <h2><a href="https://antoniocampos13.github.io/fastq-to-variant-call-part-2.html#fastq-to-variant-call-part-2">FASTQ to Variant Call (Part 2)</a></h2>
+      
+    <h1 id="fastq-to-variant-call-part-2"><span class="caps">FASTQ</span> to Variant Call (Part&nbsp;2)</h1>
     <p>
       Posted on Fri 02 October 2020 in <a href="https://antoniocampos13.github.io/category/unix.html">Unix</a>
 
-          &#8226; Tagged with
-              <a href="https://antoniocampos13.github.io/tag/bioinformatics.html">Bioinformatics</a>,              <a href="https://antoniocampos13.github.io/tag/genomic-variation.html">genomic variation</a>,              <a href="https://antoniocampos13.github.io/tag/entrez-direct.html">entrez-direct</a>,              <a href="https://antoniocampos13.github.io/tag/edirect.html">EDirect</a>
     </p>
   </header>
+
+
   <div>
-      <p>obtain raw reads from human genomes samples deposited in </p>
-<h2>The FASTQ format</h2>
-<p>The <code>FASTQ</code> file format is how we store the output of whole genome or transcriptomic sequencing (sequences of nucleotides). It inherits its name from the <code>FASTA</code> format that stores and the word <code>Qualities</code>, because a <code>FASTQ</code> file not …</p>
-        <br>
-        <a class="btn"
-           href="https://antoniocampos13.github.io/fastq-to-variant-call-part-2.html#fastq-to-variant-call-part-2">
-          Continue reading
-        </a>
+    <p>obtain raw reads from human genomes samples deposited&nbsp;in </p>
+<h2>The <span class="caps">FASTQ</span>&nbsp;format</h2>
+<p>The <code>FASTQ</code> file format is how we store the output of whole genome or transcriptomic sequencing (sequences of nucleotides). It inherits its name from the <code>FASTA</code> format that stores and the word <code>Qualities</code>, because a <code>FASTQ</code> file not only contains the nucleotide sequence, but also contains the quality of the sequencing&nbsp;procedure.</p>
+<p>The qualities are represented by Phred scores (<code>Q</code>), which is used to calculate the probability of a nucleotide being incorrectly identified during sequencing using a formula (I will not go into details here). So, for example, if we check a <code>FASTQ</code> file and found a nucleotide with <code>Q = 30</code>, it means that there is a probability of 1 in 1000 that it was incorrectly assigned during sequencing &#8212; in other words an accuracy of 99.9%. Therefore, <code>Q</code> values around 30 and above are generally seem as very good&nbsp;quality.</p>
+<h3>The reason <code>FASTQ</code> files contain information about&nbsp;quality</h3>
+<p>Because during use of these kind of files, it is important that we have confidence on the sequence assignment. During processing in Bioinformatics analysis pipelines, we can remove low-quality nucleotides to ensure that he have the &#8220;cleanest&#8221; information&nbsp;possible.</p>
+<h3>Obtaining <span class="caps">FASTQ</span>&nbsp;files</h3>
+<p>We obtain <code>FASTQ</code> after sequencing of genomic samples in platforms such as <a href="https://www.illumina.com">Illumina</a>. Normally, researchers deposit raw <code>FASTQ</code> files on public databases to share their discoveries with other scientists. Thus, I will demonstrate how we download publicly-available <code>FASTQ</code> files using the recently created <code>miniconda</code> environment.</p>
+<h2>A&nbsp;Warning</h2>
+<p><code>FASTQ</code> files, especially from human samples, have very big sizes, in the gigabytes range. Since they are so big, considerable computing power and storage are needed to process these kind of files. Common domestic desktop PCs or laptops are inadequate, because they lack sufficient <span class="caps">RAM</span> and <span class="caps">CPU</span> processing power to perform smoothly during most Bioinformatic&nbsp;uses.</p>
+<p>However, do not despair! I will demonstrate the script using especial <code>FASTQ</code> (and other) files that have sufficiently small size so your <span class="caps">PC</span> can process it on a timely manner. The logic is: if the script is working in these small files, it should work with the &#8220;real&nbsp;deal&#8221;.</p>
   </div>
-  <hr />
-</article>
-<article>
-  <header>
-    <h2><a href="https://antoniocampos13.github.io/fastq-to-variant-call-part-1.html#fastq-to-variant-call-part-1">FASTQ to Variant Call (Part 1)</a></h2>
+  <div class="tag-cloud">
     <p>
-      Posted on Thu 01 October 2020 in <a href="https://antoniocampos13.github.io/category/unix.html">Unix</a>
-
-          &#8226; Tagged with
-              <a href="https://antoniocampos13.github.io/tag/bioinformatics.html">Bioinformatics</a>,              <a href="https://antoniocampos13.github.io/tag/genomic-variation.html">genomic variation</a>,              <a href="https://antoniocampos13.github.io/tag/entrez-direct.html">entrez-direct</a>,              <a href="https://antoniocampos13.github.io/tag/edirect.html">EDirect</a>
+      <a href="https://antoniocampos13.github.io/tag/bioinformatics.html">Bioinformatics</a>
+      <a href="https://antoniocampos13.github.io/tag/genomic-variation.html">genomic variation</a>
+      <a href="https://antoniocampos13.github.io/tag/entrez-direct.html">entrez-direct</a>
+      <a href="https://antoniocampos13.github.io/tag/edirect.html">EDirect</a>
     </p>
-  </header>
-  <div>
-      <h2>Introduction</h2>
-<p>On my <a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html">previous post</a>, I showed how to configure an Ubuntu system to install Bioinformatics programs.</p>
-<p>Now, using the environment I created, I will demonstrate a bash script, <code>FasQ_to_VariantCall.sh</code> that takes next generation sequencing (NGS) raw reads from human whole genome sequencing as input and produces variant annotation …</p>
-        <br>
-        <a class="btn"
-           href="https://antoniocampos13.github.io/fastq-to-variant-call-part-1.html#fastq-to-variant-call-part-1">
-          Continue reading
-        </a>
   </div>
+
+
+
+
+
 </article>
-
-  <div class="pagination">
-  </div>
-
-
 
     <footer>
 <p>

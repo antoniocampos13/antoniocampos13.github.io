@@ -38,13 +38,13 @@
     <meta name="msapplication-TileColor" content="#333333">
 
 <meta name="author" content="Antonio Victor Campos Coelho" />
-<meta name="description" content="Introduction In this post I will show how I set up my Unix machine to use Bioinformatics programs and tools. I am currently using Ubuntu 20.04 LTS (Focal Fossa) 64-bit on a Windows Subsystem for Linux (WSL2) on Windows 10, so no GUI today! The code and files used …" />
+<meta name="description" content="Introduction In this post I will show how I set up my Unix machine to use Bioinformatics programs and tools. I am currently using Ubuntu 20.04 LTS (Focal Fossa) 64-bit on a Windows Subsystem for Linux (WSL2) on Windows 10, so no GUI today! The code and files used …" />
 <meta name="keywords" content="Bioinformatics">
 
 
 <meta property="og:site_name" content="Antonio's Portfolio"/>
-<meta property="og:title" content="Setting Up Your Unix Computer for Bioinformatics Analysis"/>
-<meta property="og:description" content="Introduction In this post I will show how I set up my Unix machine to use Bioinformatics programs and tools. I am currently using Ubuntu 20.04 LTS (Focal Fossa) 64-bit on a Windows Subsystem for Linux (WSL2) on Windows 10, so no GUI today! The code and files used …"/>
+<meta property="og:title" content="Setting Up Your Unix Computer for Bioinformatics Analysis"/>
+<meta property="og:description" content="Introduction In this post I will show how I set up my Unix machine to use Bioinformatics programs and tools. I am currently using Ubuntu 20.04 LTS (Focal Fossa) 64-bit on a Windows Subsystem for Linux (WSL2) on Windows 10, so no GUI today! The code and files used …"/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html"/>
 <meta property="og:type" content="article"/>
@@ -55,7 +55,7 @@
 <meta property="article:tag" content="Bioinformatics"/>
 <meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
 
-  <title>Antonio's Portfolio &ndash; Setting Up Your Unix Computer for Bioinformatics Analysis</title>
+  <title>Antonio's Portfolio &ndash; Setting Up Your Unix Computer for Bioinformatics Analysis</title>
 
 </head>
 <body class="light-theme">
@@ -131,7 +131,7 @@
 <article class="single">
   <header>
       
-    <h1 id="setting-up-your-unix-computer-for-bioinformatics-analysis">Setting Up Your Unix Computer for Bioinformatics Analysis</h1>
+    <h1 id="setting-up-your-unix-computer-for-bioinformatics-analysis">Setting Up Your Unix Computer for Bioinformatics&nbsp;Analysis</h1>
     <p>
       Posted on Wed 30 September 2020 in <a href="https://antoniocampos13.github.io/category/unix.html">Unix</a>
 
@@ -141,112 +141,112 @@
 
   <div>
     <h2>Introduction</h2>
-<p>In this post I will show how I set up my Unix machine to use Bioinformatics programs and tools. I am currently using Ubuntu 20.04 LTS (Focal Fossa) 64-bit on a <a href="https://www.digitalocean.com/community/posts/trying-the-new-wsl-2-its-fast-windows-subsystem-for-linux">Windows Subsystem for Linux (WSL2)</a> on Windows 10, so no GUI today!</p>
+<p>In this post I will show how I set up my Unix machine to use Bioinformatics programs and tools. I am currently using Ubuntu 20.04 <span class="caps">LTS</span> (Focal Fossa) 64-bit on a <a href="https://www.digitalocean.com/community/posts/trying-the-new-wsl-2-its-fast-windows-subsystem-for-linux">Windows Subsystem for Linux (<span class="caps">WSL2</span>)</a> on Windows 10, so no <span class="caps">GUI</span>&nbsp;today!</p>
 <p>The code and files used here can be retrieved from <a href="https://github.com/antoniocampos13/portfolio/tree/master/Unix/2020-09-30_Setting%20Up%20Your%20Unix%20Computer%20for%20Bioinformatics%20Analysis">this post corresponding folder on my portfolio</a>.</p>
-<h2>Preparing the system</h2>
-<p>First, it is recommended that we upgrade the system. Open the command line terminal in your machine and copy and paste or type the following commands, pressing Enter after each one (make sure you type your password correctly whenever asked):</p>
+<h2>Preparing the&nbsp;system</h2>
+<p>First, it is recommended that we upgrade the system. Open the command line terminal in your machine and copy and paste or type the following commands, pressing Enter after each one (make sure you type your password correctly whenever&nbsp;asked):</p>
 <div class="highlight"><pre><span></span><code>sudo apt-get update
 sudo apt-get upgrade
 </code></pre></div>
 
 
-<p>Then I must install some useful libraries, especially to be sure that all future libraries I need will be installed and work properly. Some of these (e.g. default-jdk, the Java libraries), may already be installed in your system, but just to ensure:</p>
+<p>Then I must install some useful libraries, especially to be sure that all future libraries I need will be installed and work properly. Some of these (e.g. default-jdk, the Java libraries), may already be installed in your system, but just to&nbsp;ensure:</p>
 <div class="highlight"><pre><span></span><code>sudo apt-get install -y curl unzip build-essential ncurses-dev
 sudo apt-get install -y byacc zlib1g-dev python-dev git cmake
 sudo apt-get install -y default-jdk ant
 </code></pre></div>
 
 
-<h2>Installing (mini)conda</h2>
-<p>Now I will install <a href="https://conda.io/miniconda.html">miniconda</a>. What is miniconda? Miniconda is a simplified version of Conda, an environment management system. Every program we install on our computers depend on other programs to work. So if a program X needs a program Y to work, it may stop working if Y gets an update that for some reason is incompatible with the original X program.</p>
+<h2>Installing&nbsp;(mini)conda</h2>
+<p>Now I will install <a href="https://conda.io/miniconda.html">miniconda</a>. What is miniconda? Miniconda is a simplified version of Conda, an environment management system. Every program we install on our computers depend on other programs to work. So if a program X needs a program Y to work, it may stop working if Y gets an update that for some reason is incompatible with the original X&nbsp;program.</p>
 <p>Thus, environments were developed to solve this kind of problem, because they serve to isolate groups of programs, ensuring only compatible versions of software are working together. Therefore, miniconda serves to create and manage environments. The best practice is that one should create one environment for one specific use. In my case, I installed miniconda to create a environment and populate it with tools used for several Bioinformatics analysis. Other people can create environments for other uses with specific programs needed and so on. Other advantage of miniconda is that the configuration files for environments can be shared with others, ensuring <strong>backup</strong> and <strong>reproducibility</strong>.</p>
-<p>Without further ado, let's finally install miniconda. Since I am using a Unix with Python 3.7.7 pre-installed, the version of the installer <a href="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh">is this one</a>. Check the <a href="https://docs.conda.io/en/latest/miniconda.html#linux-installers">installation page</a> if you have a different Python version.</p>
-<p>You can download the installer from your browser or via command line:</p>
+<p>Without further ado, let&#8217;s finally install miniconda. Since I am using a Unix with Python 3.7.7 pre-installed, the version of the installer <a href="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh">is this one</a>. Check the <a href="https://docs.conda.io/en/latest/miniconda.html#linux-installers">installation page</a> if you have a different Python&nbsp;version.</p>
+<p>You can download the installer from your browser or via command&nbsp;line:</p>
 <div class="highlight"><pre><span></span><code>curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 </code></pre></div>
 
 
-<p>Then, go to the folder where the installer was downloaded and run the script:</p>
+<p>Then, go to the folder where the installer was downloaded and run the&nbsp;script:</p>
 <div class="highlight"><pre><span></span><code>bash Miniconda3-latest-Linux-x86_64.sh
 
 ./Miniconda3-latest-Linux-x86_64.sh <span class="c1"># same effect</span>
 </code></pre></div>
 
 
-<p>When the installation finishes, I must initialize conda:</p>
+<p>When the installation finishes, I must initialize&nbsp;conda:</p>
 <div class="highlight"><pre><span></span><code>miniconda3/condabin/conda init
 </code></pre></div>
 
 
-<p>Close the terminal and open it again. Now miniconda must be ready to use. Check by typing and pressing Enter:</p>
+<p>Close the terminal and open it again. Now miniconda must be ready to use. Check by typing and pressing&nbsp;Enter:</p>
 <div class="highlight"><pre><span></span><code>conda
 </code></pre></div>
 
 
-<p>Then, I added two <strong>channels</strong>. Channels are <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html">"the locations where packages are stored"</a>. Miniconda has the <code>defaults</code> channel pre-configured. The two channels in question are dedicated to Bioinformatics and Data analysis programs, which may not be present in the default channels, so I must add them.</p>
-<h2>Configuring miniconda channels</h2>
-<p>Once again in the terminal enter the following commands:</p>
+<p>Then, I added two <strong>channels</strong>. Channels are <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html">&#8220;the locations where packages are stored&#8221;</a>. Miniconda has the <code>defaults</code> channel pre-configured. The two channels in question are dedicated to Bioinformatics and Data analysis programs, which may not be present in the default channels, so I must add&nbsp;them.</p>
+<h2>Configuring miniconda&nbsp;channels</h2>
+<p>Once again in the terminal enter the following&nbsp;commands:</p>
 <div class="highlight"><pre><span></span><code>conda config --add channels bioconda
 conda config --add channels conda-forge
 </code></pre></div>
 
 
-<p>Miniconda sets up priorities in the list of channels it receives. When we need to install some program, miniconda will search in the higher-priority channels first, then in the channels with lower-priority. "Different channels can have the same package" and you can "safely put channels at the bottom of your channel list to provide additional packages that are not in the default channels" as stated in the <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html">official website</a>. The flag <code>--add</code> adds the respective channels (<code>bioconda</code> and <code>conda-forge</code>) to the <strong>top</strong> of the priorities list. If you want to give lower priority, putting them in the <strong>bottom</strong> of the list, use the <code>--append</code> command instead. Thus, according to the command above, the order of channel priorities in our new miniconda installation will be: <code>conda-forge</code>, <code>bioconda</code> and lastly, <code>defaults</code>.</p>
-<h2>Create an environment for Bioinformatics programs</h2>
-<p>Now that miniconda is configured, I will create the environment that will receive them. I will name it <code>bioenv</code>. You can choose whatever name you like! </p>
+<p>Miniconda sets up priorities in the list of channels it receives. When we need to install some program, miniconda will search in the higher-priority channels first, then in the channels with lower-priority. &#8220;Different channels can have the same package&#8221; and you can &#8220;safely put channels at the bottom of your channel list to provide additional packages that are not in the default channels&#8221; as stated in the <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html">official website</a>. The flag <code>--add</code> adds the respective channels (<code>bioconda</code> and <code>conda-forge</code>) to the <strong>top</strong> of the priorities list. If you want to give lower priority, putting them in the <strong>bottom</strong> of the list, use the <code>--append</code> command instead. Thus, according to the command above, the order of channel priorities in our new miniconda installation will be: <code>conda-forge</code>, <code>bioconda</code> and lastly, <code>defaults</code>.</p>
+<h2>Create an environment for Bioinformatics&nbsp;programs</h2>
+<p>Now that miniconda is configured, I will create the environment that will receive them. I will name it <code>bioenv</code>. You can choose whatever name you&nbsp;like! </p>
 <div class="highlight"><pre><span></span><code>conda create -y --name bioenv <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8
 </code></pre></div>
 
 
-<h2>Activating and deactivating an environment</h2>
-<p>With the <code>bioenv</code> created, I must <strong>activate</strong> it:</p>
+<h2>Activating and deactivating an&nbsp;environment</h2>
+<p>With the <code>bioenv</code> created, I must <strong>activate</strong>&nbsp;it:</p>
 <div class="highlight"><pre><span></span><code>conda activate bioenv
 </code></pre></div>
 
 
-<p>I need to perform this step every time I want to use the programs that I will install in this environment. If you do not need to use the environment for the moment, simply <strong>deactivate</strong> it:</p>
+<p>I need to perform this step every time I want to use the programs that I will install in this environment. If you do not need to use the environment for the moment, simply <strong>deactivate</strong>&nbsp;it:</p>
 <div class="highlight"><pre><span></span><code>conda deactivate
 </code></pre></div>
 
 
-<p>Simply <strong>activate</strong> it again when needed.</p>
-<h2>Installing programs</h2>
+<p>Simply <strong>activate</strong> it again when&nbsp;needed.</p>
+<h2>Installing&nbsp;programs</h2>
 <p>Now we can finally install our programs. Activate the environment again (only if you have deactivated it). Download the <a href="https://raw.githubusercontent.com/antoniocampos13/portfolio/master/Unix/2020-09-30_Setting%20Up%20Your%20Unix%20Computer%20for%20Bioinformatics%20Analysis/bioenv.txt"><code>bioenv.txt</code> file</a> in my GitHub repository. This file contains a selection of most used Bioinformatics programs (hat tip to <a href="https://www.biostarhandbook.com/index.html">Dr. István Albert</a>)</p>
 <div class="highlight"><pre><span></span><code>cat bioenv.txt <span class="p">|</span> xargs conda install -y
 </code></pre></div>
 
 
-<h2>Backing up and restoring your environment configuration</h2>
-<p>Miniconda has a special command to backup your environment configuration. <strong>Activate</strong> (if needed) the environment you want to backup and enter the command:</p>
+<h2>Backing up and restoring your environment&nbsp;configuration</h2>
+<p>Miniconda has a special command to backup your environment configuration. <strong>Activate</strong> (if needed) the environment you want to backup and enter the&nbsp;command:</p>
 <div class="highlight"><pre><span></span><code>conda env <span class="nb">export</span> &gt; bioenv.yml
 </code></pre></div>
 
 
-<p>It will result in a <code>YAML</code> file in the current working folder containing all configurations in your environment. Again, I named the file <code>bioenv.yml</code> but you can choose whatever you like. Note that if you already have a <code>bioenv.yml</code> in your directory, it will be overwritten, so be careful.</p>
-<p>To restore this environment in your computer, or on other computer, first install miniconda again, and then use the command:</p>
+<p>It will result in a <code>YAML</code> file in the current working folder containing all configurations in your environment. Again, I named the file <code>bioenv.yml</code> but you can choose whatever you like. Note that if you already have a <code>bioenv.yml</code> in your directory, it will be overwritten, so be&nbsp;careful.</p>
+<p>To restore this environment in your computer, or on other computer, first install miniconda again, and then use the&nbsp;command:</p>
 <div class="highlight"><pre><span></span><code>conda env create -f bioenv.yml
 </code></pre></div>
 
 
-<p>The <code>-f</code> flag means you are creating an environment using the configurations in the <code>bioenv.yml</code> file. The first line of the yml file sets the new environment's name, so you can change it in the file if you like. It will also restore the channels configured in the previous installation of miniconda.</p>
+<p>The <code>-f</code> flag means you are creating an environment using the configurations in the <code>bioenv.yml</code> file. The first line of the yml file sets the new environment&#8217;s name, so you can change it in the file if you like. It will also restore the channels configured in the previous installation of&nbsp;miniconda.</p>
 <h2>Conclusion</h2>
-<p>This is how I configured my system so I could use the major Bioinformatics tools out there. In summary, I:</p>
+<p>This is how I configured my system so I could use the major Bioinformatics tools out there. In summary,&nbsp;I:</p>
 <ul>
-<li>Prepared an Unix (Ubuntu) system;</li>
-<li>Installed miniconda, an environment manager;</li>
-<li>Configured channels so I could retrieve desired software;</li>
-<li>Created an environment, showed how to activate and deactivate it, and finally installed software in it;</li>
-<li>Showed how to backup your environment for safekeeping or sharing with others.</li>
+<li>Prepared an Unix (Ubuntu)&nbsp;system;</li>
+<li>Installed miniconda, an environment&nbsp;manager;</li>
+<li>Configured channels so I could retrieve desired&nbsp;software;</li>
+<li>Created an environment, showed how to activate and deactivate it, and finally installed software in&nbsp;it;</li>
+<li>Showed how to backup your environment for safekeeping or sharing with&nbsp;others.</li>
 </ul>
-<p>In future posts I will demo some uses of the installed programs I  in the new environment.</p>
+<p>In future posts I will demo some uses of the installed programs I  in the new&nbsp;environment.</p>
 <h2>References</h2>
-<p><a href="https://github.com/antoniocampos13/portfolio">My Portfolio</a></p>
-<p><a href="https://www.digitalocean.com/community/posts/trying-the-new-wsl-2-its-fast-windows-subsystem-for-linux">Trying the New WSL 2. It's Fast! (Windows Subsystem for Linux) | DigitalOcean</a></p>
+<p><a href="https://github.com/antoniocampos13/portfolio">My&nbsp;Portfolio</a></p>
+<p><a href="https://www.digitalocean.com/community/posts/trying-the-new-wsl-2-its-fast-windows-subsystem-for-linux">Trying the New <span class="caps">WSL</span> 2. It&#8217;s Fast! (Windows Subsystem for Linux) |&nbsp;DigitalOcean</a></p>
 <p><a href="https://conda.io/miniconda.html">Miniconda</a></p>
-<p><a href="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh">Miniconda installer</a></p>
-<p><a href="https://docs.conda.io/en/latest/miniconda.html#linux-installers">Miniconda &amp; Conda documentation</a></p>
-<p><a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html">Managing channels; conda 4.8.4.post65+1a0ab046 documentation</a></p>
-<p><a href="https://www.biostarhandbook.com/index.html">The Biostar Handbook: 2nd Edition</a></p>
+<p><a href="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh">Miniconda&nbsp;installer</a></p>
+<p><a href="https://docs.conda.io/en/latest/miniconda.html#linux-installers">Miniconda <span class="amp">&amp;</span> Conda&nbsp;documentation</a></p>
+<p><a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html">Managing channels; conda 4.8.4.post65+1a0ab046&nbsp;documentation</a></p>
+<p><a href="https://www.biostarhandbook.com/index.html">The Biostar Handbook: 2nd&nbsp;Edition</a></p>
   </div>
   <div class="tag-cloud">
     <p>
