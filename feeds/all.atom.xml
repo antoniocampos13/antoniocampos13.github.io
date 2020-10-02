@@ -53,16 +53,13 @@ esearch -db bioproject -query &lt;span class="s1"&gt;&amp;#39;vorinostat&amp;#39
 &lt;p&gt;Thus, I will once again pipe the results, this time to &lt;code&gt;xtract&lt;/code&gt; command. As its name implies, it extracts information from the &lt;code&gt;XML&lt;/code&gt; and formats into a tab-separated format that is easier to understand. I must input the flag &lt;code&gt;-pattern&lt;/code&gt; with the part of the &lt;code&gt;XML&lt;/code&gt; files that contains the desired information, which are &lt;code&gt;elements&lt;/code&gt;. In this example, I will search inside the &lt;code&gt;DocumentSummary&lt;/code&gt; for &lt;code&gt;ArchiveID@accession&lt;/code&gt; (project unique accession number), &lt;code&gt;ID&lt;/code&gt; (an auxiliary ID code to search for samples of said project), &lt;code&gt;Title&lt;/code&gt;(the title of the project),  &lt;code&gt;Description&lt;/code&gt; (normally an abstract of the project) and &lt;code&gt;Reference&lt;/code&gt; (a list of project-related papers in PubMed ids -- PMIDs, if available). Note that I am separating each argument with spaces, no quotes are necessary in this command.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# ...almost there ... (3/4)&lt;/span&gt;
 esearch -db bioproject -query &lt;span class="s1"&gt;&amp;#39;vorinostat&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; efetch -format native -mode xml &lt;span class="p"&gt;|&lt;/span&gt; xtract -pattern DocumentSummary -element ArchiveID@accession ID Title Description Reference
- &lt;span class="sb"&gt;```&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-Here is the tab-separated output of the same record displayed on my terminal:
 
-!&lt;span class="o"&gt;[&lt;/span&gt;esearch vorinostat xtract result&lt;span class="o"&gt;]({&lt;/span&gt;static&lt;span class="o"&gt;}&lt;/span&gt;/images/esearch_vorinostat_xtract_results.PNG&lt;span class="o"&gt;)&lt;/span&gt;
-
-Lastly, I will add a final &lt;span class="nb"&gt;command&lt;/span&gt; to transfer to a &lt;span class="nb"&gt;local&lt;/span&gt; text file &lt;span class="sb"&gt;`&lt;/span&gt;vorinostat_projects.txt&lt;span class="sb"&gt;`&lt;/span&gt; that will be saved in the current working directory.  Note that &lt;span class="k"&gt;if&lt;/span&gt; you have a identically-named file in the working directory, it will be overwritten, so be careful.
-
-&lt;span class="sb"&gt;```&lt;/span&gt;bash
-&lt;span class="c1"&gt;# Finally there! (4/4)&lt;/span&gt;
+&lt;p&gt;Here is the tab-separated output of the same record displayed on my terminal:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="esearch vorinostat xtract result" src="https://antoniocampos13.github.io/images/esearch_vorinostat_xtract_results.PNG"&gt;&lt;/p&gt;
+&lt;p&gt;Lastly, I will add a final command to transfer to a local text file &lt;code&gt;vorinostat_projects.txt&lt;/code&gt; that will be saved in the current working directory.  Note that if you have a identically-named file in the working directory, it will be overwritten, so be careful.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Finally there! (4/4)&lt;/span&gt;
 esearch -db bioproject -query &lt;span class="s1"&gt;&amp;#39;vorinostat&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; efetch -format native -mode xml &lt;span class="p"&gt;|&lt;/span&gt; xtract -pattern DocumentSummary -element ArchiveID@accession ID Reference Title Description &amp;gt; vorinostat_projects.txt
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 

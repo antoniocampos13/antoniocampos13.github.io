@@ -183,16 +183,13 @@ esearch -db bioproject -query <span class="s1">&#39;vorinostat&#39;</span> <span
 <p>Thus, I will once again pipe the results, this time to <code>xtract</code> command. As its name implies, it extracts information from the <code>XML</code> and formats into a tab-separated format that is easier to understand. I must input the flag <code>-pattern</code> with the part of the <code>XML</code> files that contains the desired information, which are <code>elements</code>. In this example, I will search inside the <code>DocumentSummary</code> for <code>ArchiveID@accession</code> (project unique accession number), <code>ID</code> (an auxiliary ID code to search for samples of said project), <code>Title</code>(the title of the project),  <code>Description</code> (normally an abstract of the project) and <code>Reference</code> (a list of project-related papers in PubMed ids -- PMIDs, if available). Note that I am separating each argument with spaces, no quotes are necessary in this command.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># ...almost there ... (3/4)</span>
 esearch -db bioproject -query <span class="s1">&#39;vorinostat&#39;</span> <span class="p">|</span> efetch -format native -mode xml <span class="p">|</span> xtract -pattern DocumentSummary -element ArchiveID@accession ID Title Description Reference
- <span class="sb">```</span>
+</code></pre></div>
 
-Here is the tab-separated output of the same record displayed on my terminal:
 
-!<span class="o">[</span>esearch vorinostat xtract result<span class="o">]({</span>static<span class="o">}</span>/images/esearch_vorinostat_xtract_results.PNG<span class="o">)</span>
-
-Lastly, I will add a final <span class="nb">command</span> to transfer to a <span class="nb">local</span> text file <span class="sb">`</span>vorinostat_projects.txt<span class="sb">`</span> that will be saved in the current working directory.  Note that <span class="k">if</span> you have a identically-named file in the working directory, it will be overwritten, so be careful.
-
-<span class="sb">```</span>bash
-<span class="c1"># Finally there! (4/4)</span>
+<p>Here is the tab-separated output of the same record displayed on my terminal:</p>
+<p><img alt="esearch vorinostat xtract result" src="https://antoniocampos13.github.io/images/esearch_vorinostat_xtract_results.PNG"></p>
+<p>Lastly, I will add a final command to transfer to a local text file <code>vorinostat_projects.txt</code> that will be saved in the current working directory.  Note that if you have a identically-named file in the working directory, it will be overwritten, so be careful.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Finally there! (4/4)</span>
 esearch -db bioproject -query <span class="s1">&#39;vorinostat&#39;</span> <span class="p">|</span> efetch -format native -mode xml <span class="p">|</span> xtract -pattern DocumentSummary -element ArchiveID@accession ID Reference Title Description &gt; vorinostat_projects.txt
 </code></pre></div>
 
