@@ -1,8 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Antonio's Portfolio - Unix</title><link href="https://antoniocampos13.github.io/" rel="alternate"></link><link href="https://antoniocampos13.github.io/feeds/unix.atom.xml" rel="self"></link><id>https://antoniocampos13.github.io/</id><updated>2020-09-30T18:00:00-03:00</updated><subtitle>PhD in Genetics</subtitle><entry><title>Setting Up Your Unix Computer for Bioinformatics Analysis</title><link href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html" rel="alternate"></link><published>2020-09-30T18:00:00-03:00</published><updated>2020-09-30T18:00:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2020-09-30:/setting-up-your-unix-computer-for-bioinformatics-analysis.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
-&lt;p&gt;In this post I will show how I set up my Unix machine to use Bioinformatics programs and tools. I am currently using Ubuntu 20.04 LTS (Focal Fossa) on a &lt;a href="https://www.digitalocean.com/community/posts/trying-the-new-wsl-2-its-fast-windows-subsystem-for-linux"&gt;Windows Subsystem for Linux (WSL2)&lt;/a&gt; on Windows 10, so no GUI today!&lt;/p&gt;
-&lt;p&gt;The code and files used here …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
-&lt;p&gt;In this post I will show how I set up my Unix machine to use Bioinformatics programs and tools. I am currently using Ubuntu 20.04 LTS (Focal Fossa) on a &lt;a href="https://www.digitalocean.com/community/posts/trying-the-new-wsl-2-its-fast-windows-subsystem-for-linux"&gt;Windows Subsystem for Linux (WSL2)&lt;/a&gt; on Windows 10, so no GUI today!&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Antonio's Portfolio - Unix</title><link href="https://antoniocampos13.github.io/" rel="alternate"></link><link href="https://antoniocampos13.github.io/feeds/unix.atom.xml" rel="self"></link><id>https://antoniocampos13.github.io/</id><updated>2020-10-02T18:00:00-03:00</updated><subtitle>PhD in Genetics</subtitle><entry><title>FASTQ to Variant Call (Part 2)</title><link href="https://antoniocampos13.github.io/fastq-to-variant-call-part-2.html" rel="alternate"></link><published>2020-10-02T18:00:00-03:00</published><updated>2020-10-02T18:00:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2020-10-02:/fastq-to-variant-call-part-2.html</id><summary type="html">&lt;p&gt;obtain raw reads from human genomes samples deposited in &lt;/p&gt;
+&lt;h2&gt;The FASTQ format&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;FASTQ&lt;/code&gt; file format is how we store the output of whole genome or transcriptomic sequencing (sequences of nucleotides). It inherits its name from the &lt;code&gt;FASTA&lt;/code&gt; format that stores and the word &lt;code&gt;Qualities&lt;/code&gt;, because a &lt;code&gt;FASTQ&lt;/code&gt; file not …&lt;/p&gt;</summary><content type="html">&lt;p&gt;obtain raw reads from human genomes samples deposited in &lt;/p&gt;
+&lt;h2&gt;The FASTQ format&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;FASTQ&lt;/code&gt; file format is how we store the output of whole genome or transcriptomic sequencing (sequences of nucleotides). It inherits its name from the &lt;code&gt;FASTA&lt;/code&gt; format that stores and the word &lt;code&gt;Qualities&lt;/code&gt;, because a &lt;code&gt;FASTQ&lt;/code&gt; file not only contains the nucleotide sequence, but also contains the quality of the sequencing procedure.&lt;/p&gt;
+&lt;p&gt;The qualities are represented by Phred scores (&lt;code&gt;Q&lt;/code&gt;), which is used to calculate the probability of a nucleotide being incorrectly identified during sequencing using a formula (I will not go into details here). So, for example, if we check a &lt;code&gt;FASTQ&lt;/code&gt; file and found a nucleotide with &lt;code&gt;Q = 30&lt;/code&gt;, it means that there is a probability of 1 in 1000 that it was incorrectly assigned during sequencing -- in other words an accuracy of 99.9%. Therefore, &lt;code&gt;Q&lt;/code&gt; values around 30 and above are generally seem as very good quality.&lt;/p&gt;
+&lt;h3&gt;The reason &lt;code&gt;FASTQ&lt;/code&gt; files contain information about quality&lt;/h3&gt;
+&lt;p&gt;Because during use of these kind of files, it is important that we have confidence on the sequence assignment. During processing in Bioinformatics analysis pipelines, we can remove low-quality nucleotides to ensure that he have the "cleanest" information possible.&lt;/p&gt;
+&lt;h3&gt;Obtaining FASTQ files&lt;/h3&gt;
+&lt;p&gt;We obtain &lt;code&gt;FASTQ&lt;/code&gt; after sequencing of genomic samples in platforms such as &lt;a href="https://www.illumina.com"&gt;Illumina&lt;/a&gt;. Normally, researchers deposit raw &lt;code&gt;FASTQ&lt;/code&gt; files on public databases to share their discoveries with other scientists. Thus, I will demonstrate how we download publicly-available &lt;code&gt;FASTQ&lt;/code&gt; files using the recently created &lt;code&gt;miniconda&lt;/code&gt; environment.&lt;/p&gt;
+&lt;h2&gt;A Warning&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;FASTQ&lt;/code&gt; files, especially from human samples, have very big sizes, in the gigabytes range. Since they are so big, considerable computing power and storage are needed to process these kind of files. Common domestic desktop PCs or laptops are inadequate, because they lack sufficient RAM and CPU processing power to perform smoothly during most Bioinformatic uses.&lt;/p&gt;
+&lt;p&gt;However, do not despair! I will demonstrate the script using especial &lt;code&gt;FASTQ&lt;/code&gt; (and other) files that have sufficiently small size so your PC can process it on a timely manner. The logic is: if the script is working in these small files, it should work with the "real deal".&lt;/p&gt;</content><category term="Unix"></category><category term="Bioinformatics"></category><category term="genomic variation"></category><category term="entrez-direct"></category><category term="EDirect"></category></entry><entry><title>FASTQ to Variant Call (Part 1)</title><link href="https://antoniocampos13.github.io/fastq-to-variant-call-part-1.html" rel="alternate"></link><published>2020-10-01T18:00:00-03:00</published><updated>2020-10-01T18:00:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2020-10-01:/fastq-to-variant-call-part-1.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;On my &lt;a href="{filename}/articles/2020-09-30_Setting_Up.md"&gt;previous post&lt;/a&gt;, I showed how to configure an Ubuntu system to install Bioinformatics programs.&lt;/p&gt;
+&lt;p&gt;Now, using the environment I created, I will demonstrate a bash script, &lt;code&gt;FasQ_to_VariantCall.sh&lt;/code&gt; that takes next generation sequencing (NGS) raw reads from human whole genome sequencing as input and produces variant annotation …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;On my &lt;a href="{filename}/articles/2020-09-30_Setting_Up.md"&gt;previous post&lt;/a&gt;, I showed how to configure an Ubuntu system to install Bioinformatics programs.&lt;/p&gt;
+&lt;p&gt;Now, using the environment I created, I will demonstrate a bash script, &lt;code&gt;FasQ_to_VariantCall.sh&lt;/code&gt; that takes next generation sequencing (NGS) raw reads from human whole genome sequencing as input and produces variant annotation as output. Variant annotation is the process of identifying genetic variants in some genomic DNA sample, and assess, for example, if any of the found variants have any effect on phenotype, such as increased susceptibility to certain diseases.&lt;/p&gt;
+&lt;p&gt;This demonstration will be separated in parts. Here in the first part, I will show how to search for NGS projects deposited in &lt;a href="https://www.ncbi.nlm.nih.gov/"&gt;National Center for Biotechnology Information (NCBI) databases&lt;/a&gt; from which I can download sequencing reads later to use with the script.&lt;/p&gt;
+&lt;h2&gt;Using NCBI's entrez-direct (EDirect) to retrieve FASTQ files&lt;/h2&gt;
+&lt;p&gt;I open my Unix terminal and activate the &lt;code&gt;bioenv&lt;/code&gt; environment:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;conda activate bioenv
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now I use the &lt;code&gt;EDirect&lt;/code&gt; &lt;code&gt;esearch&lt;/code&gt; command to search NCBI's databases. I must provide a database using the flag &lt;code&gt;-db&lt;/code&gt;. Check the available databases &lt;a href="https://www.ncbi.nlm.nih.gov/books/NBK25497/table/chapter2.T._entrez_unique_identifiers_ui/?report=objectonly"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I will search the &lt;code&gt;biproject&lt;/code&gt; database because it contains metadata from projects dealing with high-throughput genome sequencing, transcriptome expression analysis and so on. I must use the &lt;code&gt;-query&lt;/code&gt; flag to provide keywords for search. In this example, I will search for studies dealing with &lt;strong&gt;vorinostat&lt;/strong&gt;, a medicine that is have been used in experimental HIV-1 latency reversal, or "shock-and-kill" treatments.&lt;/p&gt;
+&lt;p&gt;Remember to use single quotes ('') enclosing the query, especially if it has several words.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# It is just the beginning... (1/4)&lt;/span&gt;
+esearch -db bioproject -query &lt;span class="s1"&gt;&amp;#39;vorinostat&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The output is just a &lt;code&gt;XML&lt;/code&gt; summary including, among other things, the number of results retrieved:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;&amp;lt;ENTREZ_DIRECT&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;Db&amp;gt;&lt;/span&gt;bioproject&lt;span class="nt"&gt;&amp;lt;/Db&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;WebEnv&amp;gt;&lt;/span&gt;MCID_5f7726730525f301023dc947&lt;span class="nt"&gt;&amp;lt;/WebEnv&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;QueryKey&amp;gt;&lt;/span&gt;1&lt;span class="nt"&gt;&amp;lt;/QueryKey&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;Count&amp;gt;&lt;/span&gt;61&lt;span class="nt"&gt;&amp;lt;/Count&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;Step&amp;gt;&lt;/span&gt;1&lt;span class="nt"&gt;&amp;lt;/Step&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/ENTREZ_DIRECT&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In this case, the query resulted in 61 results (check the &lt;code&gt;&amp;lt;count&amp;gt;&lt;/code&gt; tag). Thus, I will add more commands to retrieve the actual query results. I will pipe, i.e. transfer, the results of the query to the another command -- &lt;code&gt;efetch&lt;/code&gt; -- that will do this work for me. This is the pipe symbol: (&lt;code&gt;|&lt;/code&gt;)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# ... not there yet ... (2/4)&lt;/span&gt;
+esearch -db bioproject -query &lt;span class="s1"&gt;&amp;#39;vorinostat&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; efetch -format native -mode xml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The output is in &lt;code&gt;XML&lt;/code&gt; format, and it is unfortunately not very much human-readable. Here is a print screen showing the first result. Notice how the record is contained within a &lt;code&gt;&amp;lt;/DocumentSummary&amp;gt;&lt;/code&gt; node:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="esearch vorinostat XML result" src="https://antoniocampos13.github.io/images/esearch_vorinostat_xml_results.PNG"&gt;&lt;/p&gt;
+&lt;p&gt;Thus, I will once again pipe the results, this time to &lt;code&gt;xtract&lt;/code&gt; command. As its name implies, it extracts information from the &lt;code&gt;XML&lt;/code&gt; and formats into a tab-separated format that is easier to understand. I must input the flag &lt;code&gt;-pattern&lt;/code&gt; with the part of the &lt;code&gt;XML&lt;/code&gt; files that contains the desired information, which are &lt;code&gt;elements&lt;/code&gt;. In this example, I will search inside the &lt;code&gt;DocumentSummary&lt;/code&gt; for &lt;code&gt;ArchiveID@accession&lt;/code&gt; (project unique accession number), &lt;code&gt;ID&lt;/code&gt; (an auxiliary ID code to search for samples of said project), &lt;code&gt;Title&lt;/code&gt;(the title of the project),  &lt;code&gt;Description&lt;/code&gt; (normally an abstract of the project) and &lt;code&gt;Reference&lt;/code&gt; (a list of project-related papers in PubMed ids -- PMIDs, if available). Note that I am separating each argument with spaces, no quotes are necessary in this command.&lt;/p&gt;
+&lt;p&gt;```bash&lt;/p&gt;
+&lt;h1&gt;... almost there ... (3/4)&lt;/h1&gt;
+&lt;p&gt;esearch -db bioproject -query 'vorinostat' | efetch -format native -mode xml | xtract -pattern DocumentSummary -element ArchiveID@accession ID Title Description Reference
+ ```&lt;/p&gt;
+&lt;p&gt;Here is the tab-separated output of the same record displayed on my terminal:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="esearch vorinostat xtract result" src="https://antoniocampos13.github.io/images/esearch_vorinostat_xtract_results.PNG"&gt;&lt;/p&gt;
+&lt;p&gt;Lastly, I will add a final command to transfer to a local text file &lt;code&gt;vorinostat_projects.txt&lt;/code&gt; that will be saved in the current working directory.  Note that if you have a identically-named file in the working directory, it will be overwritten, so be careful.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Finally there! (4/4)&lt;/span&gt;
+esearch -db bioproject -query &lt;span class="s1"&gt;&amp;#39;vorinostat&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; efetch -format native -mode xml &lt;span class="p"&gt;|&lt;/span&gt; xtract -pattern DocumentSummary -element ArchiveID@accession ID Reference Title Description &amp;gt; vorinostat_projects.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;vorinostat_projects.txt&lt;/code&gt; file can then be imported into spreadsheets to make easier to organize and read the results.&lt;/p&gt;
+&lt;h2&gt;Refining the search&lt;/h2&gt;
+&lt;p&gt;The command above is a very basic one to search NCBI databases via &lt;code&gt;EDirect&lt;/code&gt;. I can create more elaborate queries by adding other keywords and filtering results. NCBI's search engines have several parameters. I advise you go to any advanced search page on the NCBI website to look for the available parameters.&lt;/p&gt;
+&lt;p&gt;Using &lt;a href="https://www.ncbi.nlm.nih.gov/bioproject/"&gt;&lt;code&gt;bioproject&lt;/code&gt;&lt;/a&gt; as example again, click on &lt;em&gt;Advanced&lt;/em&gt; to go the query constructor:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="BioProject search box" src="https://antoniocampos13.github.io/images/bioproject_start.PNG"&gt;&lt;/p&gt;
+&lt;p&gt;Using the &lt;strong&gt;BioProject Advanced Search Builder&lt;/strong&gt;, I will refine our search. I wish to include only projects that with samples deposited on &lt;a href="https://www.ncbi.nlm.nih.gov/sra"&gt;Sequence Read Archive (SRA)&lt;/a&gt;, from human samples and that investigated genetic variation. I input all of this into the search boxes:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Refining our search" src="https://antoniocampos13.github.io/images/vorinostat_refined.PNG"&gt;&lt;/p&gt;
+&lt;p&gt;Note that clicking in &lt;code&gt;Show index list&lt;/code&gt; will provide a list of curated terms. I used them to filter for "bioproject sra" and "variation" projects. To filter for organism, it is easier: I simply selected the Organism on the drop-down list on the left of the search box. Finally, I connected all keywords with the &lt;code&gt;AND&lt;/code&gt; Boolean constructor, resulting on the query:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;(((vorinostat) AND "bioproject sra"[Filter]) AND Homo sapiens[Organism]) AND "variation"[Filter]&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;You could continue the search on the website, of course, but let's go back to the terminal and continue from there:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;esearch -db bioproject -query &lt;span class="s1"&gt;&amp;#39;(((vorinostat) AND &amp;quot;bioproject sra&amp;quot;[Filter]) AND Homo sapiens[Organism]) AND &amp;quot;variation&amp;quot;[Filter]&amp;#39;&lt;/span&gt;  &lt;span class="p"&gt;|&lt;/span&gt; efetch -format native -mode xml &lt;span class="p"&gt;|&lt;/span&gt; xtract -pattern DocumentSummary -element ArchiveID@accession ID Reference Title Description  &amp;gt; vorinostat_refined.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Remember: single quotes enclosing the query. Turns out that this refined search was rather restrictive: it resulted in a single record. Checking the &lt;code&gt;vorinostat_refined.txt&lt;/code&gt; I see in the abstract that the project dealt with "DNA Seq data: biopsy samples from patients pre- and post- treated with Vorinostat; check mutations related to MAPKi-resistance" (MAPKi: Mitogen Activated Protein Kinase inhibitors). Although I had HIV-1-related projects in mind, that's fine for now, since it is suitable to &lt;code&gt;FasQ_to_VariantCall.sh&lt;/code&gt; script: identify and annotate genetic variation.&lt;/p&gt;
+&lt;p&gt;Then, I take note of the project ID: &lt;code&gt;PRJNA436005&lt;/code&gt;. I will use it to retrieve samples from this project by searching the SRA with it. &lt;/p&gt;
+&lt;h2&gt;Conclusion of Part 1&lt;/h2&gt;
+&lt;p&gt;In this part I showed how to:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;search NCBI's databases, (especially BioProject);&lt;/li&gt;
+&lt;li&gt;refine searches;&lt;/li&gt;
+&lt;li&gt;save search results into local, human-readable text files.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href="{filename}/articles/2020-10-02_FastQ_to_Variant_Call_Part2.md"&gt;Go to FASTQ to Variant Call (Part 2)&lt;/a&gt;&lt;/p&gt;</content><category term="Unix"></category><category term="Bioinformatics"></category><category term="genomic variation"></category><category term="entrez-direct"></category><category term="EDirect"></category></entry><entry><title>Setting Up Your Unix Computer for Bioinformatics Analysis</title><link href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html" rel="alternate"></link><published>2020-09-30T18:00:00-03:00</published><updated>2020-09-30T18:00:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2020-09-30:/setting-up-your-unix-computer-for-bioinformatics-analysis.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;In this post I will show how I set up my Unix machine to use Bioinformatics programs and tools. I am currently using Ubuntu 20.04 LTS (Focal Fossa) 64-bit on a &lt;a href="https://www.digitalocean.com/community/posts/trying-the-new-wsl-2-its-fast-windows-subsystem-for-linux"&gt;Windows Subsystem for Linux (WSL2)&lt;/a&gt; on Windows 10, so no GUI today!&lt;/p&gt;
+&lt;p&gt;The code and files used …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;In this post I will show how I set up my Unix machine to use Bioinformatics programs and tools. I am currently using Ubuntu 20.04 LTS (Focal Fossa) 64-bit on a &lt;a href="https://www.digitalocean.com/community/posts/trying-the-new-wsl-2-its-fast-windows-subsystem-for-linux"&gt;Windows Subsystem for Linux (WSL2)&lt;/a&gt; on Windows 10, so no GUI today!&lt;/p&gt;
 &lt;p&gt;The code and files used here can be retrieved from &lt;a href="https://github.com/antoniocampos13/portfolio/tree/master/Unix/2020-09-30_Setting%20Up%20Your%20Unix%20Computer%20for%20Bioinformatics%20Analysis"&gt;this post corresponding folder on my portfolio&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;Preparing the system&lt;/h2&gt;
 &lt;p&gt;First, it is recommended that we upgrade the system. Open the command line terminal in your machine and copy and paste or type the following commands, pressing Enter after each one (make sure you type your password correctly whenever asked):&lt;/p&gt;
@@ -11,7 +98,7 @@ sudo apt-get upgrade
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Then we must install some useful libraries, especially to be sure that all future libraries we need will be installed and work properly. Some of these (e.g. default-jdk, the Java libraries), may already be installed in your system, but just to ensure:&lt;/p&gt;
+&lt;p&gt;Then I must install some useful libraries, especially to be sure that all future libraries I need will be installed and work properly. Some of these (e.g. default-jdk, the Java libraries), may already be installed in your system, but just to ensure:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo apt-get install -y curl unzip build-essential ncurses-dev
 sudo apt-get install -y byacc zlib1g-dev python-dev git cmake
 sudo apt-get install -y default-jdk ant
@@ -19,8 +106,8 @@ sudo apt-get install -y default-jdk ant
 
 
 &lt;h2&gt;Installing (mini)conda&lt;/h2&gt;
-&lt;p&gt;Now we will install &lt;a href="https://conda.io/miniconda.html"&gt;miniconda&lt;/a&gt;. What is miniconda? Miniconda is a simplified version of Conda, an environment management system. Every program we install on your computers depend on other programs to work. So if a program X needs a program Y to work, it may stop working if Y gets an update that for some reason is incompatible with the original X program.&lt;/p&gt;
-&lt;p&gt;Thus, environments were developed to solve this kind of problem, because they serve to isolate groups of programs, ensuring only compatible versions of software are working together. Therefore, miniconda serves to create and manage environments. The best practice is that we should create one environment for one specific use. In my case, I installed miniconda to create a environment and populate it with tools used for several Bioinformatics analysis. Other people can create environments for other uses with specific programs needed and so on. Other advantage of miniconda is that the configuration files for environments can be shared with others, ensuring &lt;strong&gt;backup&lt;/strong&gt; and &lt;strong&gt;reproducibility&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Now I will install &lt;a href="https://conda.io/miniconda.html"&gt;miniconda&lt;/a&gt;. What is miniconda? Miniconda is a simplified version of Conda, an environment management system. Every program we install on our computers depend on other programs to work. So if a program X needs a program Y to work, it may stop working if Y gets an update that for some reason is incompatible with the original X program.&lt;/p&gt;
+&lt;p&gt;Thus, environments were developed to solve this kind of problem, because they serve to isolate groups of programs, ensuring only compatible versions of software are working together. Therefore, miniconda serves to create and manage environments. The best practice is that one should create one environment for one specific use. In my case, I installed miniconda to create a environment and populate it with tools used for several Bioinformatics analysis. Other people can create environments for other uses with specific programs needed and so on. Other advantage of miniconda is that the configuration files for environments can be shared with others, ensuring &lt;strong&gt;backup&lt;/strong&gt; and &lt;strong&gt;reproducibility&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;Without further ado, let's finally install miniconda. Since I am using a Unix with Python 3.7.7 pre-installed, the version of the installer &lt;a href="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"&gt;is this one&lt;/a&gt;. Check the &lt;a href="https://docs.conda.io/en/latest/miniconda.html#linux-installers"&gt;installation page&lt;/a&gt; if you have a different Python version.&lt;/p&gt;
 &lt;p&gt;You can download the installer from your browser or via command line:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
@@ -34,7 +121,7 @@ sudo apt-get install -y default-jdk ant
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;When the installation finishes, we must initialize conda:&lt;/p&gt;
+&lt;p&gt;When the installation finishes, I must initialize conda:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;miniconda3/condabin/conda init
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
@@ -44,7 +131,7 @@ sudo apt-get install -y default-jdk ant
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Then, I added two &lt;strong&gt;channels&lt;/strong&gt;. Channels are &lt;a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html"&gt;"the locations where packages are stored"&lt;/a&gt;. Miniconda has the &lt;code&gt;defaults&lt;/code&gt; channel pre-configured. The two channels in question are dedicated to Bioinformatics and Data analysis programs, which may not be present in the default channels, so we must add them.&lt;/p&gt;
+&lt;p&gt;Then, I added two &lt;strong&gt;channels&lt;/strong&gt;. Channels are &lt;a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html"&gt;"the locations where packages are stored"&lt;/a&gt;. Miniconda has the &lt;code&gt;defaults&lt;/code&gt; channel pre-configured. The two channels in question are dedicated to Bioinformatics and Data analysis programs, which may not be present in the default channels, so I must add them.&lt;/p&gt;
 &lt;h2&gt;Configuring miniconda channels&lt;/h2&gt;
 &lt;p&gt;Once again in the terminal enter the following commands:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;conda config --add channels bioconda
@@ -54,18 +141,18 @@ conda config --add channels conda-forge
 
 &lt;p&gt;Miniconda sets up priorities in the list of channels it receives. When we need to install some program, miniconda will search in the higher-priority channels first, then in the channels with lower-priority. "Different channels can have the same package" and you can "safely put channels at the bottom of your channel list to provide additional packages that are not in the default channels" as stated in the &lt;a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html"&gt;official website&lt;/a&gt;. The flag &lt;code&gt;--add&lt;/code&gt; adds the respective channels (&lt;code&gt;bioconda&lt;/code&gt; and &lt;code&gt;conda-forge&lt;/code&gt;) to the &lt;strong&gt;top&lt;/strong&gt; of the priorities list. If you want to give lower priority, putting them in the &lt;strong&gt;bottom&lt;/strong&gt; of the list, use the &lt;code&gt;--append&lt;/code&gt; command instead. Thus, according to the command above, the order of channel priorities in our new miniconda installation will be: &lt;code&gt;conda-forge&lt;/code&gt;, &lt;code&gt;bioconda&lt;/code&gt; and lastly, &lt;code&gt;defaults&lt;/code&gt;.&lt;/p&gt;
 &lt;h2&gt;Create an environment for Bioinformatics programs&lt;/h2&gt;
-&lt;p&gt;Now that miniconda is configured, we will create the environment that will receive them. I will name it &lt;code&gt;bioenv&lt;/code&gt;. You can choose whatever name you like! &lt;/p&gt;
+&lt;p&gt;Now that miniconda is configured, I will create the environment that will receive them. I will name it &lt;code&gt;bioenv&lt;/code&gt;. You can choose whatever name you like! &lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;conda create -y --name bioenv &lt;span class="nv"&gt;python&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;.8
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;h2&gt;Activating and deactivating an environment&lt;/h2&gt;
-&lt;p&gt;With the &lt;code&gt;bioenv&lt;/code&gt; created, we must &lt;strong&gt;activate&lt;/strong&gt; it:&lt;/p&gt;
+&lt;p&gt;With the &lt;code&gt;bioenv&lt;/code&gt; created, I must &lt;strong&gt;activate&lt;/strong&gt; it:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;conda activate bioenv
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;We need to perform this step every time we want to use the programs that we will install in this environment. If you do not need to use the environment for the moment, simply &lt;strong&gt;deactivate&lt;/strong&gt; it:&lt;/p&gt;
+&lt;p&gt;I need to perform this step every time I want to use the programs that I will install in this environment. If you do not need to use the environment for the moment, simply &lt;strong&gt;deactivate&lt;/strong&gt; it:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;conda deactivate
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
@@ -99,7 +186,7 @@ conda config --add channels conda-forge
 &lt;li&gt;Created an environment, showed how to activate and deactivate it, and finally installed software in it;&lt;/li&gt;
 &lt;li&gt;Showed how to backup your environment for safekeeping or sharing with others.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;In future posts I will demo some uses of the programs I installed in the new environment.&lt;/p&gt;
+&lt;p&gt;In future posts I will demo some uses of the installed programs I  in the new environment.&lt;/p&gt;
 &lt;h2&gt;References&lt;/h2&gt;
 &lt;p&gt;&lt;a href="https://github.com/antoniocampos13/portfolio"&gt;My Portfolio&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://www.digitalocean.com/community/posts/trying-the-new-wsl-2-its-fast-windows-subsystem-for-linux"&gt;Trying the New WSL 2. It's Fast! (Windows Subsystem for Linux) | DigitalOcean&lt;/a&gt;&lt;/p&gt;
