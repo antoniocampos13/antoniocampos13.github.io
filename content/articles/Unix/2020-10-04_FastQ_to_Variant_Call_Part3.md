@@ -34,7 +34,6 @@ vep_install -a cf -s homo_sapiens_refseq -y GRCh38 -c . –CONVERT
 
 By default, the cache will be installed into a hidden folder in your home folder (`/home/<YOUR_USER_NAME>/.vep`). Thus, it is expected that different miniconda environments on the same system can find this cache. You may backup the `.vep/` folder to avoid downloading the whole thing again (but consider to download newer versions of the cache as they become available though). Remember to restore it to the equivalent location as needed (again: `/home/<YOUR_USER_NAME>/.vep`).
 
-
 ### Ensuring that the script will use the correct miniconda environment
 
 ## GPL License and Copyright Notice

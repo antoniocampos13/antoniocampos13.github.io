@@ -2,3 +2,4 @@ output/
 __pycache__/
 link_extractor.py
 content/.vscode/settings.json
+.vscode/
