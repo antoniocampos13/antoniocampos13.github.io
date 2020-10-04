@@ -220,7 +220,7 @@ conda config --add channels conda-forge
 
 <h2>Backing up and restoring your environment&nbsp;configuration</h2>
 <p>Miniconda has a special command to backup your environment configuration. <strong>Activate</strong> (if needed) the environment you want to backup and enter the&nbsp;command:</p>
-<div class="highlight"><pre><span></span><code>conda env <span class="nb">export</span> &gt; bioenv.yml
+<div class="highlight"><pre><span></span><code>conda env <span class="nb">export</span> <span class="p">|</span> grep -v <span class="s2">&quot;prefix&quot;</span> &gt; bioenv.yml
 </code></pre></div>
 
 
