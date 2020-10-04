@@ -8,7 +8,7 @@ Tags: Bioinformatics, genomic variation, entrez-direct, EDirect
 
 ## Introduction
 
-On my [previous post](https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html), I showed how to configure an Ubuntu system to install Bioinformatics programs.
+In my [previous post](https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html), I showed how to configure an Ubuntu system to install Bioinformatics programs.
 
 Now, using the environment I created, I will demonstrate a bash script, `FasQ_to_VariantCall.sh` that takes next generation sequencing (NGS) raw reads from human whole genome sequencing as input and produces variant annotation as output. Variant annotation is the process of identifying genetic variants in some genomic DNA sample, and assess, for example, if any of the found variants have any effect on phenotype, such as increased susceptibility to certain diseases.
 

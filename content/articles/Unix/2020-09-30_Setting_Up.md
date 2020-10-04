@@ -112,7 +112,7 @@ cat bioenv.txt | xargs conda install -y
 Miniconda has a special command to backup your environment configuration. **Activate** (if needed) the environment you want to backup and enter the command:
 
 ```bash
-conda env export > bioenv.yml
+conda env export | grep -v "prefix" > bioenv.yml
 ```
 
 It will result in a `YAML` file in the current working folder containing all configurations in your environment. Again, I named the file `bioenv.yml` but you can choose whatever you like. Note that if you already have a `bioenv.yml` in your directory, it will be overwritten, so be careful.
