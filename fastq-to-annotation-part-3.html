@@ -47,7 +47,7 @@
 <meta property="og:title" content="FASTQ to Annotation (Part 3)"/>
 <meta property="og:description" content="Introduction In a previous post, I showed how to configure an Ubuntu system to install Bioinformatics programs. Now, using the environment I created, I will demonstrate a bash script, FastQ_to_Annotation.sh that takes next generation sequencing (NGS) raw reads from human whole genome sequencing as input and produces variant annotation …"/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://antoniocampos13.github.io/drafts/fastq-to-annotation-part-3.html"/>
+<meta property="og:url" content="https://antoniocampos13.github.io/fastq-to-annotation-part-3.html"/>
 <meta property="og:type" content="article"/>
 <meta property="article:published_time" content="2020-10-05 18:00:00-03:00"/>
 <meta property="article:modified_time" content=""/>
@@ -150,12 +150,17 @@
 <p><em>Now, using the environment I created, I will demonstrate a bash script, <code>FastQ_to_Annotation.sh</code> that takes next generation sequencing (<span class="caps">NGS</span>) raw reads from human whole genome sequencing as input and produces variant annotation as output. Variant annotation is the process of identifying genetic variants in some genomic <span class="caps">DNA</span> sample, and assess, for example, if any of the found variants have any effect on phenotype, such as increased susceptibility to certain&nbsp;diseases.</em></p>
 <p><em>In the <a href="https://antoniocampos13.github.io/fastq-to-annotation-part-1">first part</a>, I showed how to search for <span class="caps">NGS</span> projects deposited in <a href="https://www.ncbi.nlm.nih.gov/">National Center for Biotechnology Information (<span class="caps">NCBI</span>) databases</a> from which I can download sequencing reads later to use with the&nbsp;script.</em></p>
 <p><em>In the <a href="https://antoniocampos13.github.io/fastq-to-annotation-part-2">second part</a>, I showed how to retrieve raw genome sequencing reads in the form of <code>FASTQ</code> files, which are deposited in <a href="https://www.ncbi.nlm.nih.gov/sra"><span class="caps">SRA</span></a>.</em></p>
-<p>Here in the third part, I make the final preparations for the <code>FastQ_to_Annotation.sh</code> script demonstration using the <code>FASTQ</code> files obtained in the <a href="https://antoniocampos13.github.io/fastq-to-annotation-part-2">previous part</a>.</p>
+<p>Here in the third part, I make the final preparations for the <code>FastQ_to_Annotation.sh</code> script demonstration using the <code>FASTQ</code> files obtained in the previous&nbsp;part.</p>
 <h2>Final&nbsp;preparations</h2>
 <h3>Installing local cache of Ensembl Variant Effect Predictor (<span class="caps">VEP</span>)</h3>
-<p>The <a href="https://www.ensembl.org/info/docs/tools/vep/index.html">Ensembl Variant Effect Predictor (<span class="caps">VEP</span>)</a> is the core tool used by the script for the annotation of the effects of any variants present in the sample. It may be used online, but Ensembl recommends to download and install a local cache of all data deposited in the tool to avoid server overload Open a terminal and execute the commands&nbsp;below:</p>
+<p>The <a href="https://www.ensembl.org/info/docs/tools/vep/index.html">Ensembl Variant Effect Predictor (<span class="caps">VEP</span>)</a> is the core tool used by the script for the annotation of the effects of any variants present in the sample. It may be used online, but Ensembl strongly recommends users to download and install a local cache of all data deposited in the tool to avoid server overload. I open a terminal, activate the <code>bioenv</code> miniconda environment and execute the commands&nbsp;below:</p>
 <p><strong><span class="caps">WARNING</span>: Several gigabytes of data will be downloaded from the internet and installed on your computer. Be sure that you have plenty or unlimited data allowances from your <span class="caps">ISP</span> and sufficient free space on your hard drive before continuing. It will take a while (several minutes to hours) until all the needed processes&nbsp;finish.</strong></p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Download the compressed cache</span>
+<div class="highlight"><pre><span></span><code>vep_install -a cf -s homo_sapiens_refseq -y GRCh38 -c . –CONVERT
+</code></pre></div>
+
+
+<p>Unfortunately, the command above is prone to network and other esoteric errors. If you have any problem, you can try an alternative manner. See&nbsp;below:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Alternative: manually download the compressed cache</span>
 wget ftp://ftp.ensembl.org/pub/release-101/variation/indexed_vep_cache/homo_sapiens_refseq_vep_101_GRCh38.tar.gz -P <span class="nv">$HOME</span>/.vep
 
 <span class="c1"># Uncompress the cache</span>
@@ -168,20 +173,20 @@ tar -zxf <span class="nv">$HOME</span>/.vep/homo_sapiens_refseq_vep_101_GRCh38.t
 <p>The annotation process require a collection of reference files. These files will assist us to generate a &#8220;list&#8221; of genetic variants, alongside their possible effects on the phenotype (the <strong>annotation</strong>).</p>
 <p>These files&nbsp;are:</p>
 <ol>
-<li>A <code>FASTA</code> file (extensions <code>.fasta</code>, <code>.fa</code> or <code>.fna</code>). It must contain the complete nucleotide sequence of the human genome. We will compare our <code>FASTQ</code> files against&nbsp;it;</li>
-<li>A <code>FASTA index</code> (<code>.fai</code>). It stores genomic regions as coordinates. We will use it to generate a Browser Extensible Data (<code>.bed</code>) file (see&nbsp;below);</li>
-<li>A Browser Extensible Data (<code>.bed</code>) file. It stores genomic regions as coordinates, indicating the start and end of chromosomes. It is most useful when its information is chromosome-ordered and&nbsp;position-sorted;</li>
-<li>Alternatively, the <code>FastQ_to_Annotation.sh</code> script can accept a General Feature Format (<code>.gff</code>) instead of the <code>.bed</code> file. It is used for describing genes and other features of <span class="caps">DNA</span>, <span class="caps">RNA</span> and protein&nbsp;sequences.</li>
-<li>Burrows-Wheelers Aligner index files (<code>.amb</code>, <code>.ann</code>, <code>.bwt</code>, <code>.pac</code> and <code>.sa</code>). The <code>bwa</code> program is a short read alignment tool. In other words, it identifies the location of the reads inside the <code>FASTQ</code> files. The <code>FastQ_to_Annotation.sh</code> script uses <code>bwa</code> at the start of the pipeline. It works by efficiently using this collection of five files as a&nbsp;index.</li>
+<li>A <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&amp;PAGE_TYPE=BlastDocs&amp;DOC_TYPE=BlastHelp"><code>FASTA</code></a> file (extensions <code>.fasta</code>, <code>.fa</code> or <code>.fna</code>). It must contain the complete nucleotide sequence of the human genome. We will compare our <code>FASTQ</code> files against&nbsp;it;</li>
+<li>A <a href="http://www.htslib.org/doc/faidx.html"><code>FASTA index</code></a> (<code>.fai</code>). It stores genomic regions as coordinates. We will use it to generate a Browser Extensible Data (<code>.bed</code>) file (see&nbsp;below);</li>
+<li>A <a href="https://en.wikipedia.org/wiki/BED_(file_format)">Browser Extensible Data (<code>.bed</code>)</a> file. It stores genomic regions as coordinates, indicating the start and end of chromosomes. It is most useful when its information is chromosome-ordered and&nbsp;position-sorted;</li>
+<li>Alternatively, the <code>FastQ_to_Annotation.sh</code> script can accept a <a href="https://www.ensembl.org/info/website/upload/gff.html">General Feature Format (<code>.gff</code>)</a> instead of the <code>.bed</code> file. It is used for describing genes and other features of <span class="caps">DNA</span>, <span class="caps">RNA</span> and protein&nbsp;sequences;</li>
+<li>Burrows-Wheelers Aligner index files (<code>.amb</code>, <code>.ann</code>, <code>.bwt</code>, <code>.pac</code> and <code>.sa</code>). The <a href="http://bio-bwa.sourceforge.net/"><code>bwa</code> program</a> is a short read alignment tool. In other words, it identifies the location of the reads inside the <code>FASTQ</code> files. The <code>FastQ_to_Annotation.sh</code> script uses <code>bwa</code> at the second step of the pipeline. It works by efficiently using this collection of five files as a&nbsp;index.</li>
 </ol>
-<p><em>Why we need so much these files?</em> Briefly, They serve to map the genomic location of any variant we identify in our samples, as well as the genetic mutation that occurred there, which allows us to predict the possible effect(s) over the phenotype in question (in our case, MAPKi-resistance in melanoma samples). If we compare the genetic variation profile of MAPKi-susceptible samples with MAPKi-resistant samples, we could identify genetic variants associated with the resistances, and perhaps point to new directions of prognosis and new&nbsp;treatments.</p>
-<p>I will now show how to obtain all these files. Remember to <strong>activate</strong> the <code>miniconda</code> that you created&nbsp;before.</p>
+<p><em>Why we need these files?</em> Briefly, They serve to map the genomic location of any variant we identify in our samples, as well as the genetic mutation that occurred there, which allows us to predict the possible effect(s) over the phenotype in question (in our case, MAPKi-resistance in melanoma samples). If we compare the genetic variation profile of MAPKi-susceptible samples with MAPKi-resistant samples, we could identify genetic variants associated with the resistances, and perhaps point to new directions of prognosis and new&nbsp;treatments.</p>
+<p>I will now show how to obtain all these files. Remember to <strong>activate</strong> the <code>miniconda</code> that you created before if&nbsp;necessary.</p>
 <p><strong><span class="caps">WARNING</span>: Several gigabytes of data will be downloaded from the internet and installed on your computer. Be sure that you have plenty or unlimited data allowances from your <span class="caps">ISP</span> and sufficient free space on your hard drive before continuing. It will take a while (several minutes to hours) until all the needed processes&nbsp;finish.</strong></p>
 <h4>1. Human genome <span class="caps">FASTA</span></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># First, create a subfolder into a demo folder to better organize our reference files</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># First, create a subfolder into the demo folder to better organize our reference files</span>
 <span class="nb">cd</span> demo
-mkdir demo/refs
-<span class="nb">cd</span> demo/refs
+mkdir refs
+<span class="nb">cd</span> refs
 
 <span class="c1"># Download GRCh38 major release without ALT contigs and with decoy genomes (EBV and hs38d1 contig) from NCBI&#39;s FTP server</span>
 curl -O ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.28_GRCh38.p13/GRCh38_major_release_seqs_for_alignment_pipelines/GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.gz
@@ -207,62 +212,40 @@ curl -O ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.28_
 
 
 <h4>5. bwa index&nbsp;files</h4>
-<div class="highlight"><pre><span></span><code>bwa index GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna
+<div class="highlight"><pre><span></span><code>bwa index GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.gz
 </code></pre></div>
 
 
 <p>When you complete all of the steps in Part 1, Part 2 and in this part, your <code>demo</code> folder should have the files showed&nbsp;below</p>
 <p><img alt="demo folder contents until now" src="https://antoniocampos13.github.io/images/demo_folder.PNG"></p>
-<p>Now, go to the folder <a href="https://github.com/antoniocampos13/portfolio/tree/master/Unix/2020-10-01_Fastq%20to%20Annotation"><code>FastQ_to_Annotation</code> folder in my porfolio</a>, take heed of the <span class="caps">GPL</span> License and Copyright Notice, download and copy the <code>FastQ_to_Annotation.sh</code> script into your <code>demo</code> folder.</p>
+<p>Now, go to the folder <a href="https://github.com/antoniocampos13/portfolio/tree/master/Unix/2020-10-01_Fastq%20to%20Annotation"><code>FastQ_to_Annotation</code> folder in my portfolio</a>, take heed of the <span class="caps">GPL</span> License and Copyright Notice, download and copy the <code>FastQ_to_Annotation.sh</code> script into your <code>demo</code> folder.</p>
 <p>Thus, the only mandatory files are the <code>FastQ_to_Annotation.sh</code>, the <code>FASTQ</code> pair and the ones in the <code>refs</code> folder. If you are missing any other file, do not&nbsp;worry.</p>
-<p>Notice that the <code>FASTQ</code> files and <code>refs</code> folder is missing in the <code>demo</code> counterpart in my portfolio due to size limitations of uploads to GitHub. If for some reason you can not download all the necessary data, check the Addendum in the end of this&nbsp;post.</p>
 <h2><span class="caps">GPL</span> License and Copyright&nbsp;Notice</h2>
-<p>The <code>FastQ_to_Annotation.sh</code> script is a modified version from <a href="https://github.com/kevinblighe/ClinicalGradeDNAseq">Dr. Kevin Blighe&#8217;s original scripts</a>. Both works are licensed under <a href="http://www.gnu.org/licenses"><span class="caps">GNU</span> General Public License v3.0</a>.</p>
+<p>The <code>FastQ_to_Annotation.sh</code> script is a modified version from <a href="https://github.com/kevinblighe/ClinicalGradeDNAseq">Dr. Kevin Blighe&#8217;s original scripts</a>. Both works are licensed under <a href="https://www.gnu.org/licenses/licenses.en.html"><span class="caps">GNU</span> General Public License v3.0</a>.</p>
+<h2>Conclusion of Part&nbsp;3</h2>
+<p>In this part I showed how&nbsp;to:</p>
+<ul>
+<li>Set up <span class="caps">VEP</span> local&nbsp;cache;</li>
+<li>Obtain human genome reference&nbsp;files;</li>
+<li>Obtain auxiliary files needed for short read&nbsp;alignment.</li>
+</ul>
+<p>Finally, everything is in place for the <code>FastQ_to_Annotation.sh</code> script.</p>
+<p><em><a href="https://antoniocampos13.github.io/fastq-to-annotation-part-4">Go to <span class="caps">FASTQ</span> to Annotation (Part&nbsp;4)</a></em></p>
+<p><em><a href="https://antoniocampos13.github.io/fastq-to-annotation-part-1">Go back to <span class="caps">FASTQ</span> to Annotation (Part&nbsp;1)</a></em></p>
+<p><em><a href="https://antoniocampos13.github.io/fastq-to-annotation-part-2">Go back to <span class="caps">FASTQ</span> to Annotation (Part&nbsp;2)</a></em></p>
 <h2>References</h2>
-<p><a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html">Setting Up Your Unix Computer for Bioinformatics&nbsp;Analysis</a></p>
-<p><a href="https://antoniocampos13.github.io/fastq-to-annotation-part-1"><span class="caps">FASTQ</span> to Annotation (Part&nbsp;1)</a></p>
-<p><a href="https://antoniocampos13.github.io/fastq-to-annotation-part-2"><span class="caps">FASTQ</span> to Annotation (Part&nbsp;2)</a></p>
 <p><a href="https://www.ncbi.nlm.nih.gov/">National Center for Biotechnology&nbsp;Information</a></p>
 <p><a href="https://www.ncbi.nlm.nih.gov/sra">Home - <span class="caps">SRA</span> - <span class="caps">NCBI</span></a></p>
 <p><a href="https://www.ensembl.org/info/docs/tools/vep/index.html">Ensembl Variant Effect Predictor (<span class="caps">VEP</span>)</a></p>
-<p><a href="ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.28_GRCh38.p13/GRCh38_major_release_seqs_for_alignment_pipelines/"><span class="caps">NCBI</span>&#8217;s <span class="caps">FTP</span> Server | GRCh38 major release sequences for alignment&nbsp;pipelines</a></p>
-<p><a href="ftp://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/dna/">Ensembl&#8217;s <span class="caps">FTP</span> Server | Homo sapiens sequences - Release&nbsp;101</a></p>
-<h2>Addendum</h2>
-<p>If it is not possible to download all the necessary data, or you computer is not powerful enough to perform the necessary tasks, you can generate special reduced-size files just to test the script. Activate your miniconda environment and type the&nbsp;command:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Go to your demo folder</span>
-<span class="nb">cd</span> demo
-
-<span class="c1"># Download just a subset of the read set spots</span>
-fastq-dump -X <span class="m">10000</span> --split-files SRR6784104 --gzip
-</code></pre></div>
-
-
-<p>It is a &#8220;trick&#8221; to download only a subset of the spots (the first 10,000 spots from the more than 25 million spots in the read set, with the -X&nbsp;flag)</p>
-<p>Now, for the reference files, the idea is to download the <code>FASTA</code> file of the chromosome 22, one of the smallest human chromosomes, to use it as a &#8220;mini-reference&#8221;. Follow the steps&nbsp;below:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Go to your refs folder</span>
-<span class="nb">cd</span> demo/refs
-
-<span class="c1"># Download chromosome 22 FASTA</span>
-curl -O ftp://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.22.fa.gz
-
-<span class="c1"># Uncompress the chromosome 22 FASTA</span>
-gunzip Homo_sapiens.GRCh38.dna.chromosome.22.fa.gz
-
-<span class="c1"># Rename it for simplicity</span>
-mv Homo_sapiens.GRCh38.dna.chromosome.22.fa chr22.fa
-
-<span class="c1"># Produce FASTA index with samtools</span>
-samtools faidx chr22.fa
-
-<span class="c1"># Produce sorted BED file from reference FASTA index file</span>
-awk <span class="s1">&#39;{print $1 &quot;\t0\t&quot; $2}&#39;</span> chr22.fa.fai <span class="p">|</span> sort -k1,1V -k2,2n &gt; chr22.bed
-
-<span class="c1"># Index with bwa</span>
-bwa index chr22.fa
-</code></pre></div>
-
-
-<p>With these special files, you cant test the script in a timely&nbsp;manner.</p>
+<p><a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&amp;PAGE_TYPE=BlastDocs&amp;DOC_TYPE=BlastHelp"><span class="caps">BLAST</span> Topics | Query Input and database&nbsp;selection</a></p>
+<p><a href="http://www.htslib.org/doc/faidx.html">faidx(5) manual&nbsp;page</a></p>
+<p><a href="https://en.wikipedia.org/wiki/BED_(file_format)"><span class="caps">BED</span> (file format) -&nbsp;Wikipedia</a></p>
+<p><a href="https://www.ensembl.org/info/website/upload/gff.html"><span class="caps">GFF</span>/<span class="caps">GTF</span> File&nbsp;Format</a></p>
+<p><a href="http://bio-bwa.sourceforge.net/">Burrows-Wheeler&nbsp;Aligner</a></p>
+<p><a href="https://github.com/kevinblighe/ClinicalGradeDNAseq">kevinblighe/ClinicalGradeDNAseq</a></p>
+<p><a href="https://www.gnu.org/licenses/licenses.en.html"><span class="caps">GNU</span> General Public&nbsp;License</a></p>
+<p><a href="http://ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.28_GRCh38.p13/GRCh38_major_release_seqs_for_alignment_pipelines/"><span class="caps">NCBI</span>&#8217;s <span class="caps">FTP</span> Server | GRCh38 Major release sequences for alignment&nbsp;pipelines</a></p>
+<p><a href="http://ftp://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/dna/">Ensembl&#8217;s <span class="caps">FTP</span> Server | Homo sapiens <span class="caps">DNA</span> sequences release&nbsp;101</a></p>
   </div>
   <div class="tag-cloud">
     <p>

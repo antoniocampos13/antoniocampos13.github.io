@@ -47,7 +47,7 @@
 <meta property="og:title" content="FASTQ to Annotation (Part 1)"/>
 <meta property="og:description" content="Introduction In my previous post, I showed how to configure an Ubuntu system to install Bioinformatics programs. Now, using the environment I created, I will demonstrate a bash script, FastQ_to_Annotation.sh that takes next generation sequencing (NGS) raw reads from human whole genome sequencing as input and produces variant annotation …"/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://antoniocampos13.github.io/drafts/fastq-to-annotation-part-1.html"/>
+<meta property="og:url" content="https://antoniocampos13.github.io/fastq-to-annotation-part-1.html"/>
 <meta property="og:type" content="article"/>
 <meta property="article:published_time" content="2020-10-01 18:00:00-03:00"/>
 <meta property="article:modified_time" content=""/>
@@ -148,7 +148,7 @@
     <h2>Introduction</h2>
 <p>In my <a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html">previous post</a>, I showed how to configure an Ubuntu system to install Bioinformatics&nbsp;programs.</p>
 <p>Now, using the environment I created, I will demonstrate a bash script, <code>FastQ_to_Annotation.sh</code> that takes next generation sequencing (<span class="caps">NGS</span>) raw reads from human whole genome sequencing as input and produces variant annotation as output. Variant annotation is the process of identifying genetic variants in some genomic <span class="caps">DNA</span> sample, and assess, for example, if any of the found variants have any effect on phenotype, such as increased susceptibility to certain&nbsp;diseases.</p>
-<p>This demonstration will be separated in parts. Here in the first part, I will show how to search for <span class="caps">NGS</span> projects deposited in <a href="https://www.ncbi.nlm.nih.gov/">National Center for Biotechnology Information (<span class="caps">NCBI</span>) databases</a> from which I can download sequencing reads later to use with the&nbsp;script.</p>
+<p>This demonstration will be separated in four parts. Here in the first part, I will show how to search for <span class="caps">NGS</span> projects deposited in <a href="https://www.ncbi.nlm.nih.gov/">National Center for Biotechnology Information (<span class="caps">NCBI</span>) databases</a> from which I can download sequencing reads later to use with the&nbsp;script.</p>
 <h2>Using <span class="caps">NCBI</span>&#8217;s entrez-direct (EDirect) to retrieve <span class="caps">FASTQ</span>&nbsp;files</h2>
 <p>I open my Unix terminal and activate the <code>bioenv</code> environment:</p>
 <div class="highlight"><pre><span></span><code>conda activate bioenv
@@ -179,7 +179,7 @@ esearch -db bioproject -query <span class="s1">&#39;vorinostat&#39;</span>
 </code></pre></div>
 
 
-<p>In this case, the query resulted in 61 results (check the <code>&lt;count&gt;</code> tag). Thus, I will add more commands to retrieve the actual query results. I will pipe, i.e. transfer, the results of the query to the another command &#8212; <code>efetch</code> &#8212; that will do this work for me. This is the pipe symbol: (<code>|</code>)</p>
+<p>In this case, the query resulted in 61 results (check the <code>&lt;count&gt;</code> tag). Thus, I will add more commands to retrieve the actual query results. I will pipe, i.e. transfer, the results of the query to the another command &#8212; <code>efetch</code> &#8212; that will do this work for me. This is the pipe symbol: <code>|</code>.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># ... not there yet ... (2/4)</span>
 esearch -db bioproject -query <span class="s1">&#39;vorinostat&#39;</span> <span class="p">|</span> efetch -format native -mode xml
 </code></pre></div>
@@ -187,7 +187,7 @@ esearch -db bioproject -query <span class="s1">&#39;vorinostat&#39;</span> <span
 
 <p>The output is in <code>XML</code> format, and it is unfortunately not very much human-readable. Here is a print screen showing the first result. Notice how the record is contained within a <code>&lt;/DocumentSummary&gt;</code> node:</p>
 <p><img alt="esearch vorinostat XML result" src="https://antoniocampos13.github.io/images/esearch_vorinostat_xml_results.PNG"></p>
-<p>Thus, I will once again pipe the results, this time to <code>xtract</code> command. As its name implies, it extracts information from the <code>XML</code> and formats into a tab-separated format that is easier to understand. I must input the flag <code>-pattern</code> with the part of the <code>XML</code> files that contains the desired information, which are <code>elements</code>. In this example, I will search inside the <code>DocumentSummary</code> for <code>ArchiveID@accession</code> (project unique accession number), <code>ID</code> (an auxiliary <span class="caps">ID</span> code to search for samples of said project), <code>Title</code>(the title of the project),  <code>Description</code> (normally an abstract of the project) and <code>Reference</code> (a list of project-related papers in PubMed ids &#8212; PMIDs, if available). Note that I am separating each argument with spaces, no quotes are necessary in this&nbsp;command.</p>
+<p>Thus, I will once again pipe the results, this time to <code>xtract</code> command. As its name implies, it extracts information from the <code>XML</code> and formats into a tab-separated format that is easier to understand. I must input the flag <code>-pattern</code> with the part of the <code>XML</code> files that contains the desired information, which are <code>elements</code>. In this example, I will search inside the <code>DocumentSummary</code> for <code>ArchiveID@accession</code> (project unique accession number), <code>ID</code> (an auxiliary <span class="caps">ID</span> code to search for samples of said project), <code>Title</code>(the title of the project),  <code>Description</code> (normally an abstract of the project) and <code>Reference</code> (a list of project-related papers in PubMed ids &#8212; PMIDs, if available). Note that I am separating each argument with spaces, no quotes are necessary in this part of the&nbsp;command.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># ...almost there ... (3/4)</span>
 esearch -db bioproject -query <span class="s1">&#39;vorinostat&#39;</span> <span class="p">|</span> efetch -format native -mode xml <span class="p">|</span> xtract -pattern DocumentSummary -element ArchiveID@accession ID Title Description Reference
 </code></pre></div>
@@ -195,7 +195,7 @@ esearch -db bioproject -query <span class="s1">&#39;vorinostat&#39;</span> <span
 
 <p>Here is the tab-separated output of the same record displayed on my&nbsp;terminal:</p>
 <p><img alt="esearch vorinostat xtract result" src="https://antoniocampos13.github.io/images/esearch_vorinostat_xtract_results.PNG"></p>
-<p>Lastly, I will add a final command to transfer to a local text file <code>vorinostat_projects.txt</code> that will be saved in the current working directory.  Note that if you have a identically-named file in the working directory, it will be overwritten, so be&nbsp;careful.</p>
+<p>Lastly, I will add a final command to transfer to a local text file <code>vorinostat_projects.txt</code> that will be saved in the current working directory. Note that if you have a identically-named file in the working directory, it will be overwritten, so be&nbsp;careful.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Finally there! (4/4)</span>
 esearch -db bioproject -query <span class="s1">&#39;vorinostat&#39;</span> <span class="p">|</span> efetch -format native -mode xml <span class="p">|</span> xtract -pattern DocumentSummary -element ArchiveID@accession ID Reference Title Description &gt; vorinostat_projects.txt
 </code></pre></div>
@@ -204,7 +204,7 @@ esearch -db bioproject -query <span class="s1">&#39;vorinostat&#39;</span> <span
 <p>The <code>vorinostat_projects.txt</code> file can then be imported into spreadsheets to make easier to organize and read the&nbsp;results.</p>
 <h2>Refining the&nbsp;search</h2>
 <p>The command above is a very basic one to search <span class="caps">NCBI</span> databases via <code>EDirect</code>. I can create more elaborate queries by adding other keywords and filtering results. <span class="caps">NCBI</span>&#8217;s search engines have several parameters. I advise you go to any advanced search page on the <span class="caps">NCBI</span> website to look for the available&nbsp;parameters.</p>
-<p>Using <a href="https://www.ncbi.nlm.nih.gov/bioproject/"><code>bioproject</code></a> as example again, click on <em>Advanced</em> to go the query&nbsp;constructor:</p>
+<p>Using <a href="https://www.ncbi.nlm.nih.gov/bioproject/"><code>BioProject</code> database</a> as example again, click on <em>Advanced</em> to go the query&nbsp;constructor:</p>
 <p><img alt="BioProject search box" src="https://antoniocampos13.github.io/images/bioproject_start.PNG"></p>
 <p>Using the <strong>BioProject Advanced Search Builder</strong>, I will refine our search. I wish to include only projects that with samples deposited on <a href="https://www.ncbi.nlm.nih.gov/sra">Sequence Read Archive (<span class="caps">SRA</span>)</a>, from human samples and that investigated genetic variation. I input all of this into the search&nbsp;boxes:</p>
 <p><img alt="Refining our search" src="https://antoniocampos13.github.io/images/vorinostat_refined.PNG"></p>
@@ -224,7 +224,8 @@ esearch -db bioproject -query <span class="s1">&#39;vorinostat&#39;</span> <span
 <li>refine&nbsp;searches;</li>
 <li>save search results into local, human-readable text&nbsp;files.</li>
 </ul>
-<p><em>Go to <a href="https://antoniocampos13.github.io/fastq-to-variant-call-part-2.html"><span class="caps">FASTQ</span> to Variant Call (Part&nbsp;2)</a></em></p>
+<p>Now I need to use the information gathered here to download read sets in <code>FASTQ</code> format.</p>
+<p><em><a href="https://antoniocampos13.github.io/fastq-to-annotation-part-2">Go to <span class="caps">FASTQ</span> to Annotation (Part&nbsp;2)</a></em></p>
 <h2>References</h2>
 <p><a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html">Setting Up Your Unix Computer for Bioinformatics&nbsp;Analysis</a></p>
 <p><a href="https://www.ncbi.nlm.nih.gov/">National Center for Biotechnology&nbsp;Information</a></p>
