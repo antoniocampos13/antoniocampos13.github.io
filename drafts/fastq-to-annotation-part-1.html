@@ -39,15 +39,15 @@
     <meta name="msapplication-TileColor" content="#333333">
 
 <meta name="author" content="Antonio Victor Campos Coelho" />
-<meta name="description" content="Introduction In my previous post, I showed how to configure an Ubuntu system to install Bioinformatics programs. Now, using the environment I created, I will demonstrate a bash script, FasQ_to_VariantCall.sh that takes next generation sequencing (NGS) raw reads from human whole genome sequencing as input and produces variant annotation …" />
+<meta name="description" content="Introduction In my previous post, I showed how to configure an Ubuntu system to install Bioinformatics programs. Now, using the environment I created, I will demonstrate a bash script, FastQ_to_Annotation.sh that takes next generation sequencing (NGS) raw reads from human whole genome sequencing as input and produces variant annotation …" />
 <meta name="keywords" content="Bioinformatics, genomic variation, entrez-direct, EDirect">
 
 
 <meta property="og:site_name" content="Antonio's Portfolio"/>
-<meta property="og:title" content="FASTQ to Variant Call (Part 1)"/>
-<meta property="og:description" content="Introduction In my previous post, I showed how to configure an Ubuntu system to install Bioinformatics programs. Now, using the environment I created, I will demonstrate a bash script, FasQ_to_VariantCall.sh that takes next generation sequencing (NGS) raw reads from human whole genome sequencing as input and produces variant annotation …"/>
+<meta property="og:title" content="FASTQ to Annotation (Part 1)"/>
+<meta property="og:description" content="Introduction In my previous post, I showed how to configure an Ubuntu system to install Bioinformatics programs. Now, using the environment I created, I will demonstrate a bash script, FastQ_to_Annotation.sh that takes next generation sequencing (NGS) raw reads from human whole genome sequencing as input and produces variant annotation …"/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://antoniocampos13.github.io/drafts/fastq-to-variant-call-part-1.html"/>
+<meta property="og:url" content="https://antoniocampos13.github.io/drafts/fastq-to-annotation-part-1.html"/>
 <meta property="og:type" content="article"/>
 <meta property="article:published_time" content="2020-10-01 18:00:00-03:00"/>
 <meta property="article:modified_time" content=""/>
@@ -59,7 +59,7 @@
 <meta property="article:tag" content="EDirect"/>
 <meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
 
-  <title>Antonio's Portfolio &ndash; FASTQ to Variant Call (Part 1)</title>
+  <title>Antonio's Portfolio &ndash; FASTQ to Annotation (Part 1)</title>
 
 </head>
 <body class="light-theme">
@@ -136,7 +136,7 @@
 <article class="single">
   <header>
       
-    <h1 id="fastq-to-variant-call-part-1"><span class="caps">FASTQ</span> to Variant Call (Part&nbsp;1)</h1>
+    <h1 id="fastq-to-annotation-part-1"><span class="caps">FASTQ</span> to Annotation (Part&nbsp;1)</h1>
     <p>
       Posted on Thu 01 October 2020 in <a href="https://antoniocampos13.github.io/category/unix.html">Unix</a>
 
@@ -147,7 +147,7 @@
   <div>
     <h2>Introduction</h2>
 <p>In my <a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html">previous post</a>, I showed how to configure an Ubuntu system to install Bioinformatics&nbsp;programs.</p>
-<p>Now, using the environment I created, I will demonstrate a bash script, <code>FasQ_to_VariantCall.sh</code> that takes next generation sequencing (<span class="caps">NGS</span>) raw reads from human whole genome sequencing as input and produces variant annotation as output. Variant annotation is the process of identifying genetic variants in some genomic <span class="caps">DNA</span> sample, and assess, for example, if any of the found variants have any effect on phenotype, such as increased susceptibility to certain&nbsp;diseases.</p>
+<p>Now, using the environment I created, I will demonstrate a bash script, <code>FastQ_to_Annotation.sh</code> that takes next generation sequencing (<span class="caps">NGS</span>) raw reads from human whole genome sequencing as input and produces variant annotation as output. Variant annotation is the process of identifying genetic variants in some genomic <span class="caps">DNA</span> sample, and assess, for example, if any of the found variants have any effect on phenotype, such as increased susceptibility to certain&nbsp;diseases.</p>
 <p>This demonstration will be separated in parts. Here in the first part, I will show how to search for <span class="caps">NGS</span> projects deposited in <a href="https://www.ncbi.nlm.nih.gov/">National Center for Biotechnology Information (<span class="caps">NCBI</span>) databases</a> from which I can download sequencing reads later to use with the&nbsp;script.</p>
 <h2>Using <span class="caps">NCBI</span>&#8217;s entrez-direct (EDirect) to retrieve <span class="caps">FASTQ</span>&nbsp;files</h2>
 <p>I open my Unix terminal and activate the <code>bioenv</code> environment:</p>
@@ -159,6 +159,11 @@
 <p>I will search the <code>biproject</code> database because it contains metadata from projects dealing with high-throughput genome sequencing, transcriptome expression analysis and so on. I must use the <code>-query</code> flag to provide keywords for search. In this example, I will search for studies dealing with <strong>vorinostat</strong>, a medicine that is have been used in experimental <span class="caps">HIV</span>-1 latency reversal, or &#8220;shock-and-kill&#8221;&nbsp;treatments.</p>
 <p>Remember to use single quotes (&#8221;) enclosing the query, especially if it has several&nbsp;words.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># It is just the beginning... (1/4)</span>
+
+<span class="c1"># Let&#39;s create a folder to organize our files inside</span>
+mkdir demo
+<span class="nb">cd</span> demo
+
 esearch -db bioproject -query <span class="s1">&#39;vorinostat&#39;</span>
 </code></pre></div>
 
@@ -210,8 +215,8 @@ esearch -db bioproject -query <span class="s1">&#39;vorinostat&#39;</span> <span
 </code></pre></div>
 
 
-<p>Remember: single quotes enclosing the query. Turns out that this refined search was rather restrictive: it resulted in a single record. Checking the <code>vorinostat_refined.txt</code> I see in the abstract that the project dealt with &#8220;<span class="caps">DNA</span> Seq data: biopsy samples from patients pre- and post- treated with Vorinostat; check mutations related to MAPKi-resistance&#8221; (MAPKi: Mitogen Activated Protein Kinase inhibitors). Although I had <span class="caps">HIV</span>-1-related projects in mind, that&#8217;s fine for now, since it is suitable to <code>FasQ_to_VariantCall.sh</code> script: identify and annotate genetic&nbsp;variation.</p>
-<p>Then, I take note of the project <span class="caps">ID</span>: <code>PRJNA436005</code>. I will use it to retrieve samples from this project by searching the <span class="caps">SRA</span> with&nbsp;it.</p>
+<p>Remember: single quotes enclosing the query. Turns out that this refined search was rather restrictive: it resulted in a single record. Checking the <code>vorinostat_refined.txt</code> I see in the abstract that the project dealt with samples from patients with melanoma. One of the last sentences says: &#8220;<span class="caps">DNA</span> Seq data: biopsy samples from patients pre- and post- treated with Vorinostat; check mutations related to MAPKi-resistance&#8221; (MAPKi: Mitogen Activated Protein Kinase inhibitors). Although I had <span class="caps">HIV</span>-1-related projects in mind, that&#8217;s fine for now, since it is suitable to <code>FastQ_to_Annotation.sh</code> script: identify and annotate genetic&nbsp;variation.</p>
+<p>Then, I take note of the project <span class="caps">ID</span>: <code>PRJNA436005</code>. I will use it to retrieve reads from this project by searching the <span class="caps">SRA</span> with&nbsp;it.</p>
 <h2>Conclusion of Part&nbsp;1</h2>
 <p>In this part I showed how&nbsp;to:</p>
 <ul>

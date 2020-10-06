@@ -196,7 +196,7 @@ conda config --add channels conda-forge
 <p>Miniconda sets up priorities in the list of channels it receives. When we need to install some program, miniconda will search in the higher-priority channels first, then in the channels with lower-priority. &#8220;Different channels can have the same package&#8221; and you can &#8220;safely put channels at the bottom of your channel list to provide additional packages that are not in the default channels&#8221; as stated in the <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html">official website</a>. The flag <code>--add</code> adds the respective channels (<code>bioconda</code> and <code>conda-forge</code>) to the <strong>top</strong> of the priorities list. If you want to give lower priority, putting them in the <strong>bottom</strong> of the list, use the <code>--append</code> command instead. Thus, according to the command above, the order of channel priorities in our new miniconda installation will be: <code>conda-forge</code>, <code>bioconda</code> and lastly, <code>defaults</code>.</p>
 <h2>Create an environment for Bioinformatics&nbsp;programs</h2>
 <p>Now that miniconda is configured, I will create the environment that will receive them. I will name it <code>bioenv</code>. You can choose whatever name you&nbsp;like! </p>
-<div class="highlight"><pre><span></span><code>conda create -y --name bioenv <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8
+<div class="highlight"><pre><span></span><code>conda create -y --name bioenv <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.6
 </code></pre></div>
 
 
