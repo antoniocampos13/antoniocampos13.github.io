@@ -81,7 +81,7 @@ Miniconda sets up priorities in the list of channels it receives. When we need t
 Now that miniconda is configured, I will create the environment that will receive them. I will name it `bioenv`. You can choose whatever name you like! 
 
 ```bash
-conda create -y --name bioenv python=3.8
+conda create -y --name bioenv python=3.6
 ```
 
 ## Activating and deactivating an environment

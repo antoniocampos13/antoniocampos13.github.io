@@ -1,5 +1,5 @@
 ---
-Title: FASTQ to Variant Call (Part 1)
+Title: FASTQ to Annotation (Part 1)
 Status: draft
 Date: 2020-10-01 18:00
 Author: Antonio Victor Campos Coelho
@@ -10,7 +10,7 @@ Tags: Bioinformatics, genomic variation, entrez-direct, EDirect
 
 In my [previous post](https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html), I showed how to configure an Ubuntu system to install Bioinformatics programs.
 
-Now, using the environment I created, I will demonstrate a bash script, `FasQ_to_VariantCall.sh` that takes next generation sequencing (NGS) raw reads from human whole genome sequencing as input and produces variant annotation as output. Variant annotation is the process of identifying genetic variants in some genomic DNA sample, and assess, for example, if any of the found variants have any effect on phenotype, such as increased susceptibility to certain diseases.
+Now, using the environment I created, I will demonstrate a bash script, `FastQ_to_Annotation.sh` that takes next generation sequencing (NGS) raw reads from human whole genome sequencing as input and produces variant annotation as output. Variant annotation is the process of identifying genetic variants in some genomic DNA sample, and assess, for example, if any of the found variants have any effect on phenotype, such as increased susceptibility to certain diseases.
 
 This demonstration will be separated in parts. Here in the first part, I will show how to search for NGS projects deposited in [National Center for Biotechnology Information (NCBI) databases](https://www.ncbi.nlm.nih.gov/) from which I can download sequencing reads later to use with the script.
 
@@ -30,6 +30,11 @@ Remember to use single quotes ('') enclosing the query, especially if it has sev
 
 ```bash
 # It is just the beginning... (1/4)
+
+# Let's create a folder to organize our files inside
+mkdir demo
+cd demo
+
 esearch -db bioproject -query 'vorinostat'
 ```
 
@@ -98,9 +103,9 @@ You could continue the search on the website, of course, but let's go back to th
 esearch -db bioproject -query '(((vorinostat) AND "bioproject sra"[Filter]) AND Homo sapiens[Organism]) AND "variation"[Filter]'  | efetch -format native -mode xml | xtract -pattern DocumentSummary -element ArchiveID@accession ID Reference Title Description  > vorinostat_refined.txt
 ```
 
-Remember: single quotes enclosing the query. Turns out that this refined search was rather restrictive: it resulted in a single record. Checking the `vorinostat_refined.txt` I see in the abstract that the project dealt with "DNA Seq data: biopsy samples from patients pre- and post- treated with Vorinostat; check mutations related to MAPKi-resistance" (MAPKi: Mitogen Activated Protein Kinase inhibitors). Although I had HIV-1-related projects in mind, that's fine for now, since it is suitable to `FasQ_to_VariantCall.sh` script: identify and annotate genetic variation.
+Remember: single quotes enclosing the query. Turns out that this refined search was rather restrictive: it resulted in a single record. Checking the `vorinostat_refined.txt` I see in the abstract that the project dealt with samples from patients with melanoma. One of the last sentences says: "DNA Seq data: biopsy samples from patients pre- and post- treated with Vorinostat; check mutations related to MAPKi-resistance" (MAPKi: Mitogen Activated Protein Kinase inhibitors). Although I had HIV-1-related projects in mind, that's fine for now, since it is suitable to `FastQ_to_Annotation.sh` script: identify and annotate genetic variation.
 
-Then, I take note of the project ID: `PRJNA436005`. I will use it to retrieve samples from this project by searching the SRA with it.
+Then, I take note of the project ID: `PRJNA436005`. I will use it to retrieve reads from this project by searching the SRA with it.
 
 ## Conclusion of Part 1
 

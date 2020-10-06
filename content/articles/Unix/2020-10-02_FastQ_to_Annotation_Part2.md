@@ -1,5 +1,5 @@
 ---
-Title: FASTQ to Variant Call (Part 2)
+Title: FASTQ to Annotation (Part 2)
 Status: draft
 Date: 2020-10-02 18:00
 Author: Antonio Victor Campos Coelho
@@ -10,9 +10,9 @@ Tags: Bioinformatics, genomic variation, entrez-direct, EDirect
 
 *In a [previous post](https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis), I showed how to configure an Ubuntu system to install Bioinformatics programs.*
 
-*Now, using the environment I created, I will demonstrate a bash script, `FasQ_to_VariantCall.sh` that takes next generation sequencing (NGS) raw reads from human whole genome sequencing as input and produces variant annotation as output. Variant annotation is the process of identifying genetic variants in some genomic DNA sample, and assess, for example, if any of the found variants have any effect on phenotype, such as increased susceptibility to certain diseases.*
+*Now, using the environment I created, I will demonstrate a bash script, `FastQ_to_Annotation.sh` that takes next generation sequencing (NGS) raw reads from human whole genome sequencing as input and produces variant annotation as output. Variant annotation is the process of identifying genetic variants in some genomic DNA sample, and assess, for example, if any of the found variants have any effect on phenotype, such as increased susceptibility to certain diseases.*
 
-*In the first part, I showed how to search for NGS projects deposited in [National Center for Biotechnology Information (NCBI) databases](https://www.ncbi.nlm.nih.gov/) from which I can download sequencing reads later to use with the script.*
+*In the [first part](https://antoniocampos13.github.io/fastq-to-annotation-part-1), I showed how to search for NGS projects deposited in [National Center for Biotechnology Information (NCBI) databases](https://www.ncbi.nlm.nih.gov/) from which I can download sequencing reads later to use with the script.*
 
 Here in the second part, I will show how to retrieve raw genome sequencing reads in the form of `FASTQ` files, which are deposited in [SRA](https://www.ncbi.nlm.nih.gov/sra).
 
@@ -34,15 +34,15 @@ We obtain `FASTQ` after sequencing of genomic samples in platforms such as [Illu
 
 ### A Warning
 
-`FASTQ` files, especially from human samples, have very big sizes, in the gigabytes range. Since they are so big, considerable computing power and storage are needed to process these kind of files. Common domestic desktop PCs or laptops are inadequate, because they lack sufficient RAM and CPU processing power to perform smoothly during most Bioinformatic uses.
-
-However, do not despair! I will demonstrate the script using especial `FASTQ` (and other) files that have sufficiently small size so your PC can process it on a timely manner. The logic is: if the script is working in these small files, it should work with the "real deal".
+`FASTQ` files, especially from human samples, have very big sizes, in the gigabytes range. Therefore, considerable computing power and storage are needed to process these kind of files.
 
 ## Retrieving reads from a BioProject
 
-**Activate** the environment, if needed, and connect to `SRA` database via `EDirect esearch` command using the `PRJNA436005` as keyword for query. Then, we pipe the results to the `efetch` command. With the `-format` flag, it will format the results into the `runinfo` format (more on that later). Finally, will save it into the `PRJNA436005_runinfo.csv` file. You can choose other name if wish.
+**Activate** the environment, if needed, and connect to `SRA` database via `EDirect esearch` command using the `PRJNA436005` as keyword for query. Then, we pipe the results to the `efetch` command. With the `-format` flag, it will format the results into the `runinfo` format (more on that later). Finally, will save it into the `PRJNA436005_runinfo.csv` file. You can choose other name if you wish.
 
 ```bash
+# Continuing into the folder I created in the previous part
+cd demo
 conda activate bioenv
 
 esearch -db sra -query 'PRJNA436005' | efetch -format runinfo > PRJNA436005_runinfo.csv
@@ -62,13 +62,13 @@ Other interesting columns that I like to check are:
 * `Model`, the model of the `Platform`;
 * `Sex`, `Disease` and `Tumor`: descriptors of sample phenotype.
 
-For now, I will use only the first read, which has the `SRR6784104` ID. Finally, let's download the read set with the `EDirect fastq-dump` command. Here, I use a "trick" to reduce the size of the file: download only a subset of the spots (the first 10,000 spots from the more than 25 million spots in the read set, with the `-X` flag). Additionally, I will split it into two files (`--split-files` flag), one with reads from each end of DNA fragments in the original library, and compress them with `--gzip`:
+For now, I will use only the first read, which has the `SRR6784104` ID. Finally, let's download the read set with the `EDirect fastq-dump` command and split it into two files (`--split-files` flag), one with reads from each end of DNA fragments in the original library, and compress them with `--gzip`:
 
 ```bash
-fastq-dump -X 10000 --split-files SRR6784104 --gzip
+fastq-dump --split-files SRR6784104 --gzip
 ```
 
-After a moment, two `fastq.gz` files will be downloaded to the current working directory and are ready to be used as the input for the `FasQ_to_VariantCall.sh`.
+After a moment, two `fastq.gz` files will be downloaded to the current working directory and are ready to be used as the input for the `FastQ_to_VariantCall.sh`.
 
 ## Conclusion (Part 2)
 
@@ -77,6 +77,16 @@ In this part I showed how to:
 * obtain and inspect metadata from projects via their `BioProjects` accession ID;
 * download read sets via their `SRR` accession ID via `fastq-dump`.
 
-### Post-scriptum
+## References
 
-*There is an updated version of `fastq-dump`, aptly named [`fasterq-dump`](https://github.com/ncbi/sra-tools/wiki/HowTo:-fasterq-dump), but as it does not support the `-X` and `--gzip` flags anymore (at least for now), I did not use it in this demonstration.*
+[Setting Up Your Unix Computer for Bioinformatics Analysis](https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis)
+
+[FASTQ to Annotation (Part 1)](https://antoniocampos13.github.io/fastq-to-annotation-part-1)
+
+[National Center for Biotechnology Information](https://www.ncbi.nlm.nih.gov/)
+
+[Home - SRA - NCBI](https://www.ncbi.nlm.nih.gov/sra)
+
+[Illumina | Sequencing and array-based solutions for genetic research](https://www.illumina.com)
+
+[Next-Generation Sequencing for Beginners | NGS basics for researchers](https://www.illumina.com/science/technology/next-generation-sequencing/beginners.html)
