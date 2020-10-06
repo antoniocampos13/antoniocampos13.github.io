@@ -1,6 +1,6 @@
 ---
 Title: FASTQ to Annotation (Part 1)
-Status: draft
+Status: published
 Date: 2020-10-01 18:00
 Author: Antonio Victor Campos Coelho
 Tags: Bioinformatics, genomic variation, entrez-direct, EDirect
@@ -12,7 +12,7 @@ In my [previous post](https://antoniocampos13.github.io/setting-up-your-unix-com
 
 Now, using the environment I created, I will demonstrate a bash script, `FastQ_to_Annotation.sh` that takes next generation sequencing (NGS) raw reads from human whole genome sequencing as input and produces variant annotation as output. Variant annotation is the process of identifying genetic variants in some genomic DNA sample, and assess, for example, if any of the found variants have any effect on phenotype, such as increased susceptibility to certain diseases.
 
-This demonstration will be separated in parts. Here in the first part, I will show how to search for NGS projects deposited in [National Center for Biotechnology Information (NCBI) databases](https://www.ncbi.nlm.nih.gov/) from which I can download sequencing reads later to use with the script.
+This demonstration will be separated in four parts. Here in the first part, I will show how to search for NGS projects deposited in [National Center for Biotechnology Information (NCBI) databases](https://www.ncbi.nlm.nih.gov/) from which I can download sequencing reads later to use with the script.
 
 ## Using NCBI's entrez-direct (EDirect) to retrieve FASTQ files
 
@@ -50,7 +50,7 @@ The output is just a `XML` summary including, among other things, the number of 
 </ENTREZ_DIRECT>
 ```
 
-In this case, the query resulted in 61 results (check the `<count>` tag). Thus, I will add more commands to retrieve the actual query results. I will pipe, i.e. transfer, the results of the query to the another command -- `efetch` -- that will do this work for me. This is the pipe symbol: (`|`)
+In this case, the query resulted in 61 results (check the `<count>` tag). Thus, I will add more commands to retrieve the actual query results. I will pipe, i.e. transfer, the results of the query to the another command -- `efetch` -- that will do this work for me. This is the pipe symbol: `|`.
 
 ```bash
 # ... not there yet ... (2/4)
@@ -61,7 +61,7 @@ The output is in `XML` format, and it is unfortunately not very much human-reada
 
  ![esearch vorinostat XML result]({static}/images/esearch_vorinostat_xml_results.PNG)
   
-Thus, I will once again pipe the results, this time to `xtract` command. As its name implies, it extracts information from the `XML` and formats into a tab-separated format that is easier to understand. I must input the flag `-pattern` with the part of the `XML` files that contains the desired information, which are `elements`. In this example, I will search inside the `DocumentSummary` for `ArchiveID@accession` (project unique accession number), `ID` (an auxiliary ID code to search for samples of said project), `Title`(the title of the project),  `Description` (normally an abstract of the project) and `Reference` (a list of project-related papers in PubMed ids -- PMIDs, if available). Note that I am separating each argument with spaces, no quotes are necessary in this command.
+Thus, I will once again pipe the results, this time to `xtract` command. As its name implies, it extracts information from the `XML` and formats into a tab-separated format that is easier to understand. I must input the flag `-pattern` with the part of the `XML` files that contains the desired information, which are `elements`. In this example, I will search inside the `DocumentSummary` for `ArchiveID@accession` (project unique accession number), `ID` (an auxiliary ID code to search for samples of said project), `Title`(the title of the project),  `Description` (normally an abstract of the project) and `Reference` (a list of project-related papers in PubMed ids -- PMIDs, if available). Note that I am separating each argument with spaces, no quotes are necessary in this part of the command.
 
 ```bash
 # ...almost there ... (3/4)
@@ -72,7 +72,7 @@ Here is the tab-separated output of the same record displayed on my terminal:
 
 ![esearch vorinostat xtract result]({static}/images/esearch_vorinostat_xtract_results.PNG)
 
-Lastly, I will add a final command to transfer to a local text file `vorinostat_projects.txt` that will be saved in the current working directory.  Note that if you have a identically-named file in the working directory, it will be overwritten, so be careful.
+Lastly, I will add a final command to transfer to a local text file `vorinostat_projects.txt` that will be saved in the current working directory. Note that if you have a identically-named file in the working directory, it will be overwritten, so be careful.
 
 ```bash
 # Finally there! (4/4)
@@ -85,7 +85,7 @@ The `vorinostat_projects.txt` file can then be imported into spreadsheets to mak
 
 The command above is a very basic one to search NCBI databases via `EDirect`. I can create more elaborate queries by adding other keywords and filtering results. NCBI's search engines have several parameters. I advise you go to any advanced search page on the NCBI website to look for the available parameters.
 
-Using [`bioproject`](https://www.ncbi.nlm.nih.gov/bioproject/) as example again, click on *Advanced* to go the query constructor:
+Using [`BioProject` database](https://www.ncbi.nlm.nih.gov/bioproject/) as example again, click on *Advanced* to go the query constructor:
 
 ![BioProject search box]({static}/images/bioproject_start.PNG)
 
@@ -115,7 +115,9 @@ In this part I showed how to:
 * refine searches;
 * save search results into local, human-readable text files.
 
-*Go to [FASTQ to Variant Call (Part 2)](https://antoniocampos13.github.io/fastq-to-variant-call-part-2.html)*
+Now I need to use the information gathered here to download read sets in `FASTQ` format.
+
+*[Go to FASTQ to Annotation (Part 2)](https://antoniocampos13.github.io/fastq-to-annotation-part-2)*
 
 ## References
 
