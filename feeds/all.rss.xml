@@ -1,5 +1,306 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>Antonio's Portfolio</title><link>https://antoniocampos13.github.io/</link><description>PhD in Genetics</description><lastBuildDate>Tue, 06 Oct 2020 18:00:00 -0300</lastBuildDate><item><title>FASTQ to Annotation (Part 4)</title><link>https://antoniocampos13.github.io/fastq-to-annotation-part-4.html</link><description>&lt;h2&gt;Introduction&lt;/h2&gt;
+<rss version="2.0"><channel><title>Antonio's Portfolio</title><link>https://antoniocampos13.github.io/</link><description>PhD in Genetics</description><lastBuildDate>Mon, 12 Oct 2020 12:42:00 -0300</lastBuildDate><item><title>Working with Cancer Genomics Cloud datasets in a PostgreSQL database (Part 1)</title><link>https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html</link><description>&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;Recently I have been looking for publicly-available genomics datasets to test machine learning models in Python. During my searches for such a &amp;#8220;toy dataset&amp;#8221;, I came upon the &lt;a href="http://www.cancergenomicscloud.org/"&gt;Cancer Genomics Cloud (&lt;span class="caps"&gt;CGC&lt;/span&gt;)&lt;/a&gt;&amp;nbsp;initiative.&lt;/p&gt;
+&lt;p&gt;Anyone can register in &lt;span class="caps"&gt;CGC&lt;/span&gt; and have access to open access massive public datasets, like &lt;a href="http://cancergenome.nih.gov/"&gt;The Cancer Genomics Atlas (&lt;span class="caps"&gt;TCGA&lt;/span&gt;)&lt;/a&gt;. Most individual-level genomic data can only be accessed following approval of a Data Access Request through the &lt;a href="https://www.ncbi.nlm.nih.gov/gap/"&gt;Database of Genotypes and Phenotypes (dbGaP)&lt;/a&gt;. For now, I guess the open data tier will suffice for this&amp;nbsp;exercise.&lt;/p&gt;
+&lt;p&gt;This demonstration will be separated into two parts. Here in the first part I will provide a brief run-down of how I queried the &lt;span class="caps"&gt;CGC&lt;/span&gt; to obtain genomic data from cancer patients and the first steps into preparing a local PostgreSQL relational database in my&amp;nbsp;computer.&lt;/p&gt;
+&lt;h2&gt;Querying the &lt;span class="caps"&gt;CGC&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;I registered at &lt;span class="caps"&gt;CGC&lt;/span&gt;, then I created a project in the &lt;span class="caps"&gt;CGC&lt;/span&gt; dashboard and went into the data browser&amp;nbsp;tool:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="CGC dashboard options" src="https://antoniocampos13.github.io/images/cgc_1.PNG"&gt;&lt;/p&gt;
+&lt;p&gt;Then, I chose the &lt;span class="caps"&gt;TCGA&lt;/span&gt; GRCh38 dataset and clicked on the &lt;code&gt;Explore selected&lt;/code&gt; button.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="TCGA dataset" src="https://antoniocampos13.github.io/images/cgc_2.PNG"&gt;&lt;/p&gt;
+&lt;p&gt;Inside the data browser, I see that there are several information&amp;nbsp;entities:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="TCGA information entities" src="https://antoniocampos13.github.io/images/cgc_3.PNG"&gt;&lt;/p&gt;
+&lt;p&gt;I clicked on the first one, &lt;code&gt;Cases&lt;/code&gt; and then created a query with the following entities and&amp;nbsp;filters:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;Entity&lt;/em&gt;&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;Filters&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Case&lt;ul&gt;
+&lt;li&gt;Primary site: Prostate&amp;nbsp;Gland&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Diagnosis&lt;ul&gt;
+&lt;li&gt;Age at&amp;nbsp;diagnosis&lt;/li&gt;
+&lt;li&gt;Clinical T (&lt;span class="caps"&gt;TNM&lt;/span&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Demographic&lt;ul&gt;
+&lt;li&gt;Ethnicity&lt;/li&gt;
+&lt;li&gt;Race&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Follow up&lt;ul&gt;
+&lt;li&gt;Primary therapy&amp;nbsp;outcome&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;File&lt;ul&gt;
+&lt;li&gt;Access level:&amp;nbsp;Open&lt;/li&gt;
+&lt;li&gt;Data type: Gene Level Copy Number, Gene Expression Quantification, Gene Level Copy Number&amp;nbsp;Scores&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The final query ended up like&amp;nbsp;this:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Prostate cancer query" src="https://antoniocampos13.github.io/images/cgc_4.PNG"&gt;&lt;/p&gt;
+&lt;p&gt;In other words, the query resulted in individuals diagnosed with prostate cancer (n=237), their age at diagnosis, their demographic characteristics, their therapeutic outcomes, and their genomic data (n=1,065 files overall: 276 with raw counts of gene expression quantification, 552 with &lt;a href="https://rna-seqblog.com/rpkm-fpkm-and-tpm-clearly-explained/"&gt;&lt;span class="caps"&gt;FPKM&lt;/span&gt;&lt;/a&gt; information, 236 from &lt;a href="https://www.nature.com/scitable/topicpage/copy-number-variation-445/"&gt;copy number variation&lt;/a&gt; genotyping, and a single file containing what I believe is a prostate cancer diagnosis score stratified by&amp;nbsp;gene).&lt;/p&gt;
+&lt;p&gt;Then, I clicked on the &lt;code&gt;Copy files to project&lt;/code&gt; and on the &lt;code&gt;Export&lt;/code&gt; button and chose &lt;code&gt;Export as TSV&lt;/code&gt; option. I went back to my project dashboard, clicked on the &lt;code&gt;Files&lt;/code&gt; tab and downloaded&amp;nbsp;everything.&lt;/p&gt;
+&lt;p&gt;I realized that the four &lt;code&gt;TSV&lt;/code&gt; and the genomic data could be organized as tables on a &lt;a href="https://en.wikipedia.org/wiki/Relational_database"&gt;relational database&lt;/a&gt;. So I used my &lt;a href="https://www.postgresql.org/"&gt;PostgreSQL server&lt;/a&gt; that I have installed on computer. For this demonstration, I will use my Windows 10 &lt;span class="caps"&gt;OS&lt;/span&gt;, but PostgreSQL can be installed on Unix systems as well. In my portfolio I provide a Windows script and a Unix script as well containing the steps I followed to load all the data into a PostgreSQL&amp;nbsp;database.&lt;/p&gt;
+&lt;h2&gt;Creating the &amp;#8216;tcga&amp;#8217; database into the local PostgreSQL&amp;nbsp;server&lt;/h2&gt;
+&lt;p&gt;The official PostgreSQL installation instructions are &lt;a href="https://www.postgresql.org/download/"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I created a folder named &lt;code&gt;TCGA&lt;/code&gt; for this project, and put the downloaded files inside a &lt;code&gt;data&lt;/code&gt; subfolder. Here is a representation of my directory&amp;nbsp;structure:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;.
+└── TCGA
+    ├── data
+    │   ├── counts
+    │   │   └── &lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="m"&gt;200&lt;/span&gt;+ *.counts.gz files&lt;span class="o"&gt;]&lt;/span&gt;
+    │   ├── focal_score_by_genes
+    │   ├── fpkm
+    │   ├── gene_level_copy_numbers
+    │   ├── cases.tsv
+    │   ├── demographic.tsv
+    │   ├── files.tsv
+    │   └── follow_up.tsv
+    ├── main_tcga.ps1
+    └── main_tcga.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;TSV&lt;/code&gt; files are the query results and inside the folders are the files containing the genomic data (these are not their original names &amp;#8212; I renamed them to make easier to identify the contents of each one). For now, I will use just the four &lt;code&gt;TSV&lt;/code&gt; files and the &lt;code&gt;counts&lt;/code&gt; folders.&lt;/p&gt;
+&lt;p&gt;This structure is replicated in the folder corresponding to this post in my &lt;a href="https://github.com/antoniocampos13/portfolio/tree/master/SQL/2020_10_12_Working_Data_CGC_PostgreSQL/TCGA"&gt;portfolio&lt;/a&gt;. The &lt;code&gt;main_tcga.ps1&lt;/code&gt; and &lt;code&gt;main_tcga.sh&lt;/code&gt; files contain the commands I used for this demonstration. The first is for Windows and the second for Unix&amp;nbsp;systems.&lt;/p&gt;
+&lt;p&gt;Then, in the &lt;code&gt;TCGA&lt;/code&gt; folder I opened a Windows PowerShell terminal and using &lt;code&gt;psql&lt;/code&gt;, a terminal-based front-end to PostgreSQL, created a database named &lt;code&gt;tcga&lt;/code&gt; on my local&amp;nbsp;server:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;psql&lt;/span&gt; &lt;span class="n"&gt;-U&lt;/span&gt; &lt;span class="n"&gt;postgres&lt;/span&gt; &lt;span class="n"&gt;-c&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;CREATE DATABASE tcga ENCODING &amp;#39;UTF-8&amp;#39; LC_COLLATE &amp;#39;English_United States&amp;#39; LC_CTYPE &amp;#39;English_United States&amp;#39; TEMPLATE template0&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;-U&lt;/code&gt; flag serves to indicate which user will connect to the local PostgreSQL server. &lt;code&gt;postgres&lt;/code&gt; is the default user created during PostgreSQL installation. The &lt;code&gt;-c&lt;/code&gt; flag means that we are sending a command to the server. Note that the command is inside double quotes and strings into the command are single-quoted.In summary, this command serves to connect the &lt;code&gt;postgres&lt;/code&gt; user into the server and pass a command to create the &lt;code&gt;tcga&lt;/code&gt; database with certain characteristics: use &lt;span class="caps"&gt;UTF&lt;/span&gt;-8 codification, with English locale using the &lt;code&gt;template0&lt;/code&gt; database as template, which is created by default during PostgreSQL server&amp;nbsp;installation.&lt;/p&gt;
+&lt;p&gt;If during installation you provided a password to access the server, the terminal will ask for it after you press&amp;nbsp;Enter.&lt;/p&gt;
+&lt;h2&gt;Creating tables in the &amp;#8216;tcga&amp;#8217;&amp;nbsp;database&lt;/h2&gt;
+&lt;p&gt;Then, I created four tables, corresponding to each &lt;code&gt;TSV&lt;/code&gt; files with the following&amp;nbsp;command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;psql&lt;/span&gt; &lt;span class="n"&gt;-U&lt;/span&gt; &lt;span class="n"&gt;postgres&lt;/span&gt; &lt;span class="n"&gt;-d&lt;/span&gt; &lt;span class="n"&gt;tcga&lt;/span&gt; &lt;span class="n"&gt;-a&lt;/span&gt; &lt;span class="o"&gt;-f&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;src/tcga_create_tables.sql&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The new friends here are &lt;code&gt;-d&lt;/code&gt; and &lt;code&gt;-a -f&lt;/code&gt;. &lt;code&gt;-d&lt;/code&gt; is the flag that indicates the &lt;em&gt;database&lt;/em&gt; I wished to connect; it is the &lt;code&gt;tcga&lt;/code&gt; I created above. The &lt;code&gt;-a&lt;/code&gt; serves to echo all information from the command to the terminal output so it is possible to check if the commands worked. The &lt;code&gt;-f&lt;/code&gt; flag mean &lt;em&gt;file&lt;/em&gt;: I am indicating that I want to pass the commands within the &lt;code&gt;tcga_create_tables.sql&lt;/code&gt; file inside the &lt;code&gt;src&lt;/code&gt; directory &amp;#8212; which I created as a subfolder of the &lt;code&gt;TCGA&lt;/code&gt; folder. If you are wondering how I created this file: wrote the commands in a text file and simply saved it with the &lt;code&gt;.sql&lt;/code&gt; extension.&lt;/p&gt;
+&lt;p&gt;Below is one of the commands inside the &lt;code&gt;.sql&lt;/code&gt; file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;CREATE&lt;/span&gt; &lt;span class="k"&gt;TABLE&lt;/span&gt; &lt;span class="n"&gt;allcases&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="n"&gt;case_id&lt;/span&gt; &lt;span class="nb"&gt;TEXT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="n"&gt;case_primarysite&lt;/span&gt; &lt;span class="nb"&gt;TEXT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="n"&gt;diagnosis&lt;/span&gt; &lt;span class="nb"&gt;TEXT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="n"&gt;diagnosis_ageatdiagnosis_1&lt;/span&gt; &lt;span class="nb"&gt;INT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="n"&gt;diagnosis_clinicalt_1&lt;/span&gt; &lt;span class="nb"&gt;TEXT&lt;/span&gt;
+&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The command above creates the table &lt;code&gt;allcases&lt;/code&gt; with five columns: &lt;code&gt;case_id&lt;/code&gt;, &lt;code&gt;case_primarysite&lt;/code&gt;, &lt;code&gt;diagnosis&lt;/code&gt;, &lt;code&gt;diagnosis_ageatdiagnosis_1&lt;/code&gt;, and &lt;code&gt;diagnosis_clinicalt_1&lt;/code&gt;. Notice the words beside each one: they indicate the &lt;strong&gt;data type&lt;/strong&gt; of the data that the column will hold. In this case I have four columns that will get text data (&lt;code&gt;TEXT&lt;/code&gt;) and one that will get numbers &amp;#8212; integers (&lt;code&gt;INT&lt;/code&gt;)&amp;nbsp;specifically.&lt;/p&gt;
+&lt;p&gt;Note the semicolon &lt;code&gt;;&lt;/code&gt; at the end &amp;#8212; it is a PostgreSQL requirement. It indicates the end of a command (however, if we are passing arguments through the &lt;code&gt;-c&lt;/code&gt; flag the semicolon is not needed though, it is implicit within the&amp;nbsp;flag).&lt;/p&gt;
+&lt;p&gt;The file have three more commands similar to the one above. The output of the second to last command should be &lt;code&gt;CREATE TABLE&lt;/code&gt; messages, meaning all went well &amp;#8212; I created tour tables inside the &lt;code&gt;tcga&lt;/code&gt; database.&lt;/p&gt;
+&lt;h2&gt;Populating the&amp;nbsp;tables&lt;/h2&gt;
+&lt;p&gt;However, they are still empty. To populate the tables, I used the four commands below, one for each table (&lt;code&gt;allcases&lt;/code&gt;, &lt;code&gt;demographic&lt;/code&gt;, &lt;code&gt;follow_up&lt;/code&gt; and &lt;code&gt;allfiles&lt;/code&gt;):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;psql&lt;/span&gt; &lt;span class="n"&gt;-U&lt;/span&gt; &lt;span class="n"&gt;postgres&lt;/span&gt; &lt;span class="n"&gt;-d&lt;/span&gt; &lt;span class="n"&gt;tcga&lt;/span&gt; &lt;span class="n"&gt;-c&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;\COPY allcases FROM &amp;#39;data/cases.tsv&amp;#39; DELIMITER E&amp;#39;\t&amp;#39; CSV HEADER&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;psql&lt;/span&gt; &lt;span class="n"&gt;-U&lt;/span&gt; &lt;span class="n"&gt;postgres&lt;/span&gt; &lt;span class="n"&gt;-d&lt;/span&gt; &lt;span class="n"&gt;tcga&lt;/span&gt; &lt;span class="n"&gt;-c&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;\COPY demographic FROM &amp;#39;data/demographic.tsv&amp;#39; DELIMITER E&amp;#39;\t&amp;#39; CSV HEADER&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;psql&lt;/span&gt; &lt;span class="n"&gt;-U&lt;/span&gt; &lt;span class="n"&gt;postgres&lt;/span&gt; &lt;span class="n"&gt;-d&lt;/span&gt; &lt;span class="n"&gt;tcga&lt;/span&gt; &lt;span class="n"&gt;-c&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;\COPY follow_up FROM &amp;#39;data/follow_up.tsv&amp;#39; DELIMITER E&amp;#39;\t&amp;#39; CSV HEADER&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;psql&lt;/span&gt; &lt;span class="n"&gt;-U&lt;/span&gt; &lt;span class="n"&gt;postgres&lt;/span&gt; &lt;span class="n"&gt;-d&lt;/span&gt; &lt;span class="n"&gt;tcga&lt;/span&gt; &lt;span class="n"&gt;-c&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;\COPY allfiles FROM &amp;#39;data/files.tsv&amp;#39; DELIMITER E&amp;#39;\t&amp;#39; CSV HEADER&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;(It is good practice to separate table-creating commands of table-populating ones). In summary, the commands tell the PostgreSQL server to copy the information contained in the &lt;code&gt;TSV&lt;/code&gt; files inside the &lt;code&gt;data&lt;/code&gt; directory into the specified&amp;nbsp;table.&lt;/p&gt;
+&lt;p&gt;The argument &lt;code&gt;DELIMITER E'\t'&lt;/code&gt; means that the columns are tab-separated (delimited). This argument would be &lt;code&gt;DELIMITER ','&lt;/code&gt; if the file were comma-separated or omitted&amp;nbsp;altogether.  &lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;CSV&lt;/code&gt; indicates that we are importing a delimiter-separated file. &lt;code&gt;HEADER&lt;/code&gt; means that the copied file have a header &amp;#8212; the first line have the column titles, which &lt;strong&gt;must be equal&lt;/strong&gt; to the ones specified during table creation; an error will occur otherwise. This argument must be omitted if the file does not have a&amp;nbsp;header.&lt;/p&gt;
+&lt;p&gt;The output &lt;code&gt;COPY&lt;/code&gt; followed by an integer (representing the number of rows copied) means that everything went well. Be careful: do not run the copy commands more than once, otherwise data duplication will&amp;nbsp;occur.&lt;/p&gt;
+&lt;p&gt;With this I conclude the first part of this demonstration. In the next part I will use I will use a customized Python to help with the import of genomic data into the PostgreSQL&amp;nbsp;database.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&lt;a href="https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-2.html"&gt;Go to Part 2&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
+&lt;h2&gt;Conclusion of Part&amp;nbsp;1&lt;/h2&gt;
+&lt;p&gt;In this part&amp;nbsp;I:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Demonstrated how to query open access data in &lt;span class="caps"&gt;CGC&lt;/span&gt;;&lt;/li&gt;
+&lt;li&gt;Showed basic commands for importing data into tables created in a local PostgreSQL&amp;nbsp;database.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;&lt;a href="http://www.cancergenomicscloud.org/"&gt;Cancer Genomics&amp;nbsp;Cloud&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://cancergenome.nih.gov/"&gt;The Cancer Genome Atlas&amp;nbsp;Program&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.ncbi.nlm.nih.gov/gap/"&gt;Home - dbGaP - &lt;span class="caps"&gt;NCBI&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://rna-seqblog.com/rpkm-fpkm-and-tpm-clearly-explained/"&gt;&lt;span class="caps"&gt;RPKM&lt;/span&gt;, &lt;span class="caps"&gt;FPKM&lt;/span&gt; and &lt;span class="caps"&gt;TPM&lt;/span&gt;, clearly&amp;nbsp;explained&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.nature.com/scitable/topicpage/copy-number-variation-445/"&gt;Copy Number Variation | Scitable by Nature&amp;nbsp;Education&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://en.wikipedia.org/wiki/Relational_database"&gt;Relational database -&amp;nbsp;Wikipedia&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.postgresql.org/"&gt;PostgreSQL: The world&amp;#8217;s most advanced open source&amp;nbsp;database&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.postgresql.org/download/"&gt;PostgreSQL:&amp;nbsp;Downloads&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Antonio Victor Campos Coelho</dc:creator><pubDate>Mon, 12 Oct 2020 12:42:00 -0300</pubDate><guid isPermaLink="false">tag:antoniocampos13.github.io,2020-10-12:/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html</guid><category>SQL</category><category>Bioinformatics</category><category>gene expression quantification</category><category>copy number variation</category><category>Windows</category></item><item><title>Working with Cancer Genomics Cloud datasets in a PostgreSQL database (Part 2)</title><link>https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-2.html</link><description>&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;&lt;em&gt;Recently I have been looking for publicly-available genomics datasets to test machine learning models in Python. During my searches for such a &amp;#8220;toy dataset&amp;#8221;, I came upon the &lt;a href="http://www.cancergenomicscloud.org/"&gt;Cancer Genomics Cloud (&lt;span class="caps"&gt;CGC&lt;/span&gt;)&lt;/a&gt;&amp;nbsp;initiative.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Anyone can register in &lt;span class="caps"&gt;CGC&lt;/span&gt; and have access to open access massive public datasets, like &lt;a href="http://cancergenome.nih.gov/"&gt;The Cancer Genomics Atlas (&lt;span class="caps"&gt;TCGA&lt;/span&gt;)&lt;/a&gt;. Most individual-level genomic data can only be accessed following approval of a Data Access Request through the &lt;a href="https://www.ncbi.nlm.nih.gov/gap/"&gt;Database of Genotypes and Phenotypes (dbGaP)&lt;/a&gt;. For now, I guess the open data tier will suffice for this&amp;nbsp;exercise.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;This demonstration will be separated into two parts. In the &lt;a href="https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html"&gt;first part&lt;/a&gt; I provided a brief run-down of how I queried the &lt;span class="caps"&gt;CGC&lt;/span&gt; to obtain genomic data from cancer patients and the first steps into preparing a local PostgreSQL relational database in my&amp;nbsp;computer.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Here in the second part I will use a customized Python to help with the import of genomic data into the PostgreSQL&amp;nbsp;database.&lt;/p&gt;
+&lt;h2&gt;Why use Python to import the genomic data into the PostgreSQL&amp;nbsp;database&lt;/h2&gt;
+&lt;p&gt;In the first part of this demonstration I mentioned that I got more than 200 files containing the raw counts of gene expression in the prostate cancer individuals, each corresponding to a individual with prostate gland cancer. Unfortunately, the counts files do not have the patient identification. This information is only available in the &lt;code&gt;files.tsv&lt;/code&gt; (and in my &lt;code&gt;allfiles&lt;/code&gt; table in the database consequently), which indicates which count file belongs to each patient. Therefore, I must include the count file name alongside the gene&amp;nbsp;counts.&lt;/p&gt;
+&lt;p&gt;Below I have an illustration of the problem. I have two files, count_A and&amp;nbsp;count_B:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# count_A&lt;/span&gt;
+ENSG00000000003.13 &lt;span class="m"&gt;4000&lt;/span&gt;
+ENSG00000000005.5 &lt;span class="m"&gt;5&lt;/span&gt;
+ENSG00000000419.11 &lt;span class="m"&gt;1800&lt;/span&gt;
+
+&lt;span class="c1"&gt;# count_B&lt;/span&gt;
+ENSG00000000003.13 &lt;span class="m"&gt;3000&lt;/span&gt;
+ENSG00000000005.5 &lt;span class="m"&gt;25&lt;/span&gt;
+ENSG00000000419.11 &lt;span class="m"&gt;500&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In this state, I cannot know which patients provided the samples that generate count_A and count_B. But if I add a new column with the&amp;nbsp;filename:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# count_A&lt;/span&gt;
+ENSG00000000003.13 &lt;span class="m"&gt;4000&lt;/span&gt;    count_A
+ENSG00000000005.5 &lt;span class="m"&gt;5&lt;/span&gt;   count_A
+ENSG00000000419.11 &lt;span class="m"&gt;1800&lt;/span&gt;    count_A
+
+&lt;span class="c1"&gt;# count_B&lt;/span&gt;
+ENSG00000000003.13 &lt;span class="m"&gt;3000&lt;/span&gt;    count_B
+ENSG00000000005.5 &lt;span class="m"&gt;25&lt;/span&gt;  count_B
+ENSG00000000419.11 &lt;span class="m"&gt;500&lt;/span&gt; count_B
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I can now cross-reference with the &lt;code&gt;allfiles&lt;/code&gt; table, and identify which file belong to each&amp;nbsp;patient:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;case_id file_name
+case0001 count_A
+case0002 count_B
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Thus, I created a &lt;strong&gt;relation&lt;/strong&gt; between the gene expression quantification and their patients of origin. Keep in mind that the gene counts file have &lt;strong&gt;thousands&lt;/strong&gt; of rows, each corresponding to one human gene/alternate transcript. Therefore, I&amp;nbsp;must:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Automate the creation of the third column containing the file name in all 200+ gene count&amp;nbsp;files;&lt;/li&gt;
+&lt;li&gt;Join the modified files into a single, unified data&amp;nbsp;frame;&lt;/li&gt;
+&lt;li&gt;Import the data frame into the &lt;code&gt;tcga&lt;/code&gt; database.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;With only programming language &amp;#8212; Python &amp;#8212; I can do all three requirements above. So that&amp;#8217;s why I used Python: it is a very powerful, versatile&amp;nbsp;language!&lt;/p&gt;
+&lt;h2&gt;Create Python virtual&amp;nbsp;environment&lt;/h2&gt;
+&lt;p&gt;Follow instructions to install Python in Windows &lt;a href="https://www.python.org/downloads/"&gt;here&lt;/a&gt;. Ensure that Python &lt;a href="https://datatofish.com/add-python-to-windows-path/"&gt;is included in your Windows &lt;span class="caps"&gt;PATH&lt;/span&gt;&lt;/a&gt;. Python usually comes pre-installed in several Unix distros and already included in the &lt;span class="caps"&gt;PATH&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;First, I will create a virtual environment to hold the necessary Python modules for my customized Python script. This is good practice &amp;#8212; as I explained in my &lt;a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html"&gt;previous post&lt;/a&gt; different environments isolate programs for different uses, ensuring compatibility. In the post I talked about miniconda, but the principle is the same for Python&amp;nbsp;here.&lt;/p&gt;
+&lt;p&gt;Otherwise, you can create a miniconda environment with Python included, and install all Python packages via miniconda channels. Since I will not use any other software besides Python here, there is no need to use miniconda, in my opinion. I created a virtual environment using Python&amp;#8217;s &lt;code&gt;virtualenv&lt;/code&gt; tool. Currently, I am using Python version&amp;nbsp;3.8.&lt;/p&gt;
+&lt;p&gt;In the &lt;code&gt;TCGA&lt;/code&gt; folder I open a PowerShell and issue the commands&amp;nbsp;below:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;python&lt;/span&gt; &lt;span class="n"&gt;-m&lt;/span&gt; &lt;span class="n"&gt;pip&lt;/span&gt; &lt;span class="n"&gt;install&lt;/span&gt; &lt;span class="p"&gt;-&lt;/span&gt;&lt;span class="n"&gt;-user&lt;/span&gt; &lt;span class="n"&gt;virtualenv&lt;/span&gt;
+
+&lt;span class="n"&gt;python&lt;/span&gt; &lt;span class="n"&gt;-m&lt;/span&gt; &lt;span class="n"&gt;venv&lt;/span&gt; &lt;span class="n"&gt;venv&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The first command installs the program &lt;code&gt;virtualenv&lt;/code&gt; (&lt;code&gt;venv&lt;/code&gt;) via the Python package manager &lt;code&gt;pip&lt;/code&gt;. The second command uses &lt;code&gt;venv&lt;/code&gt; to create a virtual environment deposited in a folder named &lt;code&gt;venv&lt;/code&gt; in the current directory (&lt;code&gt;TCGA&lt;/code&gt; folder in this example). You can also provide a complete path like&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;python&lt;/span&gt; &lt;span class="n"&gt;-m&lt;/span&gt; &lt;span class="n"&gt;venv&lt;/span&gt; &lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="err"&gt;:&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;Users&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;some_path&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;TCGA&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;venv&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Of course, you can call the virtual environment as you&amp;nbsp;wish.&lt;/p&gt;
+&lt;h2&gt;Activate the virtual&amp;nbsp;environment&lt;/h2&gt;
+&lt;p&gt;Still in the &lt;code&gt;TCGA&lt;/code&gt; folder, I type the&amp;nbsp;command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;venv&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;Scripts&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;activate&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The virtual environment is ready to be used. I will install the necessary modules for the&amp;nbsp;work.&lt;/p&gt;
+&lt;h2&gt;Install Python modules into the virtual&amp;nbsp;environment&lt;/h2&gt;
+&lt;p&gt;The modules I will install&amp;nbsp;are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://docs.dask.org/en/latest/why.html"&gt;&lt;code&gt;dask&lt;/code&gt;&lt;/a&gt;: to create the unified data frame with the gene&amp;nbsp;expression;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;psycopg2-binary&lt;/code&gt; and &lt;code&gt;sqlalchemy&lt;/code&gt;: to connect with the PostgreSQL database and push the dataframe into&amp;nbsp;it.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;pip&lt;/span&gt; &lt;span class="n"&gt;install&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;dask[complete]&amp;quot;&lt;/span&gt; &lt;span class="n"&gt;psycopg2-binary&lt;/span&gt; &lt;span class="n"&gt;sqlalchemy&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The modules will be downloaded from the internet and installed at the &lt;code&gt;venv&lt;/code&gt; folder. Additional dependencies, such as &lt;a href="https://pandas.pydata.org/"&gt;&lt;code&gt;pandas&lt;/code&gt;&lt;/a&gt; (a widely-used data analysis and manipulation tool) and &lt;a href="https://numpy.org/"&gt;&lt;code&gt;NumPy&lt;/code&gt;&lt;/a&gt; (package for scientific computing), used by &lt;code&gt;dask&lt;/code&gt;, will be downloaded as&amp;nbsp;well.&lt;/p&gt;
+&lt;h2&gt;Creating Python credentials to access PostgreSQL&amp;nbsp;database&lt;/h2&gt;
+&lt;p&gt;To access the &lt;code&gt;tcga&lt;/code&gt; database through Python, we need to configure credentials for the&amp;nbsp;connection.&lt;/p&gt;
+&lt;p&gt;In the terminal I&amp;nbsp;type:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;psql&lt;/span&gt; &lt;span class="n"&gt;-U&lt;/span&gt; &lt;span class="n"&gt;postgres&lt;/span&gt; &lt;span class="n"&gt;-d&lt;/span&gt; &lt;span class="n"&gt;tcga&lt;/span&gt; &lt;span class="n"&gt;-c&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;CREATE USER &amp;lt;USER_NAME&amp;gt; with encrypted password &amp;#39;&amp;lt;PASSWORD&amp;gt;&amp;#39;&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;psql&lt;/span&gt; &lt;span class="n"&gt;-U&lt;/span&gt; &lt;span class="n"&gt;postgres&lt;/span&gt; &lt;span class="n"&gt;-d&lt;/span&gt; &lt;span class="n"&gt;tcga&lt;/span&gt; &lt;span class="n"&gt;-c&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;GRANT ALL PRIVILEGES ON DATABASE tcga TO &amp;lt;USER_NAME&amp;gt;&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;&amp;lt;USER_NAME&amp;gt;&lt;/code&gt; and &lt;code&gt;&amp;lt;PASSWORD&amp;gt;&lt;/code&gt; are placeholders for my username and password, respectively, since it is good practice to &lt;strong&gt;&lt;span class="caps"&gt;NEVER&lt;/span&gt; share sensitive information&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Then, I created a file named &lt;code&gt;settings.py&lt;/code&gt; and put it in a &lt;code&gt;src&lt;/code&gt; folder with the following&amp;nbsp;content:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;DB_FLAVOR&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;postgresql&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;DB_PYTHON_LIBRARY&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;psycopg2&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;USER&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;lt;USER_NAME&amp;gt;&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;PASSWORD&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;lt;PASSWORD&amp;gt;&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;DB_HOST&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;localhost&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;PORT&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;5432&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;DB_NAME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;tcga&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Create one yourself with the user name and password you specified on the previous step. The other parameters can be left as they are. The 5432 port is usually the default port configured during installation to connection to PostgreSQL. Change it if needed, of course. &lt;code&gt;localhost&lt;/code&gt; means that the PostgreSQL is running locally in my&amp;nbsp;computer.&lt;/p&gt;
+&lt;p&gt;Then, to keep the organization of my folder, I added my &lt;code&gt;tcga_processing_counts.py&lt;/code&gt; customized script to the &lt;code&gt;src&lt;/code&gt; folder. The folder structure is now like&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;.
+└── TCGA
+    ├── data
+    │   ├── counts
+    │   │   └── &lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="m"&gt;200&lt;/span&gt;+ *.counts.gz files&lt;span class="o"&gt;]&lt;/span&gt;
+    │   ├── focal_score_by_genes
+    │   ├── fpkm
+    │   ├── gene_level_copy_numbers
+    │   ├── cases.tsv
+    │   ├── demographic.tsv
+    │   ├── files.tsv
+    │   └── follow_up.tsv
+    ├── src
+    │   ├── settings.py
+    │   └── tcga_processing_counts.py
+    ├── main_tcga.ps1
+    └── main_tcga.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Running the&amp;nbsp;script&lt;/h2&gt;
+&lt;p&gt;Back in the &lt;code&gt;TCGA&lt;/code&gt; folder, I type in the&amp;nbsp;PowerShell:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;python&lt;/span&gt; &lt;span class="n"&gt;src&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;tcga_processing_counts&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;py&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This will start the script, which has eight&amp;nbsp;steps:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Set up PostgreSQL connection object: &lt;code&gt;psycopg2&lt;/code&gt; and &lt;code&gt;sqlalchemy&lt;/code&gt; modules use the credential of the &lt;code&gt;settings.py&lt;/code&gt;;&lt;/li&gt;
+&lt;li&gt;Set up project paths: locate the data&amp;nbsp;folders;&lt;/li&gt;
+&lt;li&gt;Decompress the &lt;code&gt;.counts.gz&lt;/code&gt; files;&lt;/li&gt;
+&lt;li&gt;Make a list of all uncompressed&amp;nbsp;files;&lt;/li&gt;
+&lt;li&gt;Create a function ready to return a pandas.DataFrame: this is when I add the third column with the filename in the counts&amp;nbsp;files;&lt;/li&gt;
+&lt;li&gt;Create a list of commands to apply the read_and_label_csv function to all&amp;nbsp;files;&lt;/li&gt;
+&lt;li&gt;Using &lt;code&gt;dask&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;delayed&lt;/code&gt; method, assemble the pandas.DataFrames into a &lt;code&gt;dask.DataFrame&lt;/code&gt;;&lt;/li&gt;
+&lt;li&gt;Send the &lt;code&gt;dask.DataFrame&lt;/code&gt; to the&amp;nbsp;database.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;There is an optional step before step 8 to export the &lt;code&gt;dask.DataFrame&lt;/code&gt; as &lt;span class="caps"&gt;HUGE&lt;/span&gt; &lt;span class="caps"&gt;CSV&lt;/span&gt; file that I disabled by default. &lt;strong&gt;&lt;span class="caps"&gt;WARNING&lt;/span&gt;: &lt;span class="caps"&gt;IT&lt;/span&gt; &lt;span class="caps"&gt;USES&lt;/span&gt; A &lt;span class="caps"&gt;LOT&lt;/span&gt; &lt;span class="caps"&gt;OF&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt; &lt;span class="caps"&gt;AND&lt;/span&gt; &lt;span class="caps"&gt;CPU&lt;/span&gt;&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;The use of &lt;code&gt;dask&lt;/code&gt; for this job is crucial. &lt;code&gt;pandas&lt;/code&gt; works by loading all data into the &lt;span class="caps"&gt;RAM&lt;/span&gt;. However, since there are several files of considerable size, it would overload my available &lt;span class="caps"&gt;RAM&lt;/span&gt;. &lt;code&gt;dask&lt;/code&gt; is suited for larger-than-memory datasets, since it operates by lazy evaluation: it break operations into blocks and specifies task chains and execute them only on demand, saving computing&amp;nbsp;resources.&lt;/p&gt;
+&lt;p&gt;Go check the contents of my &lt;a href="https://github.com/antoniocampos13/portfolio/blob/master/SQL/2020_10_12_Working_Data_CGC_PostgreSQL/TCGA/src/tcga_processing_counts.py"&gt;&lt;code&gt;tcga_processing_counts.py&lt;/code&gt; in my portfolio&lt;/a&gt;. By default, it will create a table named &lt;code&gt;gene_counts&lt;/code&gt; in the &lt;code&gt;tcga&lt;/code&gt; database. See an excerpt of the final&amp;nbsp;result:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Gene counts table in tcga database" src="https://antoniocampos13.github.io/images/tcga_gene_counts.PNG"&gt;&lt;/p&gt;
+&lt;h2&gt;Finishing&amp;nbsp;touches&lt;/h2&gt;
+&lt;p&gt;With the gene expression counts dataset imported in the database, it is time to create the filename (gene counts)/patient relation as I explained in the beginning of the post. In the terminal again, I&amp;nbsp;type:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;psql&lt;/span&gt; &lt;span class="n"&gt;-U&lt;/span&gt; &lt;span class="n"&gt;postgres&lt;/span&gt; &lt;span class="n"&gt;-d&lt;/span&gt; &lt;span class="n"&gt;tcga&lt;/span&gt; &lt;span class="n"&gt;-c&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;CREATE TABLE gene_counts_cases AS SELECT DISTINCT case_id, gene_id, gene_count FROM gene_counts LEFT JOIN allfiles ON gene_counts.filename = allfiles.file_uuid WHERE gene_id LIKE &amp;#39;%ENSG%&amp;#39;&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The command above links the two tables by their information in common: the filename of the gene counts, which is named &lt;code&gt;filename&lt;/code&gt; in the gene_counts table and &lt;code&gt;file_uuid&lt;/code&gt; in &lt;code&gt;allfiles&lt;/code&gt; table that we created&amp;nbsp;before.&lt;/p&gt;
+&lt;p&gt;See an excerpt of the final&amp;nbsp;result:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Gene counts table in tcga database: counts/patient relation" src="https://antoniocampos13.github.io/images/tcga_gene_counts_cases.PNG"&gt;&lt;/p&gt;
+&lt;p&gt;With this I conclude the second and last part of this demonstration. There is still missing the outcome information, which is located in the &lt;code&gt;follow_up&lt;/code&gt; table in the database. However, the &lt;code&gt;gene_counts_cases&lt;/code&gt; table is not yet ready to be linked. I need to pivot this table, but PostgreSQL has a limit of 1600 columns. Perhaps if I import this table into a session in &lt;code&gt;R&lt;/code&gt;, it will be possible to transform the table. Additionally, I will perform differential expression analysis for sequence count&amp;nbsp;data.&lt;/p&gt;
+&lt;h2&gt;Conclusion of Part&amp;nbsp;2&lt;/h2&gt;
+&lt;p&gt;In this part&amp;nbsp;I:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Demonstrated how Python can be used to create data frames larger-than-memory with &lt;code&gt;dask&lt;/code&gt; module;&lt;/li&gt;
+&lt;li&gt;Demonstrated how to connect Python to PostgreSQL databases with &lt;code&gt;psycopg2&lt;/code&gt; and &lt;code&gt;sqlalchemy&lt;/code&gt; modules;&lt;/li&gt;
+&lt;li&gt;Demonstrated simple &lt;code&gt;LEFT JOIN&lt;/code&gt; operation to link gene counts to individual cases of prostate&amp;nbsp;cancer.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;&lt;a href="https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html"&gt;Go back to Part 1&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;&lt;a href="http://www.cancergenomicscloud.org/"&gt;Cancer Genomics&amp;nbsp;Cloud&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://cancergenome.nih.gov/"&gt;The Cancer Genome Atlas&amp;nbsp;Program&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.ncbi.nlm.nih.gov/gap/"&gt;Home - dbGaP - &lt;span class="caps"&gt;NCBI&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.python.org/downloads/"&gt;Download&amp;nbsp;Python&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://datatofish.com/add-python-to-windows-path/"&gt;How to add Python to Windows &lt;span class="caps"&gt;PATH&lt;/span&gt; - Data to&amp;nbsp;Fish&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html"&gt;Setting Up Your Unix Computer for Bioinformatics&amp;nbsp;Analysis&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://docs.dask.org/en/latest/why.html"&gt;Dask  documentation - Why&amp;nbsp;Dask?&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://pandas.pydata.org/"&gt;pandas - Python Data Analysis&amp;nbsp;Library&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://numpy.org/"&gt;NumPy&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Antonio Victor Campos Coelho</dc:creator><pubDate>Mon, 12 Oct 2020 12:42:00 -0300</pubDate><guid isPermaLink="false">tag:antoniocampos13.github.io,2020-10-12:/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-2.html</guid><category>SQL</category><category>Bioinformatics</category><category>gene expression quantification</category><category>copy number variation</category><category>Windows</category></item><item><title>FASTQ to Annotation (Part 4)</title><link>https://antoniocampos13.github.io/fastq-to-annotation-part-4.html</link><description>&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;&lt;em&gt;In a &lt;a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html"&gt;previous post&lt;/a&gt;, I showed how to configure an Ubuntu system to install Bioinformatics&amp;nbsp;programs.&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Now, using the environment I created, I will demonstrate a bash script, &lt;code&gt;FastQ_to_Annotation.sh&lt;/code&gt; that takes next generation sequencing (&lt;span class="caps"&gt;NGS&lt;/span&gt;) raw reads from human whole genome sequencing as input and produces variant annotation as output. Variant annotation is the process of identifying genetic variants in some genomic &lt;span class="caps"&gt;DNA&lt;/span&gt; sample, and assess, for example, if any of the found variants have any effect on phenotype, such as increased susceptibility to certain&amp;nbsp;diseases.&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;In the &lt;a href="https://antoniocampos13.github.io/fastq-to-annotation-part-1"&gt;first part&lt;/a&gt;, I showed how to search for &lt;span class="caps"&gt;NGS&lt;/span&gt; projects deposited in &lt;a href="https://www.ncbi.nlm.nih.gov/"&gt;National Center for Biotechnology Information (&lt;span class="caps"&gt;NCBI&lt;/span&gt;) databases&lt;/a&gt; from which I can download sequencing reads later to use with the&amp;nbsp;script.&lt;/em&gt;&lt;/p&gt;
