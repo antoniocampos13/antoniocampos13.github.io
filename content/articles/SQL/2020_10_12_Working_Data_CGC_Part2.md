@@ -13,7 +13,7 @@ Tags: Bioinformatics, gene expression quantification, copy number variation, Win
 
 *Anyone can register in CGC and have access to open access massive public datasets, like [The Cancer Genomics Atlas (TCGA)](http://cancergenome.nih.gov/). Most individual-level genomic data can only be accessed following approval of a Data Access Request through the [Database of Genotypes and Phenotypes (dbGaP)](https://www.ncbi.nlm.nih.gov/gap/). For now, I guess the open data tier will suffice for this exercise.*
 
-*This demonstration will be separated into two parts. In the [first part]() I provided a brief run-down of how I queried the CGC to obtain genomic data from cancer patients and the first steps into preparing a local PostgreSQL relational database in my computer.*
+*This demonstration will be separated into two parts. In the [first part](https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html) I provided a brief run-down of how I queried the CGC to obtain genomic data from cancer patients and the first steps into preparing a local PostgreSQL relational database in my computer.*
 
 Here in the second part I will use a customized Python to help with the import of genomic data into the PostgreSQL database.
 
@@ -23,7 +23,7 @@ In the first part of this demonstration I mentioned that I got more than 200 fil
 
 Below I have an illustration of the problem. I have two files, count_A and count_B:
 
-```txt
+```bash
 # count_A
 ENSG00000000003.13 4000
 ENSG00000000005.5 5
@@ -37,7 +37,7 @@ ENSG00000000419.11 500
 
 In this state, I cannot know which patients provided the samples that generate count_A and count_B. But if I add a new column with the filename:
 
-```txt
+```bash
 # count_A
 ENSG00000000003.13 4000    count_A
 ENSG00000000005.5 5   count_A
@@ -51,7 +51,7 @@ ENSG00000000419.11 500 count_B
 
 I can now cross-reference with the `allfiles` table, and identify which file belong to each patient:
 
-```txt
+```bash
 case_id file_name
 case0001 count_A
 case0002 count_B
@@ -142,7 +142,7 @@ Create one yourself with the user name and password you specified on the previou
 
 Then, to keep the organization of my folder, I added my `tcga_processing_counts.py` customized script to the `src` folder. The folder structure is now like this:
 
-```txt
+```bash
 .
 └── TCGA
     ├── data
@@ -213,7 +213,7 @@ In this part I:
 * Demonstrated how to connect Python to PostgreSQL databases with `psycopg2` and `sqlalchemy` modules;
 * Demonstrated simple `LEFT JOIN` operation to link gene counts to individual cases of prostate cancer.
 
-*[Go back to Part 1]().*
+*[Go back to Part 1](https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html).*
 
 ## References
 

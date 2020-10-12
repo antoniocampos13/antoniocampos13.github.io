@@ -63,7 +63,7 @@ The official PostgreSQL installation instructions are [here](https://www.postgre
 
 I created a folder named `TCGA` for this project, and put the downloaded files inside a `data` subfolder. Here is a representation of my directory structure:
 
-```txt
+```bash
 .
 └── TCGA
     ├── data
@@ -146,7 +146,7 @@ The output `COPY` followed by an integer (representing the number of rows copied
 
 With this I conclude the first part of this demonstration. In the next part I will use I will use a customized Python to help with the import of genomic data into the PostgreSQL database.
 
-*[Go to Part 2]().*
+*[Go to Part 2](https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-2.html).*
 
 ## Conclusion of Part 1
 
