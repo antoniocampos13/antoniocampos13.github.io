@@ -182,20 +182,20 @@
 <h2>Creating the &#8216;tcga&#8217; database into the local PostgreSQL&nbsp;server</h2>
 <p>The official PostgreSQL installation instructions are <a href="https://www.postgresql.org/download/">here</a>.</p>
 <p>I created a folder named <code>TCGA</code> for this project, and put the downloaded files inside a <code>data</code> subfolder. Here is a representation of my directory&nbsp;structure:</p>
-<div class="highlight"><pre><span></span><code><span class="err">.</span>
-<span class="err">└── TCGA</span>
-<span class="err">    ├── data</span>
-<span class="err">    │   ├── counts</span>
-<span class="err">    │   │   └── [200+ *.counts.gz files]</span>
-<span class="err">    │   ├── focal_score_by_genes</span>
-<span class="err">    │   ├── fpkm</span>
-<span class="err">    │   ├── gene_level_copy_numbers</span>
-<span class="err">    │   ├── cases.tsv</span>
-<span class="err">    │   ├── demographic.tsv</span>
-<span class="err">    │   ├── files.tsv</span>
-<span class="err">    │   └── follow_up.tsv</span>
-<span class="err">    ├── main_tcga.ps1</span>
-<span class="err">    └── main_tcga.sh</span>
+<div class="highlight"><pre><span></span><code>.
+└── TCGA
+    ├── data
+    │   ├── counts
+    │   │   └── <span class="o">[</span><span class="m">200</span>+ *.counts.gz files<span class="o">]</span>
+    │   ├── focal_score_by_genes
+    │   ├── fpkm
+    │   ├── gene_level_copy_numbers
+    │   ├── cases.tsv
+    │   ├── demographic.tsv
+    │   ├── files.tsv
+    │   └── follow_up.tsv
+    ├── main_tcga.ps1
+    └── main_tcga.sh
 </code></pre></div>
 
 
@@ -246,7 +246,7 @@
 <p>The <code>CSV</code> indicates that we are importing a delimiter-separated file. <code>HEADER</code> means that the copied file have a header &#8212; the first line have the column titles, which <strong>must be equal</strong> to the ones specified during table creation; an error will occur otherwise. This argument must be omitted if the file does not have a&nbsp;header.</p>
 <p>The output <code>COPY</code> followed by an integer (representing the number of rows copied) means that everything went well. Be careful: do not run the copy commands more than once, otherwise data duplication will&nbsp;occur.</p>
 <p>With this I conclude the first part of this demonstration. In the next part I will use I will use a customized Python to help with the import of genomic data into the PostgreSQL&nbsp;database.</p>
-<p><em><a href="">Go to Part 2</a>.</em></p>
+<p><em><a href="https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-2.html">Go to Part 2</a>.</em></p>
 <h2>Conclusion of Part&nbsp;1</h2>
 <p>In this part&nbsp;I:</p>
 <ul>

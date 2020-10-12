@@ -148,40 +148,40 @@
     <h2>Introduction</h2>
 <p><em>Recently I have been looking for publicly-available genomics datasets to test machine learning models in Python. During my searches for such a &#8220;toy dataset&#8221;, I came upon the <a href="http://www.cancergenomicscloud.org/">Cancer Genomics Cloud (<span class="caps">CGC</span>)</a>&nbsp;initiative.</em></p>
 <p><em>Anyone can register in <span class="caps">CGC</span> and have access to open access massive public datasets, like <a href="http://cancergenome.nih.gov/">The Cancer Genomics Atlas (<span class="caps">TCGA</span>)</a>. Most individual-level genomic data can only be accessed following approval of a Data Access Request through the <a href="https://www.ncbi.nlm.nih.gov/gap/">Database of Genotypes and Phenotypes (dbGaP)</a>. For now, I guess the open data tier will suffice for this&nbsp;exercise.</em></p>
-<p><em>This demonstration will be separated into two parts. In the <a href="">first part</a> I provided a brief run-down of how I queried the <span class="caps">CGC</span> to obtain genomic data from cancer patients and the first steps into preparing a local PostgreSQL relational database in my&nbsp;computer.</em></p>
+<p><em>This demonstration will be separated into two parts. In the <a href="https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html">first part</a> I provided a brief run-down of how I queried the <span class="caps">CGC</span> to obtain genomic data from cancer patients and the first steps into preparing a local PostgreSQL relational database in my&nbsp;computer.</em></p>
 <p>Here in the second part I will use a customized Python to help with the import of genomic data into the PostgreSQL&nbsp;database.</p>
 <h2>Why use Python to import the genomic data into the PostgreSQL&nbsp;database</h2>
 <p>In the first part of this demonstration I mentioned that I got more than 200 files containing the raw counts of gene expression in the prostate cancer individuals, each corresponding to a individual with prostate gland cancer. Unfortunately, the counts files do not have the patient identification. This information is only available in the <code>files.tsv</code> (and in my <code>allfiles</code> table in the database consequently), which indicates which count file belongs to each patient. Therefore, I must include the count file name alongside the gene&nbsp;counts.</p>
 <p>Below I have an illustration of the problem. I have two files, count_A and&nbsp;count_B:</p>
-<div class="highlight"><pre><span></span><code><span class="o">#</span> <span class="n">count_A</span>
-<span class="n">ENSG00000000003</span><span class="p">.</span><span class="mi">13</span> <span class="mi">4000</span>
-<span class="n">ENSG00000000005</span><span class="p">.</span><span class="mi">5</span> <span class="mi">5</span>
-<span class="n">ENSG00000000419</span><span class="p">.</span><span class="mi">11</span> <span class="mi">1800</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># count_A</span>
+ENSG00000000003.13 <span class="m">4000</span>
+ENSG00000000005.5 <span class="m">5</span>
+ENSG00000000419.11 <span class="m">1800</span>
 
-<span class="o">#</span> <span class="n">count_B</span>
-<span class="n">ENSG00000000003</span><span class="p">.</span><span class="mi">13</span> <span class="mi">3000</span>
-<span class="n">ENSG00000000005</span><span class="p">.</span><span class="mi">5</span> <span class="mi">25</span>
-<span class="n">ENSG00000000419</span><span class="p">.</span><span class="mi">11</span> <span class="mi">500</span>
+<span class="c1"># count_B</span>
+ENSG00000000003.13 <span class="m">3000</span>
+ENSG00000000005.5 <span class="m">25</span>
+ENSG00000000419.11 <span class="m">500</span>
 </code></pre></div>
 
 
 <p>In this state, I cannot know which patients provided the samples that generate count_A and count_B. But if I add a new column with the&nbsp;filename:</p>
-<div class="highlight"><pre><span></span><code><span class="o">#</span> <span class="n">count_A</span>
-<span class="n">ENSG00000000003</span><span class="p">.</span><span class="mi">13</span> <span class="mi">4000</span>    <span class="n">count_A</span>
-<span class="n">ENSG00000000005</span><span class="p">.</span><span class="mi">5</span> <span class="mi">5</span>   <span class="n">count_A</span>
-<span class="n">ENSG00000000419</span><span class="p">.</span><span class="mi">11</span> <span class="mi">1800</span>    <span class="n">count_A</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># count_A</span>
+ENSG00000000003.13 <span class="m">4000</span>    count_A
+ENSG00000000005.5 <span class="m">5</span>   count_A
+ENSG00000000419.11 <span class="m">1800</span>    count_A
 
-<span class="o">#</span> <span class="n">count_B</span>
-<span class="n">ENSG00000000003</span><span class="p">.</span><span class="mi">13</span> <span class="mi">3000</span>    <span class="n">count_B</span>
-<span class="n">ENSG00000000005</span><span class="p">.</span><span class="mi">5</span> <span class="mi">25</span>  <span class="n">count_B</span>
-<span class="n">ENSG00000000419</span><span class="p">.</span><span class="mi">11</span> <span class="mi">500</span> <span class="n">count_B</span>
+<span class="c1"># count_B</span>
+ENSG00000000003.13 <span class="m">3000</span>    count_B
+ENSG00000000005.5 <span class="m">25</span>  count_B
+ENSG00000000419.11 <span class="m">500</span> count_B
 </code></pre></div>
 
 
 <p>I can now cross-reference with the <code>allfiles</code> table, and identify which file belong to each&nbsp;patient:</p>
-<div class="highlight"><pre><span></span><code><span class="err">case_id file_name</span>
-<span class="err">case0001 count_A</span>
-<span class="err">case0002 count_B</span>
+<div class="highlight"><pre><span></span><code>case_id file_name
+case0001 count_A
+case0002 count_B
 </code></pre></div>
 
 
@@ -250,23 +250,23 @@
 
 <p>Create one yourself with the user name and password you specified on the previous step. The other parameters can be left as they are. The 5432 port is usually the default port configured during installation to connection to PostgreSQL. Change it if needed, of course. <code>localhost</code> means that the PostgreSQL is running locally in my&nbsp;computer.</p>
 <p>Then, to keep the organization of my folder, I added my <code>tcga_processing_counts.py</code> customized script to the <code>src</code> folder. The folder structure is now like&nbsp;this:</p>
-<div class="highlight"><pre><span></span><code><span class="err">.</span>
-<span class="err">└── TCGA</span>
-<span class="err">    ├── data</span>
-<span class="err">    │   ├── counts</span>
-<span class="err">    │   │   └── [200+ *.counts.gz files]</span>
-<span class="err">    │   ├── focal_score_by_genes</span>
-<span class="err">    │   ├── fpkm</span>
-<span class="err">    │   ├── gene_level_copy_numbers</span>
-<span class="err">    │   ├── cases.tsv</span>
-<span class="err">    │   ├── demographic.tsv</span>
-<span class="err">    │   ├── files.tsv</span>
-<span class="err">    │   └── follow_up.tsv</span>
-<span class="err">    ├── src</span>
-<span class="err">    │   ├── settings.py</span>
-<span class="err">    │   └── tcga_processing_counts.py</span>
-<span class="err">    ├── main_tcga.ps1</span>
-<span class="err">    └── main_tcga.sh</span>
+<div class="highlight"><pre><span></span><code>.
+└── TCGA
+    ├── data
+    │   ├── counts
+    │   │   └── <span class="o">[</span><span class="m">200</span>+ *.counts.gz files<span class="o">]</span>
+    │   ├── focal_score_by_genes
+    │   ├── fpkm
+    │   ├── gene_level_copy_numbers
+    │   ├── cases.tsv
+    │   ├── demographic.tsv
+    │   ├── files.tsv
+    │   └── follow_up.tsv
+    ├── src
+    │   ├── settings.py
+    │   └── tcga_processing_counts.py
+    ├── main_tcga.ps1
+    └── main_tcga.sh
 </code></pre></div>
 
 
@@ -308,7 +308,7 @@
 <li>Demonstrated how to connect Python to PostgreSQL databases with <code>psycopg2</code> and <code>sqlalchemy</code> modules;</li>
 <li>Demonstrated simple <code>LEFT JOIN</code> operation to link gene counts to individual cases of prostate&nbsp;cancer.</li>
 </ul>
-<p><em><a href="">Go back to Part 1</a>.</em></p>
+<p><em><a href="https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html">Go back to Part 1</a>.</em></p>
 <h2>References</h2>
 <p><a href="http://www.cancergenomicscloud.org/">Cancer Genomics&nbsp;Cloud</a></p>
 <p><a href="http://cancergenome.nih.gov/">The Cancer Genome Atlas&nbsp;Program</a></p>
