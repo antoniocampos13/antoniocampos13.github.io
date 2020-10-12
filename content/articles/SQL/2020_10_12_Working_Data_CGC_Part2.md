@@ -1,6 +1,6 @@
 ---
 Title: Working with Cancer Genomics Cloud datasets in a PostgreSQL database (Part 2)
-Status: draft
+Status: published
 Date: 2020-10-12 12:42
 Author: Antonio Victor Campos Coelho
 Categories: SQL, Python
