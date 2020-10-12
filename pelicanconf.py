@@ -10,7 +10,7 @@ SITEDESCRIPTION = "Data Science Portfolio by Antonio Victor Campos Coelho"
 SITESUBTITLE = 'PhD in Genetics'
 SITELOGO = 'https://avatars.githubusercontent.com/antoniocampos13'
 BROWSER_COLOR = '#333333'
-PYGMENTS_STYLE = 'friendly'
+PYGMENTS_STYLE = 'vs'
 
 USE_FOLDER_AS_CATEGORY = True
 MAIN_MENU = True
@@ -44,6 +44,7 @@ RSS_FEED_SUMMARY_ONLY = False
 # Blogroll
 LINKS = (
 ('Brazilian Lattes CV', 'http://lattes.cnpq.br/2986394950644755'),
+('Google Scholar', 'https://scholar.google.com.br/citations?user=d2ij4wUAAAAJ&hl'),
 ('ORCID', 'https://orcid.org/0000-0003-2143-9701'),
 ('Researcher ID/Publons', 'https://publons.com/researcher/2414076/antonio-victor-c-coelho'),
 )
