@@ -49,7 +49,7 @@
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="https://antoniocampos13.github.io/drafts/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html"/>
 <meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2020-10-12 18:00:00-03:00"/>
+<meta property="article:published_time" content="2020-10-12 12:42:00-03:00"/>
 <meta property="article:modified_time" content=""/>
 <meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
 <meta property="article:section" content="SQL"/>
@@ -150,7 +150,7 @@
 <p>Anyone can register in <span class="caps">CGC</span> and have access to open access massive public datasets, like <a href="http://cancergenome.nih.gov/">The Cancer Genomics Atlas (<span class="caps">TCGA</span>)</a>. Most individual-level genomic data can only be accessed following approval of a Data Access Request through the <a href="https://www.ncbi.nlm.nih.gov/gap/">Database of Genotypes and Phenotypes (dbGaP)</a>. For now, I guess the open data tier will suffice for this&nbsp;exercise.</p>
 <p>This demonstration will be separated into two parts. Here in the first part I will provide a brief run-down of how I queried the <span class="caps">CGC</span> to obtain genomic data from cancer patients and the first steps into preparing a local PostgreSQL relational database in my&nbsp;computer.</p>
 <h2>Querying the <span class="caps">CGC</span></h2>
-<p>Following registering, I created a project in the <span class="caps">CGC</span> dashboard and went into its data browser&nbsp;tool:</p>
+<p>I registered at <span class="caps">CGC</span>, then I created a project in the <span class="caps">CGC</span> dashboard and went into the data browser&nbsp;tool:</p>
 <p><img alt="CGC dashboard options" src="https://antoniocampos13.github.io/images/cgc_1.PNG"></p>
 <p>Then, I chose the <span class="caps">TCGA</span> GRCh38 dataset and clicked on the <code>Explore selected</code> button.</p>
 <p><img alt="TCGA dataset" src="https://antoniocampos13.github.io/images/cgc_2.PNG"></p>
@@ -160,8 +160,10 @@
 <ul>
 <li><em>Entity</em></li>
 <li><em>Filters</em></li>
-<li>Case</li>
+<li>Case<ul>
 <li>Primary site: Prostate&nbsp;Gland</li>
+</ul>
+</li>
 <li>Diagnosis</li>
 <li>Age at&nbsp;diagnosis</li>
 <li>Clinical T (<span class="caps">TNM</span>)</li>

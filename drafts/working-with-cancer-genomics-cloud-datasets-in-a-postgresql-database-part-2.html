@@ -49,7 +49,7 @@
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="https://antoniocampos13.github.io/drafts/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-2.html"/>
 <meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2020-10-12 18:00:00-03:00"/>
+<meta property="article:published_time" content="2020-10-12 12:42:00-03:00"/>
 <meta property="article:modified_time" content=""/>
 <meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
 <meta property="article:section" content="SQL"/>
@@ -188,14 +188,14 @@ case0002 count_B
 <p>Thus, I created a <strong>relation</strong> between the gene expression quantification and their patients of origin. Keep in mind that the gene counts file have <strong>thousands</strong> of rows, each corresponding to one human gene/alternate transcript. Therefore, I&nbsp;must:</p>
 <ol>
 <li>Automate the creation of the third column containing the file name in all 200+ gene count&nbsp;files;</li>
-<li>Join the modified files into a single, unified&nbsp;dataframe;</li>
-<li>Import the dataframe into the <code>tcga</code> database.</li>
+<li>Join the modified files into a single, unified data&nbsp;frame;</li>
+<li>Import the data frame into the <code>tcga</code> database.</li>
 </ol>
 <p>With only programming language &#8212; Python &#8212; I can do all three requirements above. So that&#8217;s why I used Python: it is a very powerful, versatile&nbsp;language!</p>
 <h2>Create Python virtual&nbsp;environment</h2>
 <p>Follow instructions to install Python in Windows <a href="https://www.python.org/downloads/">here</a>. Ensure that Python <a href="https://datatofish.com/add-python-to-windows-path/">is included in your Windows <span class="caps">PATH</span></a>. Python usually comes pre-installed in several Unix distros and already included in the <span class="caps">PATH</span>.</p>
 <p>First, I will create a virtual environment to hold the necessary Python modules for my customized Python script. This is good practice &#8212; as I explained in my <a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html">previous post</a> different environments isolate programs for different uses, ensuring compatibility. In the post I talked about miniconda, but the principle is the same for Python&nbsp;here.</p>
-<p>Otherwise, you can create a miniconda environment with Python included, and install all Python packages via miniconda channels. Since I will not use any other software besides Python here, there is no need to use miniconda, in my opinion. I created a virtual enviroment using Python&#8217;s <code>virtualenv</code> tool. Currently, I am using Python version&nbsp;3.8.</p>
+<p>Otherwise, you can create a miniconda environment with Python included, and install all Python packages via miniconda channels. Since I will not use any other software besides Python here, there is no need to use miniconda, in my opinion. I created a virtual environment using Python&#8217;s <code>virtualenv</code> tool. Currently, I am using Python version&nbsp;3.8.</p>
 <p>In the <code>TCGA</code> folder I open a PowerShell and issue the commands&nbsp;below:</p>
 <div class="highlight"><pre><span></span><code><span class="n">python</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="p">-</span><span class="n">-user</span> <span class="n">virtualenv</span>
 
@@ -219,7 +219,7 @@ case0002 count_B
 <h2>Install Python modules into the virtual&nbsp;environment</h2>
 <p>The modules I will install&nbsp;are:</p>
 <ul>
-<li><a href="https://docs.dask.org/en/latest/why.html"><code>dask</code></a>: to create the unified dataframe with the gene&nbsp;expression;</li>
+<li><a href="https://docs.dask.org/en/latest/why.html"><code>dask</code></a>: to create the unified data frame with the gene&nbsp;expression;</li>
 <li><code>psycopg2-binary</code> and <code>sqlalchemy</code>: to connect with the PostgreSQL database and push the dataframe into&nbsp;it.</li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;dask[complete]&quot;</span> <span class="n">psycopg2-binary</span> <span class="n">sqlalchemy</span>
@@ -304,7 +304,7 @@ case0002 count_B
 <h2>Conclusion of Part&nbsp;2</h2>
 <p>In this part&nbsp;I:</p>
 <ul>
-<li>Demonstrated how Python can be used to create dataframes larger-than-memory with <code>dask</code> module;</li>
+<li>Demonstrated how Python can be used to create data frames larger-than-memory with <code>dask</code> module;</li>
 <li>Demonstrated how to connect Python to PostgreSQL databases with <code>psycopg2</code> and <code>sqlalchemy</code> modules;</li>
 <li>Demonstrated simple <code>LEFT JOIN</code> operation to link gene counts to individual cases of prostate&nbsp;cancer.</li>
 </ul>
