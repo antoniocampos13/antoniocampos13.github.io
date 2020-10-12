@@ -1,0 +1,374 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/stylesheet/style.min.css">
+
+
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+          href="https://antoniocampos13.github.io/theme/pygments/monokai.min.css">
+
+
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/solid.css">
+
+
+    <link href="https://antoniocampos13.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Antonio's Portfolio Atom">
+
+    <link href="https://antoniocampos13.github.io/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="Antonio's Portfolio RSS">
+
+
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Microsoft EDGE -->
+    <meta name="msapplication-TileColor" content="#333333">
+
+<meta name="author" content="Antonio Victor Campos Coelho" />
+<meta name="description" content="Introduction Recently I have been looking for publicly-available genomics datasets to test machine learning models in Python. During my searches for such a “toy dataset”, I came upon the Cancer Genomics Cloud (CGC) initiative. Anyone can register in CGC and have access to open access massive public datasets, like The …" />
+<meta name="keywords" content="Bioinformatics, gene expression quantification, copy number variation, Windows">
+
+
+<meta property="og:site_name" content="Antonio's Portfolio"/>
+<meta property="og:title" content="Working with Cancer Genomics Cloud datasets in a PostgreSQL database (Part 2)"/>
+<meta property="og:description" content="Introduction Recently I have been looking for publicly-available genomics datasets to test machine learning models in Python. During my searches for such a “toy dataset”, I came upon the Cancer Genomics Cloud (CGC) initiative. Anyone can register in CGC and have access to open access massive public datasets, like The …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://antoniocampos13.github.io/drafts/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-2.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2020-10-12 18:00:00-03:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
+<meta property="article:section" content="SQL"/>
+<meta property="article:tag" content="Bioinformatics"/>
+<meta property="article:tag" content="gene expression quantification"/>
+<meta property="article:tag" content="copy number variation"/>
+<meta property="article:tag" content="Windows"/>
+<meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
+
+  <title>Antonio's Portfolio &ndash; Working with Cancer Genomics Cloud datasets in a PostgreSQL database (Part 2)</title>
+
+</head>
+<body class="light-theme">
+  <aside>
+    <div>
+      <a href="https://antoniocampos13.github.io">
+        <img src="https://avatars.githubusercontent.com/antoniocampos13" alt="Antonio's Portfolio" title="Antonio's Portfolio">
+      </a>
+
+      <h1>
+        <a href="https://antoniocampos13.github.io">Antonio's Portfolio</a>
+      </h1>
+
+<p>PhD in Genetics</p>
+
+      <nav>
+        <ul class="list">
+
+
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/about.html#about">
+                  About
+                </a>
+              </li>
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/contact.html#contact">
+                  Contact
+                </a>
+              </li>
+
+            <li>
+              <a target="_self" href="http://lattes.cnpq.br/2986394950644755" >Brazilian Lattes CV</a>
+            </li>
+            <li>
+              <a target="_self" href="https://orcid.org/0000-0003-2143-9701" >ORCID</a>
+            </li>
+            <li>
+              <a target="_self" href="https://publons.com/researcher/2414076/antonio-victor-c-coelho" >Researcher ID/Publons</a>
+            </li>
+        </ul>
+      </nav>
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/antoniocampos13/portfolio" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/antonio-coelho-9aa338164" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://antoniocampos13.github.io">Home</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.rss.xml">RSS</a>
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-2">Working with Cancer Genomics Cloud datasets in a PostgreSQL database (Part&nbsp;2)</h1>
+    <p>
+      Posted on Mon 12 October 2020 in <a href="https://antoniocampos13.github.io/category/sql.html">SQL</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h2>Introduction</h2>
+<p><em>Recently I have been looking for publicly-available genomics datasets to test machine learning models in Python. During my searches for such a &#8220;toy dataset&#8221;, I came upon the <a href="http://www.cancergenomicscloud.org/">Cancer Genomics Cloud (<span class="caps">CGC</span>)</a>&nbsp;initiative.</em></p>
+<p><em>Anyone can register in <span class="caps">CGC</span> and have access to open access massive public datasets, like <a href="http://cancergenome.nih.gov/">The Cancer Genomics Atlas (<span class="caps">TCGA</span>)</a>. Most individual-level genomic data can only be accessed following approval of a Data Access Request through the <a href="https://www.ncbi.nlm.nih.gov/gap/">Database of Genotypes and Phenotypes (dbGaP)</a>. For now, I guess the open data tier will suffice for this&nbsp;exercise.</em></p>
+<p><em>This demonstration will be separated into two parts. In the <a href="">first part</a> I provided a brief run-down of how I queried the <span class="caps">CGC</span> to obtain genomic data from cancer patients and the first steps into preparing a local PostgreSQL relational database in my&nbsp;computer.</em></p>
+<p>Here in the second part I will use a customized Python to help with the import of genomic data into the PostgreSQL&nbsp;database.</p>
+<h2>Why use Python to import the genomic data into the PostgreSQL&nbsp;database</h2>
+<p>In the first part of this demonstration I mentioned that I got more than 200 files containing the raw counts of gene expression in the prostate cancer individuals, each corresponding to a individual with prostate gland cancer. Unfortunately, the counts files do not have the patient identification. This information is only available in the <code>files.tsv</code> (and in my <code>allfiles</code> table in the database consequently), which indicates which count file belongs to each patient. Therefore, I must include the count file name alongside the gene&nbsp;counts.</p>
+<p>Below I have an illustration of the problem. I have two files, count_A and&nbsp;count_B:</p>
+<div class="highlight"><pre><span></span><code><span class="o">#</span> <span class="n">count_A</span>
+<span class="n">ENSG00000000003</span><span class="p">.</span><span class="mi">13</span> <span class="mi">4000</span>
+<span class="n">ENSG00000000005</span><span class="p">.</span><span class="mi">5</span> <span class="mi">5</span>
+<span class="n">ENSG00000000419</span><span class="p">.</span><span class="mi">11</span> <span class="mi">1800</span>
+
+<span class="o">#</span> <span class="n">count_B</span>
+<span class="n">ENSG00000000003</span><span class="p">.</span><span class="mi">13</span> <span class="mi">3000</span>
+<span class="n">ENSG00000000005</span><span class="p">.</span><span class="mi">5</span> <span class="mi">25</span>
+<span class="n">ENSG00000000419</span><span class="p">.</span><span class="mi">11</span> <span class="mi">500</span>
+</code></pre></div>
+
+
+<p>In this state, I cannot know which patients provided the samples that generate count_A and count_B. But if I add a new column with the&nbsp;filename:</p>
+<div class="highlight"><pre><span></span><code><span class="o">#</span> <span class="n">count_A</span>
+<span class="n">ENSG00000000003</span><span class="p">.</span><span class="mi">13</span> <span class="mi">4000</span>    <span class="n">count_A</span>
+<span class="n">ENSG00000000005</span><span class="p">.</span><span class="mi">5</span> <span class="mi">5</span>   <span class="n">count_A</span>
+<span class="n">ENSG00000000419</span><span class="p">.</span><span class="mi">11</span> <span class="mi">1800</span>    <span class="n">count_A</span>
+
+<span class="o">#</span> <span class="n">count_B</span>
+<span class="n">ENSG00000000003</span><span class="p">.</span><span class="mi">13</span> <span class="mi">3000</span>    <span class="n">count_B</span>
+<span class="n">ENSG00000000005</span><span class="p">.</span><span class="mi">5</span> <span class="mi">25</span>  <span class="n">count_B</span>
+<span class="n">ENSG00000000419</span><span class="p">.</span><span class="mi">11</span> <span class="mi">500</span> <span class="n">count_B</span>
+</code></pre></div>
+
+
+<p>I can now cross-reference with the <code>allfiles</code> table, and identify which file belong to each&nbsp;patient:</p>
+<div class="highlight"><pre><span></span><code><span class="err">case_id file_name</span>
+<span class="err">case0001 count_A</span>
+<span class="err">case0002 count_B</span>
+</code></pre></div>
+
+
+<p>Thus, I created a <strong>relation</strong> between the gene expression quantification and their patients of origin. Keep in mind that the gene counts file have <strong>thousands</strong> of rows, each corresponding to one human gene/alternate transcript. Therefore, I&nbsp;must:</p>
+<ol>
+<li>Automate the creation of the third column containing the file name in all 200+ gene count&nbsp;files;</li>
+<li>Join the modified files into a single, unified&nbsp;dataframe;</li>
+<li>Import the dataframe into the <code>tcga</code> database.</li>
+</ol>
+<p>With only programming language &#8212; Python &#8212; I can do all three requirements above. So that&#8217;s why I used Python: it is a very powerful, versatile&nbsp;language!</p>
+<h2>Create Python virtual&nbsp;environment</h2>
+<p>Follow instructions to install Python in Windows <a href="https://www.python.org/downloads/">here</a>. Ensure that Python <a href="https://datatofish.com/add-python-to-windows-path/">is included in your Windows <span class="caps">PATH</span></a>. Python usually comes pre-installed in several Unix distros and already included in the <span class="caps">PATH</span>.</p>
+<p>First, I will create a virtual environment to hold the necessary Python modules for my customized Python script. This is good practice &#8212; as I explained in my <a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html">previous post</a> different environments isolate programs for different uses, ensuring compatibility. In the post I talked about miniconda, but the principle is the same for Python&nbsp;here.</p>
+<p>Otherwise, you can create a miniconda environment with Python included, and install all Python packages via miniconda channels. Since I will not use any other software besides Python here, there is no need to use miniconda, in my opinion. I created a virtual enviroment using Python&#8217;s <code>virtualenv</code> tool. Currently, I am using Python version&nbsp;3.8.</p>
+<p>In the <code>TCGA</code> folder I open a PowerShell and issue the commands&nbsp;below:</p>
+<div class="highlight"><pre><span></span><code><span class="n">python</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="p">-</span><span class="n">-user</span> <span class="n">virtualenv</span>
+
+<span class="n">python</span> <span class="n">-m</span> <span class="n">venv</span> <span class="n">venv</span>
+</code></pre></div>
+
+
+<p>The first command installs the program <code>virtualenv</code> (<code>venv</code>) via the Python package manager <code>pip</code>. The second command uses <code>venv</code> to create a virtual environment deposited in a folder named <code>venv</code> in the current directory (<code>TCGA</code> folder in this example). You can also provide a complete path like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="n">python</span> <span class="n">-m</span> <span class="n">venv</span> <span class="n">C</span><span class="err">:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">some_path</span><span class="p">\</span><span class="n">TCGA</span><span class="p">\</span><span class="n">venv</span>
+</code></pre></div>
+
+
+<p>Of course, you can call the virtual environment as you&nbsp;wish.</p>
+<h2>Activate the virtual&nbsp;environment</h2>
+<p>Still in the <code>TCGA</code> folder, I type the&nbsp;command:</p>
+<div class="highlight"><pre><span></span><code><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">activate</span>
+</code></pre></div>
+
+
+<p>The virtual environment is ready to be used. I will install the necessary modules for the&nbsp;work.</p>
+<h2>Install Python modules into the virtual&nbsp;environment</h2>
+<p>The modules I will install&nbsp;are:</p>
+<ul>
+<li><a href="https://docs.dask.org/en/latest/why.html"><code>dask</code></a>: to create the unified dataframe with the gene&nbsp;expression;</li>
+<li><code>psycopg2-binary</code> and <code>sqlalchemy</code>: to connect with the PostgreSQL database and push the dataframe into&nbsp;it.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;dask[complete]&quot;</span> <span class="n">psycopg2-binary</span> <span class="n">sqlalchemy</span>
+</code></pre></div>
+
+
+<p>The modules will be downloaded from the internet and installed at the <code>venv</code> folder. Additional dependencies, such as <a href="https://pandas.pydata.org/"><code>pandas</code></a> (a widely-used data analysis and manipulation tool) and <a href="https://numpy.org/"><code>NumPy</code></a> (package for scientific computing), used by <code>dask</code>, will be downloaded as&nbsp;well.</p>
+<h2>Creating Python credentials to access PostgreSQL&nbsp;database</h2>
+<p>To access the <code>tcga</code> database through Python, we need to configure credentials for the&nbsp;connection.</p>
+<p>In the terminal I&nbsp;type:</p>
+<div class="highlight"><pre><span></span><code><span class="n">psql</span> <span class="n">-U</span> <span class="n">postgres</span> <span class="n">-d</span> <span class="n">tcga</span> <span class="n">-c</span> <span class="s2">&quot;CREATE USER &lt;USER_NAME&gt; with encrypted password &#39;&lt;PASSWORD&gt;&#39;&quot;</span>
+
+<span class="n">psql</span> <span class="n">-U</span> <span class="n">postgres</span> <span class="n">-d</span> <span class="n">tcga</span> <span class="n">-c</span> <span class="s2">&quot;GRANT ALL PRIVILEGES ON DATABASE tcga TO &lt;USER_NAME&gt;&quot;</span>
+</code></pre></div>
+
+
+<p><code>&lt;USER_NAME&gt;</code> and <code>&lt;PASSWORD&gt;</code> are placeholders for my username and password, respectively, since it is good practice to <strong><span class="caps">NEVER</span> share sensitive information</strong>.</p>
+<p>Then, I created a file named <code>settings.py</code> and put it in a <code>src</code> folder with the following&nbsp;content:</p>
+<div class="highlight"><pre><span></span><code><span class="n">DB_FLAVOR</span> <span class="o">=</span> <span class="s2">&quot;postgresql&quot;</span>
+<span class="n">DB_PYTHON_LIBRARY</span> <span class="o">=</span> <span class="s2">&quot;psycopg2&quot;</span>
+<span class="n">USER</span> <span class="o">=</span> <span class="s2">&quot;&lt;USER_NAME&gt;&quot;</span>
+<span class="n">PASSWORD</span> <span class="o">=</span> <span class="s2">&quot;&lt;PASSWORD&gt;&quot;</span>
+<span class="n">DB_HOST</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span>
+<span class="n">PORT</span> <span class="o">=</span> <span class="s2">&quot;5432&quot;</span>
+<span class="n">DB_NAME</span> <span class="o">=</span> <span class="s2">&quot;tcga&quot;</span>
+</code></pre></div>
+
+
+<p>Create one yourself with the user name and password you specified on the previous step. The other parameters can be left as they are. The 5432 port is usually the default port configured during installation to connection to PostgreSQL. Change it if needed, of course. <code>localhost</code> means that the PostgreSQL is running locally in my&nbsp;computer.</p>
+<p>Then, to keep the organization of my folder, I added my <code>tcga_processing_counts.py</code> customized script to the <code>src</code> folder. The folder structure is now like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="err">.</span>
+<span class="err">└── TCGA</span>
+<span class="err">    ├── data</span>
+<span class="err">    │   ├── counts</span>
+<span class="err">    │   │   └── [200+ *.counts.gz files]</span>
+<span class="err">    │   ├── focal_score_by_genes</span>
+<span class="err">    │   ├── fpkm</span>
+<span class="err">    │   ├── gene_level_copy_numbers</span>
+<span class="err">    │   ├── cases.tsv</span>
+<span class="err">    │   ├── demographic.tsv</span>
+<span class="err">    │   ├── files.tsv</span>
+<span class="err">    │   └── follow_up.tsv</span>
+<span class="err">    ├── src</span>
+<span class="err">    │   ├── settings.py</span>
+<span class="err">    │   └── tcga_processing_counts.py</span>
+<span class="err">    ├── main_tcga.ps1</span>
+<span class="err">    └── main_tcga.sh</span>
+</code></pre></div>
+
+
+<h2>Running the&nbsp;script</h2>
+<p>Back in the <code>TCGA</code> folder, I type in the&nbsp;PowerShell:</p>
+<div class="highlight"><pre><span></span><code><span class="n">python</span> <span class="n">src</span><span class="p">\</span><span class="n">tcga_processing_counts</span><span class="p">.</span><span class="n">py</span>
+</code></pre></div>
+
+
+<p>This will start the script, which has eight&nbsp;steps:</p>
+<ol>
+<li>Set up PostgreSQL connection object: <code>psycopg2</code> and <code>sqlalchemy</code> modules use the credential of the <code>settings.py</code>;</li>
+<li>Set up project paths: locate the data&nbsp;folders;</li>
+<li>Decompress the <code>.counts.gz</code> files;</li>
+<li>Make a list of all uncompressed&nbsp;files;</li>
+<li>Create a function ready to return a pandas.DataFrame: this is when I add the third column with the filename in the counts&nbsp;files;</li>
+<li>Create a list of commands to apply the read_and_label_csv function to all&nbsp;files;</li>
+<li>Using <code>dask</code><span class="quo">&#8216;</span>s <code>delayed</code> method, assemble the pandas.DataFrames into a <code>dask.DataFrame</code>;</li>
+<li>Send the <code>dask.DataFrame</code> to the&nbsp;database.</li>
+</ol>
+<p>There is an optional step before step 8 to export the <code>dask.DataFrame</code> as <span class="caps">HUGE</span> <span class="caps">CSV</span> file that I disabled by default. <strong><span class="caps">WARNING</span>: <span class="caps">IT</span> <span class="caps">USES</span> A <span class="caps">LOT</span> <span class="caps">OF</span> <span class="caps">RAM</span> <span class="caps">AND</span> <span class="caps">CPU</span></strong>.</p>
+<p>The use of <code>dask</code> for this job is crucial. <code>pandas</code> works by loading all data into the <span class="caps">RAM</span>. However, since there are several files of considerable size, it would overload my available <span class="caps">RAM</span>. <code>dask</code> is suited for larger-than-memory datasets, since it operates by lazy evaluation: it break operations into blocks and specifies task chains and execute them only on demand, saving computing&nbsp;resources.</p>
+<p>Go check the contents of my <a href="https://github.com/antoniocampos13/portfolio/blob/master/SQL/2020_10_12_Working_Data_CGC_PostgreSQL/TCGA/src/tcga_processing_counts.py"><code>tcga_processing_counts.py</code> in my portfolio</a>. By default, it will create a table named <code>gene_counts</code> in the <code>tcga</code> database. See an excerpt of the final&nbsp;result:</p>
+<p><img alt="Gene counts table in tcga database" src="https://antoniocampos13.github.io/images/tcga_gene_counts.PNG"></p>
+<h2>Finishing&nbsp;touches</h2>
+<p>With the gene expression counts dataset imported in the database, it is time to create the filename (gene counts)/patient relation as I explained in the beginning of the post. In the terminal again, I&nbsp;type:</p>
+<div class="highlight"><pre><span></span><code><span class="n">psql</span> <span class="n">-U</span> <span class="n">postgres</span> <span class="n">-d</span> <span class="n">tcga</span> <span class="n">-c</span> <span class="s2">&quot;CREATE TABLE gene_counts_cases AS SELECT DISTINCT case_id, gene_id, gene_count FROM gene_counts LEFT JOIN allfiles ON gene_counts.filename = allfiles.file_uuid WHERE gene_id LIKE &#39;%ENSG%&#39;&quot;</span>
+</code></pre></div>
+
+
+<p>The command above links the two tables by their information in common: the filename of the gene counts, which is named <code>filename</code> in the gene_counts table and <code>file_uuid</code> in <code>allfiles</code> table that we created&nbsp;before.</p>
+<p>See an excerpt of the final&nbsp;result:</p>
+<p><img alt="Gene counts table in tcga database: counts/patient relation" src="https://antoniocampos13.github.io/images/tcga_gene_counts_cases.PNG"></p>
+<p>With this I conclude the second and last part of this demonstration. There is still missing the outcome information, which is located in the <code>follow_up</code> table in the database. However, the <code>gene_counts_cases</code> table is not yet ready to be linked. I need to pivot this table, but PostgreSQL has a limit of 1600 columns. Perhaps if I import this table into a session in <code>R</code>, it will be possible to transform the table. Additionally, I will perform differential expression analysis for sequence count&nbsp;data.</p>
+<h2>Conclusion of Part&nbsp;2</h2>
+<p>In this part&nbsp;I:</p>
+<ul>
+<li>Demonstrated how Python can be used to create dataframes larger-than-memory with <code>dask</code> module;</li>
+<li>Demonstrated how to connect Python to PostgreSQL databases with <code>psycopg2</code> and <code>sqlalchemy</code> modules;</li>
+<li>Demonstrated simple <code>LEFT JOIN</code> operation to link gene counts to individual cases of prostate&nbsp;cancer.</li>
+</ul>
+<p><em><a href="">Go back to Part 1</a>.</em></p>
+<h2>References</h2>
+<p><a href="http://www.cancergenomicscloud.org/">Cancer Genomics&nbsp;Cloud</a></p>
+<p><a href="http://cancergenome.nih.gov/">The Cancer Genome Atlas&nbsp;Program</a></p>
+<p><a href="https://www.ncbi.nlm.nih.gov/gap/">Home - dbGaP - <span class="caps">NCBI</span></a></p>
+<p><a href="https://www.python.org/downloads/">Download&nbsp;Python</a></p>
+<p><a href="https://datatofish.com/add-python-to-windows-path/">How to add Python to Windows <span class="caps">PATH</span> - Data to&nbsp;Fish</a></p>
+<p><a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html">Setting Up Your Unix Computer for Bioinformatics&nbsp;Analysis</a></p>
+<p><a href="https://docs.dask.org/en/latest/why.html">Dask  documentation - Why&nbsp;Dask?</a></p>
+<p><a href="https://pandas.pydata.org/">pandas - Python Data Analysis&nbsp;Library</a></p>
+<p><a href="https://numpy.org/">NumPy</a></p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://antoniocampos13.github.io/tag/bioinformatics.html">Bioinformatics</a>
+      <a href="https://antoniocampos13.github.io/tag/gene-expression-quantification.html">gene expression quantification</a>
+      <a href="https://antoniocampos13.github.io/tag/copy-number-variation.html">copy number variation</a>
+      <a href="https://antoniocampos13.github.io/tag/windows.html">Windows</a>
+    </p>
+  </div>
+
+
+
+
+
+</article>
+
+    <footer>
+<p>
+  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+           src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Antonio's Portfolio ",
+  "url" : "https://antoniocampos13.github.io",
+  "image": "https://avatars.githubusercontent.com/antoniocampos13",
+  "description": "Data Science Portfolio by Antonio Victor Campos Coelho"
+}
+</script>
+
+
+</body>
+</html>
