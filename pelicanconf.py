@@ -10,7 +10,7 @@ SITEDESCRIPTION = "Data Science Portfolio by Antonio Victor Campos Coelho"
 SITESUBTITLE = 'PhD in Genetics'
 SITELOGO = 'https://avatars.githubusercontent.com/antoniocampos13'
 BROWSER_COLOR = '#333333'
-PYGMENTS_STYLE = 'monokai'
+PYGMENTS_STYLE = 'friendly'
 
 USE_FOLDER_AS_CATEGORY = True
 MAIN_MENU = True

@@ -32,20 +32,20 @@ Inside the data browser, I see that there are several information entities:
 I clicked on the first one, `Cases` and then created a query with the following entities and filters:
 
 * *Entity*
-  * *Filters*
+    * *Filters*
 * Case
     * Primary site: Prostate Gland
 * Diagnosis
-  * Age at diagnosis
-  * Clinical T (TNM)
+    * Age at diagnosis
+    * Clinical T (TNM)
 * Demographic
-  * Ethnicity
-  * Race
+    * Ethnicity
+    * Race
 * Follow up
-  * Primary therapy outcome
+    * Primary therapy outcome
 * File
-  * Access level: Open
-  * Data type: Gene Level Copy Number, Gene Expression Quantification, Gene Level Copy Number Scores
+    * Access level: Open
+    * Data type: Gene Level Copy Number, Gene Expression Quantification, Gene Level Copy Number Scores
 
 The final query ended up like this:
 
