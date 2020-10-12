@@ -1,7 +1,7 @@
 ---
 Title: Working with Cancer Genomics Cloud datasets in a PostgreSQL database (Part 2)
 Status: draft
-Date: 2020-10-12 18:00
+Date: 2020-10-12 12:42
 Author: Antonio Victor Campos Coelho
 Categories: SQL, Python
 Tags: Bioinformatics, gene expression quantification, copy number variation, Windows
@@ -60,8 +60,8 @@ case0002 count_B
 Thus, I created a **relation** between the gene expression quantification and their patients of origin. Keep in mind that the gene counts file have **thousands** of rows, each corresponding to one human gene/alternate transcript. Therefore, I must:
 
 1. Automate the creation of the third column containing the file name in all 200+ gene count files;
-2. Join the modified files into a single, unified dataframe;
-3. Import the dataframe into the `tcga` database.
+2. Join the modified files into a single, unified data frame;
+3. Import the data frame into the `tcga` database.
 
 With only programming language -- Python -- I can do all three requirements above. So that's why I used Python: it is a very powerful, versatile language!
 
@@ -71,7 +71,7 @@ Follow instructions to install Python in Windows [here](https://www.python.org/d
 
 First, I will create a virtual environment to hold the necessary Python modules for my customized Python script. This is good practice -- as I explained in my [previous post](https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html) different environments isolate programs for different uses, ensuring compatibility. In the post I talked about miniconda, but the principle is the same for Python here.
 
-Otherwise, you can create a miniconda environment with Python included, and install all Python packages via miniconda channels. Since I will not use any other software besides Python here, there is no need to use miniconda, in my opinion. I created a virtual enviroment using Python's `virtualenv` tool. Currently, I am using Python version 3.8.
+Otherwise, you can create a miniconda environment with Python included, and install all Python packages via miniconda channels. Since I will not use any other software besides Python here, there is no need to use miniconda, in my opinion. I created a virtual environment using Python's `virtualenv` tool. Currently, I am using Python version 3.8.
 
 In the `TCGA` folder I open a PowerShell and issue the commands below:
 
@@ -103,7 +103,7 @@ The virtual environment is ready to be used. I will install the necessary module
 
 The modules I will install are:
 
-* [`dask`](https://docs.dask.org/en/latest/why.html): to create the unified dataframe with the gene expression;
+* [`dask`](https://docs.dask.org/en/latest/why.html): to create the unified data frame with the gene expression;
 * `psycopg2-binary` and `sqlalchemy`: to connect with the PostgreSQL database and push the dataframe into it.
 
 ```powershell
@@ -209,7 +209,7 @@ With this I conclude the second and last part of this demonstration. There is st
 
 In this part I:
 
-* Demonstrated how Python can be used to create dataframes larger-than-memory with `dask` module;
+* Demonstrated how Python can be used to create data frames larger-than-memory with `dask` module;
 * Demonstrated how to connect Python to PostgreSQL databases with `psycopg2` and `sqlalchemy` modules;
 * Demonstrated simple `LEFT JOIN` operation to link gene counts to individual cases of prostate cancer.
 

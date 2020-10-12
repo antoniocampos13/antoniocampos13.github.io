@@ -1,7 +1,7 @@
 ---
 Title: Working with Cancer Genomics Cloud datasets in a PostgreSQL database (Part 1)
 Status: draft
-Date: 2020-10-12 18:00
+Date: 2020-10-12 12:42
 Author: Antonio Victor Campos Coelho
 Categories: SQL, Python
 Tags: Bioinformatics, gene expression quantification, copy number variation, Windows
@@ -17,7 +17,7 @@ This demonstration will be separated into two parts. Here in the first part I wi
 
 ## Querying the CGC
 
-Following registering, I created a project in the CGC dashboard and went into its data browser tool:
+I registered at CGC, then I created a project in the CGC dashboard and went into the data browser tool:
 
 ![CGC dashboard options]({static}/images/cgc_1.PNG)
 
@@ -34,7 +34,7 @@ I clicked on the first one, `Cases` and then created a query with the following 
 * *Entity*
   * *Filters*
 * Case
-  * Primary site: Prostate Gland
+    * Primary site: Prostate Gland
 * Diagnosis
   * Age at diagnosis
   * Clinical T (TNM)
