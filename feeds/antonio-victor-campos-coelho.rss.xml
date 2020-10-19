@@ -1,5 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>Antonio's Portfolio - Antonio Victor Campos Coelho</title><link>https://antoniocampos13.github.io/</link><description>PhD in Genetics</description><lastBuildDate>Tue, 13 Oct 2020 14:00:00 -0300</lastBuildDate><item><title>Meta-analysis and Meta-regression with R</title><link>https://antoniocampos13.github.io/meta-analysis-and-meta-regression-with-r.html</link><description>&lt;h2&gt;Introduction&lt;/h2&gt;
+<rss version="2.0"><channel><title>Antonio's Portfolio - Antonio Victor Campos Coelho</title><link>https://antoniocampos13.github.io/</link><description>PhD in Genetics</description><lastBuildDate>Mon, 19 Oct 2020 13:30:00 -0300</lastBuildDate><item><title>Data manipulation with R</title><link>https://antoniocampos13.github.io/data-manipulation-with-r.html</link><description>&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;In my &lt;a href="https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html#working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1"&gt;previous post&lt;/a&gt; I demonstrated how to obtain a prostate cancer dataset with genomic information in the form of gene expression quantification and created a local PostgreSQL database to hold the&amp;nbsp;data.&lt;/p&gt;
+&lt;p&gt;Here, I will use R to connect to the PostgreSQL database, retrieve and then prepare the &lt;span class="caps"&gt;CGC&lt;/span&gt; data to perform a Differential Expression Analysis for sequence count data in the &lt;span class="caps"&gt;CGC&lt;/span&gt; dataset. This demonstration is on a RStudio project running in Windows 10, but the same steps can be followed on an Unix&amp;nbsp;system.&lt;/p&gt;
+&lt;p&gt;As always, the code demonstrated here is available on my &lt;a href="https://github.com/antoniocampos13/portfolio/tree/master/R/2020_10_19_Data_manipulation_with_R"&gt;portfolio on GitHub&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Setting up .Renviron&amp;nbsp;file&lt;/h2&gt;
+&lt;p&gt;In my working directory, I create a text file named &lt;code&gt;.Renviron&lt;/code&gt; to store the credentials of the PostgreSQL database with the following&amp;nbsp;information:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;userid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&amp;lt;USER_NAME&amp;gt;&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;pwd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&amp;lt;PASSWORD&amp;gt;&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Replace &lt;code&gt;&amp;lt;USER_NAME&amp;gt;&lt;/code&gt; and &lt;code&gt;&amp;lt;PASSWORD&amp;gt;&lt;/code&gt; with your credentials used to access the PostgreSQL database. Usually, the default username is &lt;code&gt;postgres&lt;/code&gt; and the password is defined during PostgreSQL&amp;nbsp;installation.&lt;/p&gt;
+&lt;h2&gt;Install/Load&amp;nbsp;packages&lt;/h2&gt;
+&lt;p&gt;Then I open a RStudio session and create a project in the folder containing the &lt;code&gt;.Renviron&lt;/code&gt; file. Now, I need to load the packages I will use today. You can install them using &lt;code&gt;install.packages()&lt;/code&gt; function if you do not have them installed&amp;nbsp;yet:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Run only once&lt;/span&gt;
+&lt;span class="nf"&gt;install.packages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;RPostgres&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;here&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;tidyverse&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Note that to install more than one package at once we must use the concatenate &lt;code&gt;c()&lt;/code&gt; command to pass the packages names and they must be quoted and separated by commas &amp;#8212; a R &lt;em&gt;vector&lt;/em&gt;. The package dependencies will be installed as&amp;nbsp;well.&lt;/p&gt;
+&lt;p&gt;Now I load the packages into the R&amp;nbsp;session:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;RPostgres&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;here&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tidyverse&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;RPostgres&lt;/code&gt; is needed to connect to the PostgreSQL database I created before. The &lt;a href="https://github.com/jennybc/here_here"&gt;&lt;code&gt;here&lt;/code&gt; package&lt;/a&gt; handles file paths. &lt;code&gt;tidyverse&lt;/code&gt; is a powerful collection of packages for data manipulation. By using it, it will actually load several other packages, such as &lt;code&gt;dplyr&lt;/code&gt;, &lt;code&gt;stringr&lt;/code&gt; and &lt;code&gt;tidyr&lt;/code&gt;. It is one of the packages I use the most. Check &lt;code&gt;RPostgres&lt;/code&gt; documentation &lt;a href="https://www.rdocumentation.org/packages/RPostgres/versions/1.2.1"&gt;here&lt;/a&gt; and &lt;code&gt;tidyverse&lt;/code&gt; documentation &lt;a href="https://www.tidyverse.org/"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Set up connection to tcga&amp;nbsp;database&lt;/h2&gt;
+&lt;p&gt;I now set up the connection to the&amp;nbsp;database:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;con&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;dbConnect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+  &lt;span class="n"&gt;RPostgres&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="nf"&gt;Postgres&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;
+  &lt;span class="n"&gt;dbname&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;tcga&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;host&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;localhost&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;port&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;5432&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;user&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;Sys.getenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;userid&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+  &lt;span class="n"&gt;password&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;Sys.getenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;pwd&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;Sys.getenv()&lt;/code&gt; will retrieve the information in the &lt;code&gt;.Renviron&lt;/code&gt; file. Remember to not share this file so your credentials remain secret. The connection credentials are now stored in the &lt;code&gt;con&lt;/code&gt; object.&lt;/p&gt;
+&lt;h2&gt;Retrieve and pivot gene_counts_cases&amp;nbsp;table&lt;/h2&gt;
+&lt;p&gt;With the command below, I retrieve the table containing the case-identified, raw gene counts I created last&amp;nbsp;time:  &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;cases&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;dbGetQuery&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;con&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;SELECT * FROM gene_counts_cases&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;dbGetQuery()&lt;/code&gt; is one of the functions from &lt;code&gt;DBI&lt;/code&gt; package, a dependency of &lt;code&gt;RPostgres&lt;/code&gt;. Check &lt;code&gt;DBI&lt;/code&gt; documentation &lt;a href="https://www.rdocumentation.org/packages/DBI/versions/0.5-1"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The information is now stored in the &lt;code&gt;cases&lt;/code&gt; object, which has three columns: &lt;code&gt;case_id&lt;/code&gt;, &lt;code&gt;gene_id&lt;/code&gt; and &lt;code&gt;gene_counts&lt;/code&gt;. Therefore, each row is a combination of a case, a gene and a gene count &amp;#8212; it is a &amp;#8220;long&amp;#8221;&amp;nbsp;format.&lt;/p&gt;
+&lt;p&gt;I now will reformat the table to a &amp;#8220;wide&amp;#8221; format (pivot) because it is a requirement for the differential expression analysis. The pivoted table will have &lt;em&gt;G&lt;/em&gt;x&lt;em&gt;N&lt;/em&gt; dimensions, where &lt;em&gt;G&lt;/em&gt; are the number of rows (the number of gene transcripts quantified) and &lt;em&gt;N&lt;/em&gt; the number of columns (the number of&amp;nbsp;cases).&lt;/p&gt;
+&lt;p&gt;I will use the &lt;code&gt;pivot_wider()&lt;/code&gt; function of the &lt;code&gt;tidyr&lt;/code&gt; package to do the job (&lt;strong&gt;&lt;span class="caps"&gt;WARNING&lt;/span&gt;: &lt;span class="caps"&gt;COMPUTATION&lt;/span&gt; &lt;span class="caps"&gt;INTENSIVE&lt;/span&gt; &lt;span class="caps"&gt;STEP&lt;/span&gt;&lt;/strong&gt;):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;cases_pivoted&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
+  &lt;span class="n"&gt;cases&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="nf"&gt;pivot_wider&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="n"&gt;names_from&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;case_id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;values_from&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;gene_count&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;values_fill&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;names_repair&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;check_unique&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;values_fn&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mean&lt;/span&gt;
+  &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;cases_pivoted&lt;/code&gt; is the name of the object that will hold the pivoted table. The &lt;code&gt;%&amp;gt;%&lt;/code&gt; is &lt;code&gt;dplyr&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s syntax. It means that we are piping the contents of &lt;code&gt;cases&lt;/code&gt; object into the &lt;code&gt;pivot_wider()&lt;/code&gt; function and its&amp;nbsp;arguments.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;names_from&lt;/code&gt; argument tells which column will be pivoted to generate new columns. The &lt;code&gt;values_from&lt;/code&gt; argument tells which column hold the values that will fill the new pivoted table. The &lt;code&gt;values_fill&lt;/code&gt; argument will substitute any missing data for a zero. The &lt;code&gt;names_repair&lt;/code&gt; argument checks that each new column has a unique name. Finally, the &lt;code&gt;values_fn&lt;/code&gt; argument indicates the function that must be applied to the values filling the new pivoted table. Note that I used the &lt;code&gt;mean&lt;/code&gt; function because during this step I noticed that some cases were associated with more than one gene expression quantification file. Therefore, I had to take the mean of these extra gene counts to correctly generate the pivoted&amp;nbsp;table.&lt;/p&gt;
+&lt;p&gt;Since I calculated means for the values, I then rounded to the next integer all numerical data in the table with the help of &lt;code&gt;dplyr&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;mutate()&lt;/code&gt;, &lt;code&gt;across()&lt;/code&gt; and &lt;code&gt;where()&lt;/code&gt; functions and &lt;code&gt;round()&lt;/code&gt;, which is one of R&amp;#8217;s standard (base)&amp;nbsp;functions:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;counts&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;cases_pivoted&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="nf"&gt;mutate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;across&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;where&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;is.numeric&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;round&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;where(is.numeric)&lt;/code&gt; ensures that I only manipulated numeric data in the table. The &lt;code&gt;across()&lt;/code&gt; function applies the same transformation (rounding in this case) to multiple columns. Finally, &lt;code&gt;mutate()&lt;/code&gt; adds the new variables (rounded columns), replacing the existing&amp;nbsp;ones.&lt;/p&gt;
+&lt;h2&gt;Retrieve and de-duplicate follow_up&amp;nbsp;table&lt;/h2&gt;
+&lt;p&gt;Now I set aside the &lt;code&gt;counts&lt;/code&gt; table for a moment to prepare the sample classifications. I realized that the &lt;code&gt;follow_up&lt;/code&gt; table had duplicate data for some reason. Thus I connected to the database and de-duplicate the &lt;code&gt;followup_primarytherapyoutcomesuccess_1&lt;/code&gt; column by using string aggregation (PostgreSQL&amp;#8217;s &lt;a href="https://www.postgresqltutorial.com/postgresql-aggregate-functions/postgresql-string_agg-function/"&gt;&lt;code&gt;STRING_AGG&lt;/code&gt; function&lt;/a&gt;). I also changed its name to &lt;code&gt;outcome&lt;/code&gt; for simplicity, and saved the results as the &lt;code&gt;followup_dedup&lt;/code&gt; table. This is the command I&amp;nbsp;used:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;dbExecute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+  &lt;span class="n"&gt;con&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="s"&gt;&amp;quot;CREATE TABLE followup_dedup AS SELECT case_id, STRING_AGG(followup_primarytherapyoutcomesuccess_1, &amp;#39;,&amp;#39;) AS outcome FROM follow_up GROUP BY case_id&amp;quot;&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Note how I used &lt;code&gt;DBI&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;dbExecute()&lt;/code&gt; instead of &lt;code&gt;dbGetQuery()&lt;/code&gt;, since I will not retrieve the table into the R&amp;nbsp;session.&lt;/p&gt;
+&lt;p&gt;Now I create other table to link the cases &lt;span class="caps"&gt;ID&lt;/span&gt; numbers with the de-duplicated outcomes, saving the result as the &lt;code&gt;outcomes&lt;/code&gt; table:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;dbExecute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+  &lt;span class="n"&gt;con&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="s"&gt;&amp;quot;CREATE TABLE outcomes AS SELECT case_id, outcome FROM allcases INNER JOIN followup_dedup USING(case_id)&amp;quot;&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I now retrieve the &lt;code&gt;outcomes&lt;/code&gt; table into the R&amp;nbsp;session:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;outcomes&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;dbGetQuery&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;con&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;SELECT * FROM outcomes&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Create sample classification and new&amp;nbsp;labels&lt;/h2&gt;
+&lt;p&gt;I will now create a new column named &lt;code&gt;class&lt;/code&gt; in the outcomes table with a simplified case/control classification based on the &lt;code&gt;outcome&lt;/code&gt; column with the help of &lt;code&gt;dplyr&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;mutate()&lt;/code&gt; and &lt;code&gt;case_when()&lt;/code&gt;, which vectorizes multiple if/else statements (it is an R equivalent of the &lt;span class="caps"&gt;SQL&lt;/span&gt; &lt;code&gt;CASE WHEN&lt;/code&gt; statement):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;outcomes&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;outcomes&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="nf"&gt;mutate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;class&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;case_when&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+  &lt;span class="nf"&gt;str_detect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;outcome&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Complete&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;control&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="nf"&gt;str_detect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;outcome&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Partial&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;case&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="nf"&gt;str_detect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;outcome&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Disease&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;case&amp;quot;&lt;/span&gt;
+&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now I will create a new label for the cases for simplification. I created a column named &lt;code&gt;new_names&lt;/code&gt; in the &lt;code&gt;outcomes&lt;/code&gt; table. The new names were created by joining the classification created in the previous step with the 12 last characters of the &lt;code&gt;case_id&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;outcomes&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;outcomes&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="nf"&gt;mutate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;new_names&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;paste0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;str_sub&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;case_id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;-12&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;_&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;class&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Finally, let&amp;#8217;s apply the new case labels, substituting the old ones with the help of &lt;code&gt;dplyr&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;recode()&lt;/code&gt;  function:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;colnames&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;dplyr&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="nf"&gt;recode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;colnames&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="o"&gt;!!!&lt;/span&gt;&lt;span class="nf"&gt;setNames&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;as.character&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;outcomes&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;new_names&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;outcomes&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;case_id&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Convert gene_ids into row names, then delete gene_id&amp;nbsp;column&lt;/h2&gt;
+&lt;p&gt;The table is almost in the state required for differential expression analysis. I just need to convert the &lt;code&gt;gene_id&lt;/code&gt; column into row names of the data&amp;nbsp;frame:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;counts&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;as.data.frame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;row.names&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;gene_id&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;gene_id&lt;/code&gt; is not needed anymore. I can delete&amp;nbsp;it:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;counts&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;subset&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;select&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gene_id&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The data frame is now ready for differential expression analysis for sequence count data. The features (gene IDs) are embedded on the R object row names, whereas each column corresponds to a individual sample. The row/column intersection are therefore, the raw counts of gene&amp;nbsp;expression.&lt;/p&gt;
+&lt;p&gt;Check the dimensions (&lt;em&gt;G&lt;/em&gt;x&lt;em&gt;N&lt;/em&gt;) of the data frame with the &lt;code&gt;dim()&lt;/code&gt; function and see that there 60483 rows and 236 columns, meaning that 60483 transcripts where quantified in samples obtained from 236 individuals with prostate&amp;nbsp;cancer.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;dim&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Output:&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="m"&gt;60483&lt;/span&gt;   &lt;span class="m"&gt;236&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;See below first few rows and columns of the finalized &lt;code&gt;counts&lt;/code&gt; data&amp;nbsp;frame:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Final gene counts table" src="https://antoniocampos13.github.io/images/counts_final.PNG"&gt;&lt;/p&gt;
+&lt;p&gt;In a future post I will demonstrate the differential expression analysis &lt;em&gt;per se&lt;/em&gt;.&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;I demonstrated how to connect to a local PostgreSQL database with &lt;code&gt;Rpostgres&lt;/code&gt; and &lt;code&gt;DBI&lt;/code&gt; packages;&lt;/li&gt;
+&lt;li&gt;Reorganized data by pivoting a long data frame to a wider data frame with gene IDs in rows and samples in columns with &lt;code&gt;dplyr&lt;/code&gt; package&amp;nbsp;functions;&lt;/li&gt;
+&lt;li&gt;Labeled columns as cases or controls for the differential expression analysis, also with &lt;code&gt;dplyr&lt;/code&gt; package.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Go back to &lt;a href="https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html#working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1"&gt;Working with Cancer Genomics Cloud datasets in a PostgreSQL database Part 1&lt;/a&gt; and &lt;a href="https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-2.html#working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-2"&gt;Part 2&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Subscribe to my &lt;a href="https://antoniocampos13.github.io/feeds/all.rss.xml"&gt;&lt;span class="caps"&gt;RSS&lt;/span&gt; feed&lt;/a&gt;, &lt;a href="https://antoniocampos13.github.io/feeds/all.atom.xml"&gt;Atom feed&lt;/a&gt; or &lt;a href="https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg"&gt;Telegram channel&lt;/a&gt; to keep you updated whenever I post new&amp;nbsp;content.&lt;/em&gt;&lt;/p&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://github.com/jennybc/here_here"&gt;Ode to the here&amp;nbsp;package&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.rdocumentation.org/packages/RPostgres/versions/1.2.1"&gt;RPostgres package | R&amp;nbsp;Documentation&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.tidyverse.org/"&gt;Tidyverse&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.rdocumentation.org/packages/DBI/versions/0.5-1"&gt;&lt;span class="caps"&gt;DBI&lt;/span&gt; package | R&amp;nbsp;Documentation&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.postgresqltutorial.com/postgresql-aggregate-functions/postgresql-string_agg-function/"&gt;PostgreSQL STRING_AGG() Function By Practical&amp;nbsp;Examples&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Antonio Victor Campos Coelho</dc:creator><pubDate>Mon, 19 Oct 2020 13:30:00 -0300</pubDate><guid isPermaLink="false">tag:antoniocampos13.github.io,2020-10-19:/data-manipulation-with-r.html</guid><category>R</category><category>Bioinformatics</category><category>gene expression</category><category>SQL</category><category>PostgreSQL</category></item><item><title>Meta-analysis and Meta-regression with R</title><link>https://antoniocampos13.github.io/meta-analysis-and-meta-regression-with-r.html</link><description>&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;On December 2019, reports from severe acute respiratory syndrome in Wuhan, China, were linked to a novel coronavirus, now known as &lt;span class="caps"&gt;SARS&lt;/span&gt;-CoV-2, and the disease it causes was termed coronavirus disease 2019 (&lt;span class="caps"&gt;COVID&lt;/span&gt;-19).&lt;/p&gt;
 &lt;p&gt;The World Health Organization declared the &lt;span class="caps"&gt;COVID&lt;/span&gt;-19 outbreak a Public Health Emergency of International Concern on 30 January 2020, and a pandemic on 11 March&amp;nbsp;2020.&lt;/p&gt;
 &lt;p&gt;&lt;span class="caps"&gt;SARS&lt;/span&gt;-CoV-2 causes an interstitial and alveolar pneumonia, but in nearly 26% of patients it can lead to a severe disease, with multiple organ failure (references: &lt;a href="https://www.bmj.com/content/369/bmj.m1985"&gt;1&lt;/a&gt;, &lt;a href="https://jamanetwork.com/journals/jamainternalmedicine/fullarticle/2763184"&gt;2&lt;/a&gt;, &lt;a href="https://linkinghub.elsevier.com/retrieve/pii/S0140673620311892"&gt;3&lt;/a&gt;, &lt;a href="https://linkinghub.elsevier.com/retrieve/pii/S0163445320301705"&gt;4&lt;/a&gt;).&lt;/p&gt;
