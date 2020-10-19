@@ -1,6 +1,6 @@
 ---
 Title: Data manipulation with R
-Status: draft
+Status: published
 Date: 2020-10-19 13:30
 Author: Antonio Victor Campos Coelho
 Categories: R
@@ -186,7 +186,7 @@ See below first few rows and columns of the finalized `counts` data frame:
 
 ![Final gene counts table]({static}/images/counts_final.PNG)
 
-In a future post I will demonstrate the differential expression analysis per se.
+In a future post I will demonstrate the differential expression analysis *per se*.
 
 ## Conclusion
 
@@ -195,6 +195,8 @@ In a future post I will demonstrate the differential expression analysis per se.
 * Labeled columns as cases or controls for the differential expression analysis, also with `dplyr` package.
 
 *Go back to [Working with Cancer Genomics Cloud datasets in a PostgreSQL database Part 1](https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html#working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1) and [Part 2](https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-2.html#working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-2).*
+
+*Subscribe to my [RSS feed](https://antoniocampos13.github.io/feeds/all.rss.xml), [Atom feed](https://antoniocampos13.github.io/feeds/all.atom.xml) or [Telegram channel](https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg) to keep you updated whenever I post new content.*
 
 ## References
 
