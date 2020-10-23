@@ -1,0 +1,291 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/stylesheet/style.min.css">
+
+
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+          href="https://antoniocampos13.github.io/theme/pygments/vs.min.css">
+
+
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/solid.css">
+
+
+    <link href="https://antoniocampos13.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Antonio's Portfolio Atom">
+
+    <link href="https://antoniocampos13.github.io/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="Antonio's Portfolio RSS">
+
+
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Microsoft EDGE -->
+    <meta name="msapplication-TileColor" content="#333333">
+
+<meta name="author" content="Antonio Victor Campos Coelho" />
+<meta name="description" content="Introduction In this post I will show how I set up my Unix machine to use Bioinformatics programs and tools. I am currently using Ubuntu 20.04 LTS (Focal Fossa) 64-bit on a Windows Subsystem for Linux (WSL2) on Windows 10, so no GUI today! The code and files used …" />
+<meta name="keywords" content="Bioinformatics">
+
+
+<meta property="og:site_name" content="Antonio's Portfolio"/>
+<meta property="og:title" content="Setting Up Your Unix Computer for Bioinformatics Analysis"/>
+<meta property="og:description" content="Introduction In this post I will show how I set up my Unix machine to use Bioinformatics programs and tools. I am currently using Ubuntu 20.04 LTS (Focal Fossa) 64-bit on a Windows Subsystem for Linux (WSL2) on Windows 10, so no GUI today! The code and files used …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2020-09-30 18:00:00-03:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
+<meta property="article:section" content="Unix"/>
+<meta property="article:tag" content="Bioinformatics"/>
+<meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
+
+  <title>Antonio's Portfolio &ndash; Setting Up Your Unix Computer for Bioinformatics Analysis</title>
+
+</head>
+<body class="light-theme">
+  <aside>
+    <div>
+      <a href="https://antoniocampos13.github.io">
+        <img src="https://avatars.githubusercontent.com/antoniocampos13" alt="Antonio's Portfolio" title="Antonio's Portfolio">
+      </a>
+
+      <h1>
+        <a href="https://antoniocampos13.github.io">Antonio's Portfolio</a>
+      </h1>
+
+<p>PhD in Genetics</p>
+
+      <nav>
+        <ul class="list">
+
+
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/about.html#about">
+                  About
+                </a>
+              </li>
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/contact.html#contact">
+                  Contact
+                </a>
+              </li>
+
+            <li>
+              <a target="_self" href="http://lattes.cnpq.br/2986394950644755" >Brazilian Lattes CV</a>
+            </li>
+            <li>
+              <a target="_self" href="https://scholar.google.com.br/citations?user=d2ij4wUAAAAJ&hl" >Google Scholar</a>
+            </li>
+            <li>
+              <a target="_self" href="https://orcid.org/0000-0003-2143-9701" >ORCID</a>
+            </li>
+            <li>
+              <a target="_self" href="https://publons.com/researcher/2414076/antonio-victor-c-coelho" >Researcher ID/Publons</a>
+            </li>
+        </ul>
+      </nav>
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/antoniocampos13/portfolio" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/antonio-coelho-9aa338164" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://antoniocampos13.github.io">Home</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.rss.xml">RSS</a>
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="setting-up-your-unix-computer-for-bioinformatics-analysis">Setting Up Your Unix Computer for Bioinformatics&nbsp;Analysis</h1>
+    <p>
+      Posted on Wed 30 September 2020 in <a href="https://antoniocampos13.github.io/category/unix.html">Unix</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h2>Introduction</h2>
+<p>In this post I will show how I set up my Unix machine to use Bioinformatics programs and tools. I am currently using Ubuntu 20.04 <span class="caps">LTS</span> (Focal Fossa) 64-bit on a <a href="https://www.digitalocean.com/community/posts/trying-the-new-wsl-2-its-fast-windows-subsystem-for-linux">Windows Subsystem for Linux (<span class="caps">WSL2</span>)</a> on Windows 10, so no <span class="caps">GUI</span>&nbsp;today!</p>
+<p>The code and files used here can be retrieved from <a href="https://github.com/antoniocampos13/portfolio/tree/master/Unix/2020-09-30_Setting%20Up%20Your%20Unix%20Computer%20for%20Bioinformatics%20Analysis">this post corresponding folder on my portfolio</a>.</p>
+<h2>Preparing the&nbsp;system</h2>
+<p>First, it is recommended that we upgrade the system. Open the command line terminal in your machine and copy and paste or type the following commands, pressing Enter after each one (make sure you type your password correctly whenever&nbsp;asked):</p>
+<div class="highlight"><pre><span></span><code>sudo apt-get update
+sudo apt-get upgrade
+</code></pre></div>
+
+<p>Then I must install some useful libraries, especially to be sure that all future libraries I need will be installed and work properly. Some of these (e.g. default-jdk, the Java libraries), may already be installed in your system, but just to&nbsp;ensure:</p>
+<div class="highlight"><pre><span></span><code>sudo apt-get install -y curl unzip build-essential ncurses-dev
+sudo apt-get install -y byacc zlib1g-dev python-dev git cmake
+sudo apt-get install -y default-jdk ant
+</code></pre></div>
+
+<h2>Installing&nbsp;(mini)conda</h2>
+<p>Now I will install <a href="https://conda.io/miniconda.html">miniconda</a>. What is miniconda? Miniconda is a simplified version of Conda, an environment management system. Every program we install on our computers depend on other programs to work. So if a program X needs a program Y to work, it may stop working if Y gets an update that for some reason is incompatible with the original X&nbsp;program.</p>
+<p>Thus, environments were developed to solve this kind of problem, because they serve to isolate groups of programs, ensuring only compatible versions of software are working together. Therefore, miniconda serves to create and manage environments. The best practice is that one should create one environment for one specific use. In my case, I installed miniconda to create a environment and populate it with tools used for several Bioinformatics analysis. Other people can create environments for other uses with specific programs needed and so on. Other advantage of miniconda is that the configuration files for environments can be shared with others, ensuring <strong>backup</strong> and <strong>reproducibility</strong>.</p>
+<p>Without further ado, let&#8217;s finally install miniconda. Since I am using a Unix with Python 3.7.7 pre-installed, the version of the installer <a href="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh">is this one</a>. Check the <a href="https://docs.conda.io/en/latest/miniconda.html#linux-installers">installation page</a> if you have a different Python&nbsp;version.</p>
+<p>You can download the installer from your browser or via command&nbsp;line:</p>
+<div class="highlight"><pre><span></span><code>curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh &gt; Miniconda3-latest-Linux-x86_64.sh
+</code></pre></div>
+
+<p>Then, go to the folder where the installer was downloaded and run the&nbsp;script:</p>
+<div class="highlight"><pre><span></span><code>bash Miniconda3-latest-Linux-x86_64.sh
+
+./Miniconda3-latest-Linux-x86_64.sh <span class="c1"># same effect</span>
+</code></pre></div>
+
+<p>When the installation finishes, I must initialize&nbsp;conda:</p>
+<div class="highlight"><pre><span></span><code>miniconda3/condabin/conda init
+</code></pre></div>
+
+<p>Close the terminal and open it again. Now miniconda must be ready to use. Check by typing and pressing&nbsp;Enter:</p>
+<div class="highlight"><pre><span></span><code>conda
+</code></pre></div>
+
+<p>Then, I added two <strong>channels</strong>. Channels are <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html">&#8220;the locations where packages are stored&#8221;</a>. Miniconda has the <code>defaults</code> channel pre-configured. The two channels in question are dedicated to Bioinformatics and Data analysis programs, which may not be present in the default channels, so I must add&nbsp;them.</p>
+<h2>Configuring miniconda&nbsp;channels</h2>
+<p>Once again in the terminal enter the following&nbsp;commands:</p>
+<div class="highlight"><pre><span></span><code>conda config --add channels bioconda
+conda config --add channels conda-forge
+</code></pre></div>
+
+<p>Miniconda sets up priorities in the list of channels it receives. When we need to install some program, miniconda will search in the higher-priority channels first, then in the channels with lower-priority. &#8220;Different channels can have the same package&#8221; and you can &#8220;safely put channels at the bottom of your channel list to provide additional packages that are not in the default channels&#8221; as stated in the <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html">official website</a>. The flag <code>--add</code> adds the respective channels (<code>bioconda</code> and <code>conda-forge</code>) to the <strong>top</strong> of the priorities list. If you want to give lower priority, putting them in the <strong>bottom</strong> of the list, use the <code>--append</code> command instead. Thus, according to the command above, the order of channel priorities in our new miniconda installation will be: <code>conda-forge</code>, <code>bioconda</code> and lastly, <code>defaults</code>.</p>
+<h2>Create an environment for Bioinformatics&nbsp;programs</h2>
+<p>Now that miniconda is configured, I will create the environment that will receive them. I will name it <code>bioenv</code>. You can choose whatever name you&nbsp;like! </p>
+<div class="highlight"><pre><span></span><code>conda create -y --name bioenv <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.6
+</code></pre></div>
+
+<h2>Activating and deactivating an&nbsp;environment</h2>
+<p>With the <code>bioenv</code> created, I must <strong>activate</strong>&nbsp;it:</p>
+<div class="highlight"><pre><span></span><code>conda activate bioenv
+</code></pre></div>
+
+<p>I need to perform this step every time I want to use the programs that I will install in this environment. If you do not need to use the environment for the moment, simply <strong>deactivate</strong>&nbsp;it:</p>
+<div class="highlight"><pre><span></span><code>conda deactivate
+</code></pre></div>
+
+<p>Simply <strong>activate</strong> it again when&nbsp;needed.</p>
+<h2>Installing&nbsp;programs</h2>
+<p>Now we can finally install our programs. Activate the environment again (only if you have deactivated it). Download the <a href="https://raw.githubusercontent.com/antoniocampos13/portfolio/master/Unix/2020-09-30_Setting%20Up%20Your%20Unix%20Computer%20for%20Bioinformatics%20Analysis/bioenv.txt"><code>bioenv.txt</code> file</a> in my GitHub repository. This file contains a selection of most used Bioinformatics programs (hat tip to <a href="https://www.biostarhandbook.com/index.html">Dr. István Albert</a>)</p>
+<div class="highlight"><pre><span></span><code>cat bioenv.txt <span class="p">|</span> xargs conda install -y
+</code></pre></div>
+
+<h2>Backing up and restoring your environment&nbsp;configuration</h2>
+<p>Miniconda has a special command to backup your environment configuration. <strong>Activate</strong> (if needed) the environment you want to backup and enter the&nbsp;command:</p>
+<div class="highlight"><pre><span></span><code>conda env <span class="nb">export</span> <span class="p">|</span> grep -v <span class="s2">&quot;prefix&quot;</span> &gt; bioenv.yml
+</code></pre></div>
+
+<p>It will result in a <code>YAML</code> file in the current working folder containing all configurations in your environment. Again, I named the file <code>bioenv.yml</code> but you can choose whatever you like. Note that if you already have a <code>bioenv.yml</code> in your directory, it will be overwritten, so be&nbsp;careful.</p>
+<p>To restore this environment in your computer, or on other computer, first install miniconda again, and then use the&nbsp;command:</p>
+<div class="highlight"><pre><span></span><code>conda env create -f bioenv.yml
+</code></pre></div>
+
+<p>The <code>-f</code> flag means you are creating an environment using the configurations in the <code>bioenv.yml</code> file. The first line of the yml file sets the new environment&#8217;s name, so you can change it in the file if you like. It will also restore the channels configured in the previous installation of&nbsp;miniconda.</p>
+<h2>Conclusion</h2>
+<p>This is how I configured my system so I could use the major Bioinformatics tools out there. In summary,&nbsp;I:</p>
+<ul>
+<li>Prepared an Unix (Ubuntu)&nbsp;system;</li>
+<li>Installed miniconda, an environment&nbsp;manager;</li>
+<li>Configured channels so I could retrieve desired&nbsp;software;</li>
+<li>Created an environment, showed how to activate and deactivate it, and finally installed software in&nbsp;it;</li>
+<li>Showed how to backup your environment for safekeeping or sharing with&nbsp;others.</li>
+</ul>
+<p>In future posts I will demo some uses of the installed programs I  in the new&nbsp;environment.</p>
+<h2>References</h2>
+<p><a href="https://github.com/antoniocampos13/portfolio">My&nbsp;Portfolio</a></p>
+<p><a href="https://www.digitalocean.com/community/posts/trying-the-new-wsl-2-its-fast-windows-subsystem-for-linux">Trying the New <span class="caps">WSL</span> 2. It&#8217;s Fast! (Windows Subsystem for Linux) |&nbsp;DigitalOcean</a></p>
+<p><a href="https://conda.io/miniconda.html">Miniconda</a></p>
+<p><a href="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh">Miniconda&nbsp;installer</a></p>
+<p><a href="https://docs.conda.io/en/latest/miniconda.html#linux-installers">Miniconda <span class="amp">&amp;</span> Conda&nbsp;documentation</a></p>
+<p><a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html">Managing channels; conda 4.8.4.post65+1a0ab046&nbsp;documentation</a></p>
+<p><a href="https://www.biostarhandbook.com/index.html">The Biostar Handbook: 2nd&nbsp;Edition</a></p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://antoniocampos13.github.io/tag/bioinformatics.html">Bioinformatics</a>
+    </p>
+  </div>
+
+
+
+
+
+</article>
+
+    <footer>
+<p>
+  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+           src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Antonio's Portfolio ",
+  "url" : "https://antoniocampos13.github.io",
+  "image": "https://avatars.githubusercontent.com/antoniocampos13",
+  "description": "Data Science Portfolio by Antonio Victor Campos Coelho"
+}
+</script>
+
+
+</body>
+</html>

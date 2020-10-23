@@ -1,0 +1,340 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/stylesheet/style.min.css">
+
+
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+          href="https://antoniocampos13.github.io/theme/pygments/vs.min.css">
+
+
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/solid.css">
+
+
+    <link href="https://antoniocampos13.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Antonio's Portfolio Atom">
+
+    <link href="https://antoniocampos13.github.io/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="Antonio's Portfolio RSS">
+
+
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Microsoft EDGE -->
+    <meta name="msapplication-TileColor" content="#333333">
+
+<meta name="author" content="Antonio Victor Campos Coelho" />
+<meta name="description" content="Introduction In my previous post I demonstrated how to obtain a prostate cancer dataset with genomic information in the form of gene expression quantification and created a local PostgreSQL database to hold the data. Here, I will use R to connect to the PostgreSQL database, retrieve and then prepare the …" />
+<meta name="keywords" content="Bioinformatics, gene expression, SQL, PostgreSQL">
+
+
+<meta property="og:site_name" content="Antonio's Portfolio"/>
+<meta property="og:title" content="Data manipulation with R"/>
+<meta property="og:description" content="Introduction In my previous post I demonstrated how to obtain a prostate cancer dataset with genomic information in the form of gene expression quantification and created a local PostgreSQL database to hold the data. Here, I will use R to connect to the PostgreSQL database, retrieve and then prepare the …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://antoniocampos13.github.io/data-manipulation-with-r.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2020-10-19 13:30:00-03:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
+<meta property="article:section" content="R"/>
+<meta property="article:tag" content="Bioinformatics"/>
+<meta property="article:tag" content="gene expression"/>
+<meta property="article:tag" content="SQL"/>
+<meta property="article:tag" content="PostgreSQL"/>
+<meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
+
+  <title>Antonio's Portfolio &ndash; Data manipulation with R</title>
+
+</head>
+<body class="light-theme">
+  <aside>
+    <div>
+      <a href="https://antoniocampos13.github.io">
+        <img src="https://avatars.githubusercontent.com/antoniocampos13" alt="Antonio's Portfolio" title="Antonio's Portfolio">
+      </a>
+
+      <h1>
+        <a href="https://antoniocampos13.github.io">Antonio's Portfolio</a>
+      </h1>
+
+<p>PhD in Genetics</p>
+
+      <nav>
+        <ul class="list">
+
+
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/about.html#about">
+                  About
+                </a>
+              </li>
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/contact.html#contact">
+                  Contact
+                </a>
+              </li>
+
+            <li>
+              <a target="_self" href="http://lattes.cnpq.br/2986394950644755" >Brazilian Lattes CV</a>
+            </li>
+            <li>
+              <a target="_self" href="https://scholar.google.com.br/citations?user=d2ij4wUAAAAJ&hl" >Google Scholar</a>
+            </li>
+            <li>
+              <a target="_self" href="https://orcid.org/0000-0003-2143-9701" >ORCID</a>
+            </li>
+            <li>
+              <a target="_self" href="https://publons.com/researcher/2414076/antonio-victor-c-coelho" >Researcher ID/Publons</a>
+            </li>
+        </ul>
+      </nav>
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/antoniocampos13/portfolio" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/antonio-coelho-9aa338164" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://antoniocampos13.github.io">Home</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.rss.xml">RSS</a>
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="data-manipulation-with-r">Data manipulation with&nbsp;R</h1>
+    <p>
+      Posted on Mon 19 October 2020 in <a href="https://antoniocampos13.github.io/category/r.html">R</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h2>Introduction</h2>
+<p>In my <a href="https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html#working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1">previous post</a> I demonstrated how to obtain a prostate cancer dataset with genomic information in the form of gene expression quantification and created a local PostgreSQL database to hold the&nbsp;data.</p>
+<p>Here, I will use R to connect to the PostgreSQL database, retrieve and then prepare the <span class="caps">CGC</span> data to perform a Differential Expression Analysis for sequence count data in the <span class="caps">CGC</span> dataset. This demonstration is on a RStudio project running in Windows 10, but the same steps can be followed on an Unix&nbsp;system.</p>
+<p>As always, the code demonstrated here is available on my <a href="https://github.com/antoniocampos13/portfolio/tree/master/R/2020_10_19_Data_manipulation_with_R">portfolio on GitHub</a>.</p>
+<h2>Setting up .Renviron&nbsp;file</h2>
+<p>In my working directory, I create a text file named <code>.Renviron</code> to store the credentials of the PostgreSQL database with the following&nbsp;information:</p>
+<div class="highlight"><pre><span></span><code><span class="n">userid</span> <span class="o">=</span> <span class="s">&quot;&lt;USER_NAME&gt;&quot;</span>
+<span class="n">pwd</span> <span class="o">=</span> <span class="s">&quot;&lt;PASSWORD&gt;&quot;</span>
+</code></pre></div>
+
+<p>Replace <code>&lt;USER_NAME&gt;</code> and <code>&lt;PASSWORD&gt;</code> with your credentials used to access the PostgreSQL database. Usually, the default username is <code>postgres</code> and the password is defined during PostgreSQL&nbsp;installation.</p>
+<h2>Install/Load&nbsp;packages</h2>
+<p>Then I open a RStudio session and create a project in the folder containing the <code>.Renviron</code> file. Now, I need to load the packages I will use today. You can install them using <code>install.packages()</code> function if you do not have them installed&nbsp;yet:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run only once</span>
+<span class="nf">install.packages</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;RPostgres&quot;</span><span class="p">,</span> <span class="s">&quot;here&quot;</span><span class="p">,</span> <span class="s">&quot;tidyverse&quot;</span><span class="p">))</span>
+</code></pre></div>
+
+<p>Note that to install more than one package at once we must use the concatenate <code>c()</code> command to pass the packages names and they must be quoted and separated by commas &#8212; a R <em>vector</em>. The package dependencies will be installed as&nbsp;well.</p>
+<p>Now I load the packages into the R&nbsp;session:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">RPostgres</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">here</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The <code>RPostgres</code> is needed to connect to the PostgreSQL database I created before. The <a href="https://github.com/jennybc/here_here"><code>here</code> package</a> handles file paths. <code>tidyverse</code> is a powerful collection of packages for data manipulation. By using it, it will actually load several other packages, such as <code>dplyr</code>, <code>stringr</code> and <code>tidyr</code>. It is one of the packages I use the most. Check <code>RPostgres</code> documentation <a href="https://www.rdocumentation.org/packages/RPostgres/versions/1.2.1">here</a> and <code>tidyverse</code> documentation <a href="https://www.tidyverse.org/">here</a>.</p>
+<h2>Set up connection to tcga&nbsp;database</h2>
+<p>I now set up the connection to the&nbsp;database:</p>
+<div class="highlight"><pre><span></span><code><span class="n">con</span> <span class="o">&lt;-</span> <span class="nf">dbConnect</span><span class="p">(</span>
+  <span class="n">RPostgres</span><span class="o">::</span><span class="nf">Postgres</span><span class="p">(),</span>
+  <span class="n">dbname</span> <span class="o">=</span> <span class="s">&quot;tcga&quot;</span><span class="p">,</span>
+  <span class="n">host</span> <span class="o">=</span> <span class="s">&quot;localhost&quot;</span><span class="p">,</span>
+  <span class="n">port</span> <span class="o">=</span> <span class="m">5432</span><span class="p">,</span>
+  <span class="n">user</span> <span class="o">=</span> <span class="nf">Sys.getenv</span><span class="p">(</span><span class="s">&quot;userid&quot;</span><span class="p">),</span>
+  <span class="n">password</span> <span class="o">=</span> <span class="nf">Sys.getenv</span><span class="p">(</span><span class="s">&quot;pwd&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>The <code>Sys.getenv()</code> will retrieve the information in the <code>.Renviron</code> file. Remember to not share this file so your credentials remain secret. The connection credentials are now stored in the <code>con</code> object.</p>
+<h2>Retrieve and pivot gene_counts_cases&nbsp;table</h2>
+<p>With the command below, I retrieve the table containing the case-identified, raw gene counts I created last&nbsp;time:  </p>
+<div class="highlight"><pre><span></span><code><span class="n">cases</span> <span class="o">&lt;-</span> <span class="nf">dbGetQuery</span><span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="s">&quot;SELECT * FROM gene_counts_cases&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The <code>dbGetQuery()</code> is one of the functions from <code>DBI</code> package, a dependency of <code>RPostgres</code>. Check <code>DBI</code> documentation <a href="https://www.rdocumentation.org/packages/DBI/versions/0.5-1">here</a>.</p>
+<p>The information is now stored in the <code>cases</code> object, which has three columns: <code>case_id</code>, <code>gene_id</code> and <code>gene_counts</code>. Therefore, each row is a combination of a case, a gene and a gene count &#8212; it is a &#8220;long&#8221;&nbsp;format.</p>
+<p>I now will reformat the table to a &#8220;wide&#8221; format (pivot) because it is a requirement for the differential expression analysis. The pivoted table will have <em>G</em>x<em>N</em> dimensions, where <em>G</em> are the number of rows (the number of gene transcripts quantified) and <em>N</em> the number of columns (the number of&nbsp;cases).</p>
+<p>I will use the <code>pivot_wider()</code> function of the <code>tidyr</code> package to do the job (<strong><span class="caps">WARNING</span>: <span class="caps">COMPUTATION</span> <span class="caps">INTENSIVE</span> <span class="caps">STEP</span></strong>):</p>
+<div class="highlight"><pre><span></span><code><span class="n">cases_pivoted</span> <span class="o">&lt;-</span>
+  <span class="n">cases</span> <span class="o">%&gt;%</span> <span class="nf">pivot_wider</span><span class="p">(</span>
+    <span class="n">names_from</span> <span class="o">=</span> <span class="n">case_id</span><span class="p">,</span>
+    <span class="n">values_from</span> <span class="o">=</span> <span class="n">gene_count</span><span class="p">,</span>
+    <span class="n">values_fill</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span>
+    <span class="n">names_repair</span> <span class="o">=</span> <span class="s">&quot;check_unique&quot;</span><span class="p">,</span>
+    <span class="n">values_fn</span> <span class="o">=</span> <span class="n">mean</span>
+  <span class="p">)</span>
+</code></pre></div>
+
+<p><code>cases_pivoted</code> is the name of the object that will hold the pivoted table. The <code>%&gt;%</code> is <code>dplyr</code><span class="quo">&#8216;</span>s syntax. It means that we are piping the contents of <code>cases</code> object into the <code>pivot_wider()</code> function and its&nbsp;arguments.</p>
+<p>The <code>names_from</code> argument tells which column will be pivoted to generate new columns. The <code>values_from</code> argument tells which column hold the values that will fill the new pivoted table. The <code>values_fill</code> argument will substitute any missing data for a zero. The <code>names_repair</code> argument checks that each new column has a unique name. Finally, the <code>values_fn</code> argument indicates the function that must be applied to the values filling the new pivoted table. Note that I used the <code>mean</code> function because during this step I noticed that some cases were associated with more than one gene expression quantification file. Therefore, I had to take the mean of these extra gene counts to correctly generate the pivoted&nbsp;table.</p>
+<p>Since I calculated means for the values, I then rounded to the next integer all numerical data in the table with the help of <code>dplyr</code><span class="quo">&#8216;</span>s <code>mutate()</code>, <code>across()</code> and <code>where()</code> functions and <code>round()</code>, which is one of R&#8217;s standard (base)&nbsp;functions:</p>
+<div class="highlight"><pre><span></span><code><span class="n">counts</span> <span class="o">&lt;-</span> <span class="n">cases_pivoted</span> <span class="o">%&gt;%</span> <span class="nf">mutate</span><span class="p">(</span><span class="nf">across</span><span class="p">(</span><span class="nf">where</span><span class="p">(</span><span class="n">is.numeric</span><span class="p">),</span> <span class="n">round</span><span class="p">,</span> <span class="m">0</span><span class="p">))</span>
+</code></pre></div>
+
+<p>The <code>where(is.numeric)</code> ensures that I only manipulated numeric data in the table. The <code>across()</code> function applies the same transformation (rounding in this case) to multiple columns. Finally, <code>mutate()</code> adds the new variables (rounded columns), replacing the existing&nbsp;ones.</p>
+<h2>Retrieve and de-duplicate follow_up&nbsp;table</h2>
+<p>Now I set aside the <code>counts</code> table for a moment to prepare the sample classifications. I realized that the <code>follow_up</code> table had duplicate data for some reason. Thus I connected to the database and de-duplicate the <code>followup_primarytherapyoutcomesuccess_1</code> column by using string aggregation (PostgreSQL&#8217;s <a href="https://www.postgresqltutorial.com/postgresql-aggregate-functions/postgresql-string_agg-function/"><code>STRING_AGG</code> function</a>). I also changed its name to <code>outcome</code> for simplicity, and saved the results as the <code>followup_dedup</code> table. This is the command I&nbsp;used:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">dbExecute</span><span class="p">(</span>
+  <span class="n">con</span><span class="p">,</span>
+  <span class="s">&quot;CREATE TABLE followup_dedup AS SELECT case_id, STRING_AGG(followup_primarytherapyoutcomesuccess_1, &#39;,&#39;) AS outcome FROM follow_up GROUP BY case_id&quot;</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Note how I used <code>DBI</code><span class="quo">&#8216;</span>s <code>dbExecute()</code> instead of <code>dbGetQuery()</code>, since I will not retrieve the table into the R&nbsp;session.</p>
+<p>Now I create other table to link the cases <span class="caps">ID</span> numbers with the de-duplicated outcomes, saving the result as the <code>outcomes</code> table:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">dbExecute</span><span class="p">(</span>
+  <span class="n">con</span><span class="p">,</span>
+  <span class="s">&quot;CREATE TABLE outcomes AS SELECT case_id, outcome FROM allcases INNER JOIN followup_dedup USING(case_id)&quot;</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>I now retrieve the <code>outcomes</code> table into the R&nbsp;session:</p>
+<div class="highlight"><pre><span></span><code><span class="n">outcomes</span> <span class="o">&lt;-</span> <span class="nf">dbGetQuery</span><span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="s">&quot;SELECT * FROM outcomes&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<h2>Create sample classification and new&nbsp;labels</h2>
+<p>I will now create a new column named <code>class</code> in the outcomes table with a simplified case/control classification based on the <code>outcome</code> column with the help of <code>dplyr</code><span class="quo">&#8216;</span>s <code>mutate()</code> and <code>case_when()</code>, which vectorizes multiple if/else statements (it is an R equivalent of the <span class="caps">SQL</span> <code>CASE WHEN</code> statement):</p>
+<div class="highlight"><pre><span></span><code><span class="n">outcomes</span> <span class="o">&lt;-</span> <span class="n">outcomes</span> <span class="o">%&gt;%</span> <span class="nf">mutate</span><span class="p">(</span><span class="n">class</span> <span class="o">=</span> <span class="nf">case_when</span><span class="p">(</span>
+  <span class="nf">str_detect</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="s">&quot;Complete&quot;</span><span class="p">)</span> <span class="o">~</span> <span class="s">&quot;control&quot;</span><span class="p">,</span>
+  <span class="nf">str_detect</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="s">&quot;Partial&quot;</span><span class="p">)</span> <span class="o">~</span> <span class="s">&quot;case&quot;</span><span class="p">,</span>
+  <span class="nf">str_detect</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="s">&quot;Disease&quot;</span><span class="p">)</span> <span class="o">~</span> <span class="s">&quot;case&quot;</span>
+<span class="p">))</span>
+</code></pre></div>
+
+<p>Now I will create a new label for the cases for simplification. I created a column named <code>new_names</code> in the <code>outcomes</code> table. The new names were created by joining the classification created in the previous step with the 12 last characters of the <code>case_id</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">outcomes</span> <span class="o">&lt;-</span> <span class="n">outcomes</span> <span class="o">%&gt;%</span> <span class="nf">mutate</span><span class="p">(</span><span class="n">new_names</span> <span class="o">=</span> <span class="nf">paste0</span><span class="p">(</span><span class="nf">str_sub</span><span class="p">(</span><span class="n">case_id</span><span class="p">,</span> <span class="m">-12</span><span class="p">),</span> <span class="s">&quot;_&quot;</span><span class="p">,</span> <span class="n">class</span><span class="p">))</span>
+</code></pre></div>
+
+<p>Finally, let&#8217;s apply the new case labels, substituting the old ones with the help of <code>dplyr</code><span class="quo">&#8216;</span>s <code>recode()</code>  function:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">colnames</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">recode</span><span class="p">(</span><span class="nf">colnames</span><span class="p">(</span><span class="n">counts</span><span class="p">),</span> <span class="o">!!!</span><span class="nf">setNames</span><span class="p">(</span><span class="nf">as.character</span><span class="p">(</span><span class="n">outcomes</span><span class="o">$</span><span class="n">new_names</span><span class="p">),</span> <span class="n">outcomes</span><span class="o">$</span><span class="n">case_id</span><span class="p">))</span>
+</code></pre></div>
+
+<h2>Convert gene_ids into row names, then delete gene_id&nbsp;column</h2>
+<p>The table is almost in the state required for differential expression analysis. I just need to convert the <code>gene_id</code> column into row names of the data&nbsp;frame:</p>
+<div class="highlight"><pre><span></span><code><span class="n">counts</span> <span class="o">&lt;-</span> <span class="nf">as.data.frame</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+
+<span class="nf">row.names</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">counts</span><span class="o">$</span><span class="n">gene_id</span>
+</code></pre></div>
+
+<p>The <code>gene_id</code> is not needed anymore. I can delete&nbsp;it:</p>
+<div class="highlight"><pre><span></span><code><span class="n">counts</span> <span class="o">&lt;-</span> <span class="nf">subset</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">select</span> <span class="o">=</span> <span class="o">-</span><span class="nf">c</span><span class="p">(</span><span class="n">gene_id</span><span class="p">))</span>
+</code></pre></div>
+
+<p>The data frame is now ready for differential expression analysis for sequence count data. The features (gene IDs) are embedded on the R object row names, whereas each column corresponds to a individual sample. The row/column intersection are therefore, the raw counts of gene&nbsp;expression.</p>
+<p>Check the dimensions (<em>G</em>x<em>N</em>) of the data frame with the <code>dim()</code> function and see that there 60483 rows and 236 columns, meaning that 60483 transcripts where quantified in samples obtained from 236 individuals with prostate&nbsp;cancer.</p>
+<div class="highlight"><pre><span></span><code><span class="nf">dim</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+
+<span class="c1"># Output:</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="m">60483</span>   <span class="m">236</span>
+</code></pre></div>
+
+<p>See below first few rows and columns of the finalized <code>counts</code> data&nbsp;frame:</p>
+<p><img alt="Final gene counts table" src="https://antoniocampos13.github.io/images/counts_final.PNG"></p>
+<p>In a future post I will demonstrate the differential expression analysis <em>per se</em>.</p>
+<h2>Conclusion</h2>
+<ul>
+<li>I demonstrated how to connect to a local PostgreSQL database with <code>Rpostgres</code> and <code>DBI</code> packages;</li>
+<li>Reorganized data by pivoting a long data frame to a wider data frame with gene IDs in rows and samples in columns with <code>dplyr</code> package&nbsp;functions;</li>
+<li>Labeled columns as cases or controls for the differential expression analysis, also with <code>dplyr</code> package.</li>
+</ul>
+<p><em>Go back to <a href="https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html#working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1">Working with Cancer Genomics Cloud datasets in a PostgreSQL database Part 1</a> and <a href="https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-2.html#working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-2">Part 2</a>.</em></p>
+<p><em>Subscribe to my <a href="https://antoniocampos13.github.io/feeds/all.rss.xml"><span class="caps">RSS</span> feed</a>, <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom feed</a> or <a href="https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg">Telegram channel</a> to keep you updated whenever I post new&nbsp;content.</em></p>
+<h2>References</h2>
+<p><a href="https://github.com/jennybc/here_here">Ode to the here&nbsp;package</a></p>
+<p><a href="https://www.rdocumentation.org/packages/RPostgres/versions/1.2.1">RPostgres package | R&nbsp;Documentation</a></p>
+<p><a href="https://www.tidyverse.org/">Tidyverse</a></p>
+<p><a href="https://www.rdocumentation.org/packages/DBI/versions/0.5-1"><span class="caps">DBI</span> package | R&nbsp;Documentation</a></p>
+<p><a href="https://www.postgresqltutorial.com/postgresql-aggregate-functions/postgresql-string_agg-function/">PostgreSQL STRING_AGG() Function By Practical&nbsp;Examples</a></p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://antoniocampos13.github.io/tag/bioinformatics.html">Bioinformatics</a>
+      <a href="https://antoniocampos13.github.io/tag/gene-expression.html">gene expression</a>
+      <a href="https://antoniocampos13.github.io/tag/sql.html">SQL</a>
+      <a href="https://antoniocampos13.github.io/tag/postgresql.html">PostgreSQL</a>
+    </p>
+  </div>
+
+
+
+
+
+</article>
+
+    <footer>
+<p>
+  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+           src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Antonio's Portfolio ",
+  "url" : "https://antoniocampos13.github.io",
+  "image": "https://avatars.githubusercontent.com/antoniocampos13",
+  "description": "Data Science Portfolio by Antonio Victor Campos Coelho"
+}
+</script>
+
+
+</body>
+</html>

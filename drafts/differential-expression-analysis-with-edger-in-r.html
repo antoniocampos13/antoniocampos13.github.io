@@ -1,0 +1,229 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/stylesheet/style.min.css">
+
+
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+          href="https://antoniocampos13.github.io/theme/pygments/vs.min.css">
+
+
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/solid.css">
+
+
+    <link href="https://antoniocampos13.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Antonio's Portfolio Atom">
+
+    <link href="https://antoniocampos13.github.io/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="Antonio's Portfolio RSS">
+
+
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Microsoft EDGE -->
+    <meta name="msapplication-TileColor" content="#333333">
+
+<meta name="author" content="Antonio Victor Campos Coelho" />
+<meta name="description" content="Introduction In my previous post I demonstrated how to organize the CGC prostate cancer data to a format suited to differential expression analysis (DEA). Nowadays, DEA usually arises from high-throughput sequencing of a collection (library) of RNA molecules expressed by single cells or tissue given their conditions upon collection and …" />
+<meta name="keywords" content="Bioinformatics, gene expression, edgeR">
+
+
+<meta property="og:site_name" content="Antonio's Portfolio"/>
+<meta property="og:title" content="Differential Expression Analysis with edgeR in R"/>
+<meta property="og:description" content="Introduction In my previous post I demonstrated how to organize the CGC prostate cancer data to a format suited to differential expression analysis (DEA). Nowadays, DEA usually arises from high-throughput sequencing of a collection (library) of RNA molecules expressed by single cells or tissue given their conditions upon collection and …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://antoniocampos13.github.io/drafts/differential-expression-analysis-with-edger-in-r.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2020-10-22 15:30:00-03:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
+<meta property="article:section" content="R"/>
+<meta property="article:tag" content="Bioinformatics"/>
+<meta property="article:tag" content="gene expression"/>
+<meta property="article:tag" content="edgeR"/>
+<meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
+
+  <title>Antonio's Portfolio &ndash; Differential Expression Analysis with edgeR in R</title>
+
+</head>
+<body class="light-theme">
+  <aside>
+    <div>
+      <a href="https://antoniocampos13.github.io">
+        <img src="https://avatars.githubusercontent.com/antoniocampos13" alt="Antonio's Portfolio" title="Antonio's Portfolio">
+      </a>
+
+      <h1>
+        <a href="https://antoniocampos13.github.io">Antonio's Portfolio</a>
+      </h1>
+
+<p>PhD in Genetics</p>
+
+      <nav>
+        <ul class="list">
+
+
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/about.html#about">
+                  About
+                </a>
+              </li>
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/contact.html#contact">
+                  Contact
+                </a>
+              </li>
+
+            <li>
+              <a target="_self" href="http://lattes.cnpq.br/2986394950644755" >Brazilian Lattes CV</a>
+            </li>
+            <li>
+              <a target="_self" href="https://scholar.google.com.br/citations?user=d2ij4wUAAAAJ&hl" >Google Scholar</a>
+            </li>
+            <li>
+              <a target="_self" href="https://orcid.org/0000-0003-2143-9701" >ORCID</a>
+            </li>
+            <li>
+              <a target="_self" href="https://publons.com/researcher/2414076/antonio-victor-c-coelho" >Researcher ID/Publons</a>
+            </li>
+        </ul>
+      </nav>
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/antoniocampos13/portfolio" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/antonio-coelho-9aa338164" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://antoniocampos13.github.io">Home</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.rss.xml">RSS</a>
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="differential-expression-analysis-with-edger-in-r">Differential Expression Analysis with edgeR in&nbsp;R</h1>
+    <p>
+      Posted on Thu 22 October 2020 in <a href="https://antoniocampos13.github.io/category/r.html">R</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h2>Introduction</h2>
+<p>In my <a href="https://antoniocampos13.github.io/data-manipulation-with-r.html#data-manipulation-with-r">previous post</a> I demonstrated how to organize the <a href="https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html"><span class="caps">CGC</span> prostate cancer data</a> to a format suited to differential expression analysis (<span class="caps">DEA</span>).</p>
+<p>Nowadays, <span class="caps">DEA</span> usually arises from high-throughput sequencing of a collection (library) of <span class="caps">RNA</span> molecules expressed by single cells or tissue given their conditions upon collection and <span class="caps">RNA</span>&nbsp;extraction.</p>
+<p>In terms of statistical analysis, <span class="caps">DEA</span> <a href="https://www.ebi.ac.uk/training/online/course/functional-genomics-ii-common-technologies-and-data-analysis-methods/differential-gene">&#8220;means taking the normalized read count data and performing statistical analysis to discover quantitative changes in expression levels between experimental groups&#8221;</a>. What are experimental groups? Consider for example, diseased versus healthy cells, treated cells versus non-treated cells (when someone is testing new drugs for example), and so&nbsp;on.</p>
+<h2>The edgeR&nbsp;package</h2>
+<p>There are some statistical packages in R that deal with <span class="caps">DEA</span>, such as <code>edgeR</code>, <code>DESeq2</code> and <code>limma</code>. Here I will demonstrate a custom script to perform <span class="caps">DEA</span> with <a href="https://bioconductor.org/packages/release/bioc/html/edgeR.html"><code>edgeR</code></a>.</p>
+<p><code>edgeR</code> performs <span class="caps">DEA</span> for pre-defined genomic features, which can be genes, transcripts or exons, for example. In the present demonstration, we will quantify transcripts. Remember that genes can produce several transcripts through alternative splicing. The <code>edgeR</code> statistical model is based on negative binomial distribution. Prior to statistical analysis, <code>edgeR</code> normalizes gene/transcript expression counts via the Trimmed Mean of M-values (<span class="caps">TMM</span>) method. See <a href="https://www.biostars.org/p/284775/#284893">Dr. Kevin Blighe&#8217;s comment in a Biostars forum topic</a> for a brief discussion of <code>edgeR</code> and other <span class="caps">DEA</span>&nbsp;packages.</p>
+<p>Without further ado, I will show how to set up a R session to run a <span class="caps">DEA</span> with <code>edgeR</code>, and how to interpret results. As usual, the code presented here is deposited on my <a href="">portolio at GitHub</a>.</p>
+<h2>Install and load&nbsp;packages</h2>
+<p>First, I will install two packages. The first one is <a href="https://www.rdocumentation.org/packages/openxlsx/versions/4.2.2"><code>openxlsx</code></a>, which is a package used to read/write Microsoft Office Excel spreadsheets. I will use it to conveniently save the output of the <span class="caps">DEA</span>.</p>
+<p>The second is <a href="https://www.rdocumentation.org/packages/BiocManager/versions/1.30.10"><code>BiocManager</code></a>. It is needed to install packages from <a href="https://www.bioconductor.org/">Bioconductor</a> project. They are Bioinformatics analysis packages that are not on the default R package&nbsp;repository.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run only once</span>
+<span class="nf">install.packages</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;openxlsx&quot;</span><span class="p">,</span> <span class="s">&quot;BiocManager&quot;</span><span class="p">))</span>
+</code></pre></div>
+
+<p>Now I install <code>edgeR</code> and some more packages from Bioconductor. I will use them to annotate and convert the transcript/gene IDs to a gene symbol. Check their documentation: <a href="https://www.rdocumentation.org/packages/annotate/versions/1.50.0"><code>annotate</code></a>, <a href="https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html"><code>org.Hs.eg.db</code></a>, <a href="https://bioconductor.org/packages/release/data/annotation/html/EnsDb.Hsapiens.v79.html">EnsDb.Hsapiens.v79</a> and <a href="https://www.rdocumentation.org/packages/ensembldb/versions/1.4.7"><code>ensembldb</code></a>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run only once</span>
+<span class="n">BiocManager</span><span class="o">::</span><span class="nf">install</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;edgeR&quot;</span><span class="p">,</span> <span class="s">&quot;annotate&quot;</span><span class="p">,</span> <span class="s">&quot;org.Hs.eg.db&quot;</span><span class="p">,</span> <span class="s">&quot;EnsDb.Hsapiens.v79&quot;</span><span class="p">,</span><span class="s">&quot;ensembldb&quot;</span><span class="p">))</span>
+</code></pre></div>
+
+<p>The <code>::</code> is used when we wish to invoke the mentioned package directly (<code>BiocManager</code> in this case), without loading it into the&nbsp;memory.</p>
+<p>Now, I will load just the <code>here</code> package to handle filepaths for now, the rest will be loaded into R later (I am assuming you installed it from last&nbsp;time).</p>
+<div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">here</span><span class="p">)</span>
+</code></pre></div>
+
+<p>I will use the <code>counts</code> data frame I produced <a href="https://antoniocampos13.github.io/data-manipulation-with-r.html">last time</a>. Since I have saved it to my disk, I load it into the current R&nbsp;session:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">load</span><span class="p">(</span><span class="nf">here</span><span class="p">(</span><span class="s">&quot;data&quot;</span><span class="p">,</span> <span class="s">&quot;counts.RData&quot;</span><span class="p">))</span>
+</code></pre></div>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://antoniocampos13.github.io/tag/bioinformatics.html">Bioinformatics</a>
+      <a href="https://antoniocampos13.github.io/tag/gene-expression.html">gene expression</a>
+      <a href="https://antoniocampos13.github.io/tag/edger.html">edgeR</a>
+    </p>
+  </div>
+
+
+
+
+
+</article>
+
+    <footer>
+<p>
+  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+           src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Antonio's Portfolio ",
+  "url" : "https://antoniocampos13.github.io",
+  "image": "https://avatars.githubusercontent.com/antoniocampos13",
+  "description": "Data Science Portfolio by Antonio Victor Campos Coelho"
+}
+</script>
+
+
+</body>
+</html>
