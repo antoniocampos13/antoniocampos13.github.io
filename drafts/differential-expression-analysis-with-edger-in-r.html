@@ -152,29 +152,123 @@
 <p>Nowadays, <span class="caps">DEA</span> usually arises from high-throughput sequencing of a collection (library) of <span class="caps">RNA</span> molecules expressed by single cells or tissue given their conditions upon collection and <span class="caps">RNA</span>&nbsp;extraction.</p>
 <p>In terms of statistical analysis, <span class="caps">DEA</span> <a href="https://www.ebi.ac.uk/training/online/course/functional-genomics-ii-common-technologies-and-data-analysis-methods/differential-gene">&#8220;means taking the normalized read count data and performing statistical analysis to discover quantitative changes in expression levels between experimental groups&#8221;</a>. What are experimental groups? Consider for example, diseased versus healthy cells, treated cells versus non-treated cells (when someone is testing new drugs for example), and so&nbsp;on.</p>
 <h2>The edgeR&nbsp;package</h2>
-<p>There are some statistical packages in R that deal with <span class="caps">DEA</span>, such as <code>edgeR</code>, <code>DESeq2</code> and <code>limma</code>. Here I will demonstrate a custom script to perform <span class="caps">DEA</span> with <a href="https://bioconductor.org/packages/release/bioc/html/edgeR.html"><code>edgeR</code></a>.</p>
+<p>There are some statistical packages in R that deal with <span class="caps">DEA</span>, such as <code>edgeR</code>, <code>DESeq2</code> and <code>limma</code>. Here I will demonstrate a custom script to perform <span class="caps">DEA</span> with <a href="https://bioconductor.org/packages/release/bioc/html/edgeR.html"><code>edgeR</code></a>. The demonstration here is on Windows 10, but the same steps can be performed on Unix&nbsp;systems.</p>
 <p><code>edgeR</code> performs <span class="caps">DEA</span> for pre-defined genomic features, which can be genes, transcripts or exons, for example. In the present demonstration, we will quantify transcripts. Remember that genes can produce several transcripts through alternative splicing. The <code>edgeR</code> statistical model is based on negative binomial distribution. Prior to statistical analysis, <code>edgeR</code> normalizes gene/transcript expression counts via the Trimmed Mean of M-values (<span class="caps">TMM</span>) method. See <a href="https://www.biostars.org/p/284775/#284893">Dr. Kevin Blighe&#8217;s comment in a Biostars forum topic</a> for a brief discussion of <code>edgeR</code> and other <span class="caps">DEA</span>&nbsp;packages.</p>
-<p>Without further ado, I will show how to set up a R session to run a <span class="caps">DEA</span> with <code>edgeR</code>, and how to interpret results. As usual, the code presented here is deposited on my <a href="">portolio at GitHub</a>.</p>
+<p>Without further ado, I will show how to set up a R session to run a <span class="caps">DEA</span> with <code>edgeR</code>, and how to interpret results. As usual, the code presented here is deposited on my <a href="https://github.com/antoniocampos13/portfolio/tree/master/R/2020_10_22_DEA_with_edgeR">portfolio at GitHub</a>.</p>
 <h2>Install and load&nbsp;packages</h2>
-<p>First, I will install two packages. The first one is <a href="https://www.rdocumentation.org/packages/openxlsx/versions/4.2.2"><code>openxlsx</code></a>, which is a package used to read/write Microsoft Office Excel spreadsheets. I will use it to conveniently save the output of the <span class="caps">DEA</span>.</p>
-<p>The second is <a href="https://www.rdocumentation.org/packages/BiocManager/versions/1.30.10"><code>BiocManager</code></a>. It is needed to install packages from <a href="https://www.bioconductor.org/">Bioconductor</a> project. They are Bioinformatics analysis packages that are not on the default R package&nbsp;repository.</p>
+<p>First, I will install some new packages that I have not talked about. The first one is <a href="https://www.rdocumentation.org/packages/openxlsx/versions/4.2.2"><code>openxlsx</code></a>, which is a package used to read/write Microsoft Office Excel spreadsheets. I will use it to conveniently save the output of the <span class="caps">DEA</span>.</p>
+<p>The second is <a href="https://www.rdocumentation.org/packages/BiocManager/versions/1.30.10"><code>BiocManager</code></a>. It is needed to install packages from <a href="https://www.bioconductor.org/">Bioconductor project</a>, which hosts Bioinformatics analysis packages that are not on the default R package&nbsp;repository.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Run only once</span>
-<span class="nf">install.packages</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;openxlsx&quot;</span><span class="p">,</span> <span class="s">&quot;BiocManager&quot;</span><span class="p">))</span>
+<span class="nf">install.packages</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;here&quot;</span><span class="p">,</span> <span class="s">&quot;tidyverse&quot;</span><span class="p">,</span> <span class="s">&quot;openxlsx&quot;</span><span class="p">,</span> <span class="s">&quot;BiocManager&quot;</span><span class="p">))</span>
 </code></pre></div>
 
-<p>Now I install <code>edgeR</code> and some more packages from Bioconductor. I will use them to annotate and convert the transcript/gene IDs to a gene symbol. Check their documentation: <a href="https://www.rdocumentation.org/packages/annotate/versions/1.50.0"><code>annotate</code></a>, <a href="https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html"><code>org.Hs.eg.db</code></a>, <a href="https://bioconductor.org/packages/release/data/annotation/html/EnsDb.Hsapiens.v79.html">EnsDb.Hsapiens.v79</a> and <a href="https://www.rdocumentation.org/packages/ensembldb/versions/1.4.7"><code>ensembldb</code></a>:</p>
+<p>Now I install <code>edgeR</code> and some more packages from Bioconductor. I will use them to annotate and convert the transcript/gene IDs to a gene symbol. Check their documentation: <a href="https://www.bioconductor.org/packages/release/bioc/html/AnnotationDbi.html"><code>AnnotationDbi</code></a>, <a href="https://www.rdocumentation.org/packages/annotate/versions/1.50.0"><code>annotate</code></a>, <a href="https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html"><code>org.Hs.eg.db</code></a>, <a href="https://bioconductor.org/packages/release/data/annotation/html/EnsDb.Hsapiens.v79.html">EnsDb.Hsapiens.v79</a> and <a href="https://www.rdocumentation.org/packages/ensembldb/versions/1.4.7"><code>ensembldb</code></a>:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Run only once</span>
-<span class="n">BiocManager</span><span class="o">::</span><span class="nf">install</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;edgeR&quot;</span><span class="p">,</span> <span class="s">&quot;annotate&quot;</span><span class="p">,</span> <span class="s">&quot;org.Hs.eg.db&quot;</span><span class="p">,</span> <span class="s">&quot;EnsDb.Hsapiens.v79&quot;</span><span class="p">,</span><span class="s">&quot;ensembldb&quot;</span><span class="p">))</span>
+<span class="n">BiocManager</span><span class="o">::</span><span class="nf">install</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;edgeR&quot;</span><span class="p">,</span><span class="s">&quot;AnnotationDbi&quot;</span><span class="p">,</span> <span class="s">&quot;annotate&quot;</span><span class="p">,</span> <span class="s">&quot;org.Hs.eg.db&quot;</span><span class="p">,</span> <span class="s">&quot;EnsDb.Hsapiens.v79&quot;</span><span class="p">,</span><span class="s">&quot;ensembldb&quot;</span><span class="p">))</span>
 </code></pre></div>
 
 <p>The <code>::</code> is used when we wish to invoke the mentioned package directly (<code>BiocManager</code> in this case), without loading it into the&nbsp;memory.</p>
-<p>Now, I will load just the <code>here</code> package to handle filepaths for now, the rest will be loaded into R later (I am assuming you installed it from last&nbsp;time).</p>
+<p>Now, I will load just the <code>here</code> package to handle file paths for now, the rest will be loaded into R&nbsp;later.</p>
 <div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">here</span><span class="p">)</span>
 </code></pre></div>
 
-<p>I will use the <code>counts</code> data frame I produced <a href="https://antoniocampos13.github.io/data-manipulation-with-r.html">last time</a>. Since I have saved it to my disk, I load it into the current R&nbsp;session:</p>
+<p>I will use the <code>counts</code> data frame I produced <a href="https://antoniocampos13.github.io/data-manipulation-with-r.html">last time</a>. Since I have saved it to my disk, I load it into the current R session. If you already have the <code>counts</code> data frame loaded in the session from the previous demonstration, this step is not&nbsp;necessary.</p>
 <div class="highlight"><pre><span></span><code><span class="nf">load</span><span class="p">(</span><span class="nf">here</span><span class="p">(</span><span class="s">&quot;data&quot;</span><span class="p">,</span> <span class="s">&quot;counts.RData&quot;</span><span class="p">))</span>
 </code></pre></div>
+
+<p>Now I load the custom <code>edgeR_setup()</code> function I use to perform <span class="caps">DEA</span> with <code>edgeR</code>. I wrote the function in a R script with the same name and saved it on my <code>src</code> folder:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">source</span><span class="p">(</span><span class="nf">here</span><span class="p">(</span><span class="s">&quot;src&quot;</span><span class="p">,</span> <span class="s">&quot;edgeR_setup.R&quot;</span><span class="p">))</span>
+</code></pre></div>
+
+<p>Check the <code>edgeR_setup.R</code> script. First, it loads the packages I installed&nbsp;before:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">openxlsx</span><span class="p">)</span>
+
+<span class="c1"># Install trough BiocManager</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">edgeR</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">annotate</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">EnsDb.Hsapiens.v79</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">ensembldb</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Now, check the function&nbsp;arguments:</p>
+<div class="highlight"><pre><span></span><code><span class="n">edger_setup</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">counts</span><span class="p">,</span> <span class="n">replicates</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">filter</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">gene_id</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&quot;NCBI&quot;</span><span class="p">,</span> <span class="s">&quot;ENSEMBL&quot;</span><span class="p">,</span> <span class="s">&quot;SYMBOL&quot;</span><span class="p">),</span> <span class="n">output_path</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="c1"># ... the function goes here ...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<ul>
+<li><code>name</code>: A string. An identifier for the&nbsp;experiment.</li>
+<li><code>counts</code>: The data frame containing the transcript&nbsp;counts.</li>
+<li><code>replicates</code>: A Boolean indicating if the samples are biological replicates. Defaults to <code>TRUE</code>.</li>
+<li><code>filter</code>: A Boolean indicating if lowly expressed transcripts should be filter out. Defaults to <code>TRUE</code>.</li>
+<li><code>gene_id</code>: A string indicating how transcripts are identified in the data frame. There are three options:<ul>
+<li><code>NCBI</code>: <a href="https://www.ncbi.nlm.nih.gov/Class/MLACourse/Modules/Genes/sample_entrez_gene_record.html">Entrez Gene Record&nbsp;ids</a></li>
+<li><code>ENSEMBL</code>: <a href="https://www.ebi.ac.uk/training-beta/online/courses/ensembl-browsing-genomes/navigating-ensembl/investigating-a-gene/"><span class="caps">ENSEMBL</span> ids (<span class="caps">ENS</span>#)</a></li>
+<li><code>SYMBOL</code>: <a href="https://www.genenames.org/">Official <span class="caps">HGNC</span> gene&nbsp;symbol</a></li>
+</ul>
+</li>
+<li><code>output_path</code>: A path and filename string where the results will be saved in Excel spreadsheet format. Example: <code>"\some\path\results.xlsx"</code>.</li>
+</ul>
+<p>The use of <code>edgeR</code> to analyze datasets with no biological replicates (<code>replicates = FALSE</code>) is discouraged. However, I prepared a special dataset of housekeeping genes based on the work by <a href="https://www.cell.com/trends/genetics/fulltext/S0168-9525(13)00089-9?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS0168952513000899%3Fshowall%3Dtrue">Eisenberg and Levanon (2013)</a>. I downloaded the <code>HK_genes.txt</code> supplementary file <a href="https://www.tau.ac.il/~elieis/HKG/">here</a> and placed it in the <code>data</code> folder at my current work directory. I also wrote an auxiliary script named <code>hk_genes.R</code> and placed it in the <code>src</code> folder. Check below a representation of my current work directory, where <code>main_dea_edgeR.R</code> contains the commands of this&nbsp;demonstration.</p>
+<div class="highlight"><pre><span></span><code><span class="err">.</span>
+<span class="err">├── data</span>
+<span class="err">│   ├── counts.RData</span>
+<span class="err">│   └── HK_genes.txt</span>
+<span class="err">├── output</span>
+<span class="err">├── src</span>
+<span class="err">│   ├── edgeR_setup.R</span>
+<span class="err">│   └── hk_genes.R</span>
+<span class="err">└── main_dea_edgeR.R</span>
+</code></pre></div>
+
+<p>For now, I will use default values and indicate that the transcripts in the data frame are identified by <span class="caps">ENSEMBL</span> ids. Before running the function, I assign the output path string to the <code>out_path</code> object, which I include in the function call. Note that I gave the name <code>prostate_cancer</code> to identify the&nbsp;experiment.</p>
+<div class="highlight"><pre><span></span><code><span class="n">out_path</span> <span class="o">&lt;-</span> <span class="nf">here</span><span class="p">(</span><span class="s">&quot;output&quot;</span><span class="p">,</span> <span class="s">&quot;prostate_cancer.xlsx&quot;</span><span class="p">)</span>
+
+<span class="nf">edger_setup</span><span class="p">(</span><span class="s">&quot;prostate_cancer&quot;</span><span class="p">,</span> <span class="n">counts</span><span class="p">,</span> <span class="n">replicates</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">filter</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">gene_id</span> <span class="o">=</span> <span class="s">&quot;ENSEMBL&quot;</span><span class="p">,</span> <span class="n">out_path</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The function will organize the data into groups based on the sample labels I applied previously (&#8220;case&#8221; and &#8220;control&#8221;), filter out genes with negligible expression and calculate the expression metrics, such as the logarithm of the fold-change (logFC) and counts per million transcripts (logCPM), as well as fit a statistical generalized linear model (<span class="caps">GLM</span>), calculating <span class="caps">GLM</span> coefficients (&beta;) for each gene. The <span class="caps">DEA</span> then consists in perform a hypothesis test (quasi-likelihood F-test in this case), to test the null hypothesis that the coefficients are equal (or that &beta;<sub><em>control</em></sub> - &beta;<sub><em>case</em></sub> = 0). From the F-test statistics is then derived a p-value, which is adjusted by false discovery rate (<span class="caps">FDR</span>) to account for multiple&nbsp;comparisons.</p>
+<p>After a while, the function will generate a spreadsheet with the <span class="caps">DEA</span> results. See below an excerpt of the&nbsp;spreadsheet:</p>
+<p><img alt="edgeR differential expression analysis in a prostate cancer dataset" src="https://antoniocampos13.github.io/images/prostate_cancer_edger_result.PNG"></p>
+<p>Note that there are seven&nbsp;columns:</p>
+<ul>
+<li><code>symbol</code> and <code>geneid</code>: transcript&nbsp;identifiers;</li>
+<li><code>logfc</code>: the base 2 logarithm of the <strong>fold-change</strong> (logFC), which is how much a quantity changes between two measurements &#8212; it is a ratio of two quantities. A logFC = 1 means that the expression of a certain gene was double in one condition than the other, a logFC = 2 means four-times higher expression, and so on. A logFC = -1 means half of the expression, a logFC = -2 means a quarter, and so&nbsp;on.</li>
+<li><code>logcpm</code>: the logarithm of the counts per million&nbsp;transcripts.</li>
+<li><code>f</code>: the quasi-likelihood F-test&nbsp;statistic.</li>
+<li><code>pvalue</code> and <code>adjpvalue</code>: the quasi-likelihood F-test statistic raw and <span class="caps">FDR</span>-adjusted p-values,&nbsp;respectively.</li>
+</ul>
+<p>Note that the <code>logfc</code> column is the expression in cases group relative to control group. The <code>edger_setup()</code> custom function automatically organizes data to this&nbsp;end.</p>
+<p>Usually, the researcher may want to further filter these results. For example, I like to consider not only the adjusted p-value, but also check which genes presented |logFC &gt;= 1| (note the absolute value symbols here). Thus, if a gene passes these two criteria, I usually assume that it may have biological relevance for the disease/characteristic in&nbsp;study.</p>
+<h2>Conclusion</h2>
+<p>I demonstrated a custom function that uses <code>edgeR</code> package to perform differential expression analysis. Here is a summary of the requirements of the&nbsp;function:</p>
+<ul>
+<li>A R data frame: rows are the transcripts, columns are the&nbsp;samples;</li>
+<li>The samples must be labeled as &#8220;case&#8221; or &#8220;control&#8221; (in the column&nbsp;names);</li>
+<li>The function outputs a spreadsheet with logFC and&nbsp;p-values;</li>
+<li>The reported logFC are relative to the control group (control group is the&nbsp;reference);</li>
+<li>The result spreadsheets can be filtered as the researcher&nbsp;wishes.</li>
+</ul>
+<p><em>Subscribe to my <a href="https://antoniocampos13.github.io/feeds/all.rss.xml"><span class="caps">RSS</span> feed</a>, <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom feed</a> or <a href="https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg">Telegram channel</a> to keep you updated whenever I post new&nbsp;content.</em></p>
+<h2>References</h2>
+<p><a href="https://www.ebi.ac.uk/training/online/course/functional-genomics-ii-common-technologies-and-data-analysis-methods/differential-gene">Differential gene expression&nbsp;analysis</a></p>
+<p><a href="https://bioconductor.org/packages/release/bioc/html/edgeR.html">edgeR</a></p>
+<p><a href="https://www.biostars.org/p/284775/#284893">How do I explain the difference between edgeR, <span class="caps">LIMMA</span>, DESeq etc. to experimental&nbsp;Biologist/non-bioinformatician</a></p>
+<p><a href="https://www.rdocumentation.org/packages/openxlsx/versions/4.2.2">openxlsx package | R&nbsp;Documentation</a></p>
+<p><a href="https://www.rdocumentation.org/packages/BiocManager/versions/1.30.10">BiocManager package | R&nbsp;Documentation</a></p>
+<p><a href="https://www.bioconductor.org/">Bioconductor -&nbsp;Home</a></p>
+<p><a href="https://www.bioconductor.org/packages/release/bioc/html/AnnotationDbi.html">AnnotationDbi</a></p>
+<p><a href="https://www.rdocumentation.org/packages/annotate/versions/1.50.0">annotate package | R&nbsp;Documentation</a></p>
+<p><a href="https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html">org.Hs.eg.db&nbsp;package</a></p>
+<p><a href="https://bioconductor.org/packages/release/data/annotation/html/EnsDb.Hsapiens.v79.html">EnsDb.Hsapiens.v79</a></p>
+<p><a href="https://www.ncbi.nlm.nih.gov/Class/MLACourse/Modules/Genes/sample_entrez_gene_record.html">Entrez Gene&nbsp;Records</a></p>
+<p><a href="https://www.ebi.ac.uk/training-beta/online/courses/ensembl-browsing-genomes/navigating-ensembl/investigating-a-gene/">Investigating a gene |&nbsp;Ensembl</a></p>
+<p><a href="https://www.genenames.org/"><span class="caps">HUGO</span> Gene Nomenclature&nbsp;Committee</a></p>
+<p><a href="https://www.cell.com/trends/genetics/fulltext/S0168-9525(13)00089-9?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS0168952513000899%3Fshowall%3Dtrue">Human housekeeping genes,&nbsp;revisited</a></p>
+<p><a href="https://www.tau.ac.il/~elieis/HKG/">Human housekeeping genes, revisited - Supplementary&nbsp;material</a></p>
   </div>
   <div class="tag-cloud">
     <p>
