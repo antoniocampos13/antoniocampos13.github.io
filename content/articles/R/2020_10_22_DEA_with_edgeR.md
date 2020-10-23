@@ -1,7 +1,7 @@
 ---
 Title: Differential Expression Analysis with edgeR in R
 Status: draft
-Date: 2020-10-22 15:30
+Date: 2020-10-26 10:00
 Author: Antonio Victor Campos Coelho
 Categories: R
 Tags: Bioinformatics, gene expression, edgeR
@@ -96,7 +96,7 @@ edger_setup <- function(name, counts, replicates = TRUE, filter = TRUE, gene_id 
 
 The use of `edgeR` to analyze datasets with no biological replicates (`replicates = FALSE`) is discouraged. However, I prepared a special dataset of housekeeping genes based on the work by [Eisenberg and Levanon (2013)](https://www.cell.com/trends/genetics/fulltext/S0168-9525(13)00089-9?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS0168952513000899%3Fshowall%3Dtrue). I downloaded the `HK_genes.txt` supplementary file [here](https://www.tau.ac.il/~elieis/HKG/) and placed it in the `data` folder at my current work directory. I also wrote an auxiliary script named `hk_genes.R` and placed it in the `src` folder. Check below a representation of my current work directory, where `main_dea_edgeR.R` contains the commands of this demonstration.
 
-```txt
+```text
 .
 ├── data
 │   ├── counts.RData
@@ -118,7 +118,7 @@ edger_setup("prostate_cancer", counts, replicates = TRUE, filter = TRUE, gene_id
 
 The function will organize the data into groups based on the sample labels I applied previously ("case" and "control"), filter out genes with negligible expression and calculate the expression metrics, such as the logarithm of the fold-change (logFC) and counts per million transcripts (logCPM), as well as fit a statistical generalized linear model (GLM), calculating GLM coefficients (&beta;) for each gene. The DEA then consists in perform a hypothesis test (quasi-likelihood F-test in this case), to test the null hypothesis that the coefficients are equal (or that &beta;<sub>*control*</sub> - &beta;<sub>*case*</sub> = 0). From the F-test statistics is then derived a p-value, which is adjusted by false discovery rate (FDR) to account for multiple comparisons.
 
-After a while, the function will generate a spreadsheet with the DEA results. See below an excerpt of the spreadsheet:
+After a while, the function will generate a spreadsheet with the DEA results. See below an excerpt of the spreadsheet (*with commas as decimal separators*):
 
 ![edgeR differential expression analysis in a prostate cancer dataset]({static}/images/prostate_cancer_edger_result.PNG)
 
