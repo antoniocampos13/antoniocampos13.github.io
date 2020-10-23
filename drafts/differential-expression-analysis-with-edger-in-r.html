@@ -49,7 +49,7 @@
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="https://antoniocampos13.github.io/drafts/differential-expression-analysis-with-edger-in-r.html"/>
 <meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2020-10-22 15:30:00-03:00"/>
+<meta property="article:published_time" content="2020-10-26 10:00:00-03:00"/>
 <meta property="article:modified_time" content=""/>
 <meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
 <meta property="article:section" content="R"/>
@@ -140,7 +140,7 @@
       
     <h1 id="differential-expression-analysis-with-edger-in-r">Differential Expression Analysis with edgeR in&nbsp;R</h1>
     <p>
-      Posted on Thu 22 October 2020 in <a href="https://antoniocampos13.github.io/category/r.html">R</a>
+      Posted on Mon 26 October 2020 in <a href="https://antoniocampos13.github.io/category/r.html">R</a>
 
     </p>
   </header>
@@ -213,15 +213,15 @@
 <li><code>output_path</code>: A path and filename string where the results will be saved in Excel spreadsheet format. Example: <code>"\some\path\results.xlsx"</code>.</li>
 </ul>
 <p>The use of <code>edgeR</code> to analyze datasets with no biological replicates (<code>replicates = FALSE</code>) is discouraged. However, I prepared a special dataset of housekeeping genes based on the work by <a href="https://www.cell.com/trends/genetics/fulltext/S0168-9525(13)00089-9?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS0168952513000899%3Fshowall%3Dtrue">Eisenberg and Levanon (2013)</a>. I downloaded the <code>HK_genes.txt</code> supplementary file <a href="https://www.tau.ac.il/~elieis/HKG/">here</a> and placed it in the <code>data</code> folder at my current work directory. I also wrote an auxiliary script named <code>hk_genes.R</code> and placed it in the <code>src</code> folder. Check below a representation of my current work directory, where <code>main_dea_edgeR.R</code> contains the commands of this&nbsp;demonstration.</p>
-<div class="highlight"><pre><span></span><code><span class="err">.</span>
-<span class="err">├── data</span>
-<span class="err">│   ├── counts.RData</span>
-<span class="err">│   └── HK_genes.txt</span>
-<span class="err">├── output</span>
-<span class="err">├── src</span>
-<span class="err">│   ├── edgeR_setup.R</span>
-<span class="err">│   └── hk_genes.R</span>
-<span class="err">└── main_dea_edgeR.R</span>
+<div class="highlight"><pre><span></span><code>.
+├── data
+│   ├── counts.RData
+│   └── HK_genes.txt
+├── output
+├── src
+│   ├── edgeR_setup.R
+│   └── hk_genes.R
+└── main_dea_edgeR.R
 </code></pre></div>
 
 <p>For now, I will use default values and indicate that the transcripts in the data frame are identified by <span class="caps">ENSEMBL</span> ids. Before running the function, I assign the output path string to the <code>out_path</code> object, which I include in the function call. Note that I gave the name <code>prostate_cancer</code> to identify the&nbsp;experiment.</p>
@@ -231,7 +231,7 @@
 </code></pre></div>
 
 <p>The function will organize the data into groups based on the sample labels I applied previously (&#8220;case&#8221; and &#8220;control&#8221;), filter out genes with negligible expression and calculate the expression metrics, such as the logarithm of the fold-change (logFC) and counts per million transcripts (logCPM), as well as fit a statistical generalized linear model (<span class="caps">GLM</span>), calculating <span class="caps">GLM</span> coefficients (&beta;) for each gene. The <span class="caps">DEA</span> then consists in perform a hypothesis test (quasi-likelihood F-test in this case), to test the null hypothesis that the coefficients are equal (or that &beta;<sub><em>control</em></sub> - &beta;<sub><em>case</em></sub> = 0). From the F-test statistics is then derived a p-value, which is adjusted by false discovery rate (<span class="caps">FDR</span>) to account for multiple&nbsp;comparisons.</p>
-<p>After a while, the function will generate a spreadsheet with the <span class="caps">DEA</span> results. See below an excerpt of the&nbsp;spreadsheet:</p>
+<p>After a while, the function will generate a spreadsheet with the <span class="caps">DEA</span> results. See below an excerpt of the spreadsheet (<em>with commas as decimal separators</em>):</p>
 <p><img alt="edgeR differential expression analysis in a prostate cancer dataset" src="https://antoniocampos13.github.io/images/prostate_cancer_edger_result.PNG"></p>
 <p>Note that there are seven&nbsp;columns:</p>
 <ul>
