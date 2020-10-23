@@ -40,7 +40,7 @@ Without further ado, let's finally install miniconda. Since I am using a Unix wi
 You can download the installer from your browser or via command line:
 
 ```bash
-curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh > Miniconda3-latest-Linux-x86_64.sh
 ```
 
 Then, go to the folder where the installer was downloaded and run the script:
