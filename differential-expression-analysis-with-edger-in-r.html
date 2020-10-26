@@ -47,9 +47,9 @@
 <meta property="og:title" content="Differential Expression Analysis with edgeR in R"/>
 <meta property="og:description" content="Introduction In my previous post I demonstrated how to organize the CGC prostate cancer data to a format suited to differential expression analysis (DEA). Nowadays, DEA usually arises from high-throughput sequencing of a collection (library) of RNA molecules expressed by single cells or tissue given their conditions upon collection and …"/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://antoniocampos13.github.io/drafts/differential-expression-analysis-with-edger-in-r.html"/>
+<meta property="og:url" content="https://antoniocampos13.github.io/differential-expression-analysis-with-edger-in-r.html"/>
 <meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2020-10-26 10:00:00-03:00"/>
+<meta property="article:published_time" content="2020-10-26 09:50:00-03:00"/>
 <meta property="article:modified_time" content=""/>
 <meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
 <meta property="article:section" content="R"/>
@@ -158,11 +158,12 @@
 <h2>Install and load&nbsp;packages</h2>
 <p>First, I will install some new packages that I have not talked about. The first one is <a href="https://www.rdocumentation.org/packages/openxlsx/versions/4.2.2"><code>openxlsx</code></a>, which is a package used to read/write Microsoft Office Excel spreadsheets. I will use it to conveniently save the output of the <span class="caps">DEA</span>.</p>
 <p>The second is <a href="https://www.rdocumentation.org/packages/BiocManager/versions/1.30.10"><code>BiocManager</code></a>. It is needed to install packages from <a href="https://www.bioconductor.org/">Bioconductor project</a>, which hosts Bioinformatics analysis packages that are not on the default R package&nbsp;repository.</p>
+<p>The command below contains other packages I have used before, edit the comment if you already installed&nbsp;them:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Run only once</span>
 <span class="nf">install.packages</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;here&quot;</span><span class="p">,</span> <span class="s">&quot;tidyverse&quot;</span><span class="p">,</span> <span class="s">&quot;openxlsx&quot;</span><span class="p">,</span> <span class="s">&quot;BiocManager&quot;</span><span class="p">))</span>
 </code></pre></div>
 
-<p>Now I install <code>edgeR</code> and some more packages from Bioconductor. I will use them to annotate and convert the transcript/gene IDs to a gene symbol. Check their documentation: <a href="https://www.bioconductor.org/packages/release/bioc/html/AnnotationDbi.html"><code>AnnotationDbi</code></a>, <a href="https://www.rdocumentation.org/packages/annotate/versions/1.50.0"><code>annotate</code></a>, <a href="https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html"><code>org.Hs.eg.db</code></a>, <a href="https://bioconductor.org/packages/release/data/annotation/html/EnsDb.Hsapiens.v79.html">EnsDb.Hsapiens.v79</a> and <a href="https://www.rdocumentation.org/packages/ensembldb/versions/1.4.7"><code>ensembldb</code></a>:</p>
+<p>Now I install <code>edgeR</code> and some more packages from Bioconductor. I will use them to annotate and convert the transcript/gene IDs to a gene symbol. Check their documentation: <a href="https://www.bioconductor.org/packages/release/bioc/html/AnnotationDbi.html"><code>AnnotationDbi</code></a>, <a href="https://www.rdocumentation.org/packages/annotate/versions/1.50.0"><code>annotate</code></a>, <a href="https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html"><code>org.Hs.eg.db</code></a>, <a href="https://bioconductor.org/packages/release/data/annotation/html/EnsDb.Hsapiens.v79.html"><code>EnsDb.Hsapiens.v79</code></a> and <a href="https://www.rdocumentation.org/packages/ensembldb/versions/1.4.7"><code>ensembldb</code></a>:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Run only once</span>
 <span class="n">BiocManager</span><span class="o">::</span><span class="nf">install</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;edgeR&quot;</span><span class="p">,</span><span class="s">&quot;AnnotationDbi&quot;</span><span class="p">,</span> <span class="s">&quot;annotate&quot;</span><span class="p">,</span> <span class="s">&quot;org.Hs.eg.db&quot;</span><span class="p">,</span> <span class="s">&quot;EnsDb.Hsapiens.v79&quot;</span><span class="p">,</span><span class="s">&quot;ensembldb&quot;</span><span class="p">))</span>
 </code></pre></div>
@@ -180,6 +181,7 @@
 <div class="highlight"><pre><span></span><code><span class="nf">source</span><span class="p">(</span><span class="nf">here</span><span class="p">(</span><span class="s">&quot;src&quot;</span><span class="p">,</span> <span class="s">&quot;edgeR_setup.R&quot;</span><span class="p">))</span>
 </code></pre></div>
 
+<p>Careful to not confuse the <code>load()</code> with <code>source()</code> functions. The <a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/load">former</a> is used with R objects (<code>*.RData</code>) as input, whereas the <a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/source">latter</a> takes a R script (<code>*.R</code>) as input and parses the commands contained in the&nbsp;script.</p>
 <p>Check the <code>edgeR_setup.R</code> script. First, it loads the packages I installed&nbsp;before:</p>
 <div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">openxlsx</span><span class="p">)</span>
@@ -190,6 +192,7 @@
 <span class="nf">library</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">)</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">EnsDb.Hsapiens.v79</span><span class="p">)</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">ensembldb</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">AnnotationDbi</span><span class="p">)</span>
 </code></pre></div>
 
 <p>Now, check the function&nbsp;arguments:</p>
@@ -224,7 +227,7 @@
 └── main_dea_edgeR.R
 </code></pre></div>
 
-<p>For now, I will use default values and indicate that the transcripts in the data frame are identified by <span class="caps">ENSEMBL</span> ids. Before running the function, I assign the output path string to the <code>out_path</code> object, which I include in the function call. Note that I gave the name <code>prostate_cancer</code> to identify the&nbsp;experiment.</p>
+<p>For now, I will use default values and indicate that the transcripts in the data frame are identified by <span class="caps">ENSEMBL</span> ids. Before running the function, I assign the output path string to the <code>out_path</code> object, which I include in the function call. Note that I gave the name <code>prostate_cancer</code> to identify the experiment, and it will also be the name of the sheet in the&nbsp;spreadsheet.</p>
 <div class="highlight"><pre><span></span><code><span class="n">out_path</span> <span class="o">&lt;-</span> <span class="nf">here</span><span class="p">(</span><span class="s">&quot;output&quot;</span><span class="p">,</span> <span class="s">&quot;prostate_cancer.xlsx&quot;</span><span class="p">)</span>
 
 <span class="nf">edger_setup</span><span class="p">(</span><span class="s">&quot;prostate_cancer&quot;</span><span class="p">,</span> <span class="n">counts</span><span class="p">,</span> <span class="n">replicates</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">filter</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">gene_id</span> <span class="o">=</span> <span class="s">&quot;ENSEMBL&quot;</span><span class="p">,</span> <span class="n">out_path</span><span class="p">)</span>
@@ -233,6 +236,7 @@
 <p>The function will organize the data into groups based on the sample labels I applied previously (&#8220;case&#8221; and &#8220;control&#8221;), filter out genes with negligible expression and calculate the expression metrics, such as the logarithm of the fold-change (logFC) and counts per million transcripts (logCPM), as well as fit a statistical generalized linear model (<span class="caps">GLM</span>), calculating <span class="caps">GLM</span> coefficients (&beta;) for each gene. The <span class="caps">DEA</span> then consists in perform a hypothesis test (quasi-likelihood F-test in this case), to test the null hypothesis that the coefficients are equal (or that &beta;<sub><em>control</em></sub> - &beta;<sub><em>case</em></sub> = 0). From the F-test statistics is then derived a p-value, which is adjusted by false discovery rate (<span class="caps">FDR</span>) to account for multiple&nbsp;comparisons.</p>
 <p>After a while, the function will generate a spreadsheet with the <span class="caps">DEA</span> results. See below an excerpt of the spreadsheet (<em>with commas as decimal separators</em>):</p>
 <p><img alt="edgeR differential expression analysis in a prostate cancer dataset" src="https://antoniocampos13.github.io/images/prostate_cancer_edger_result.PNG"></p>
+<h2>Interpretation of the&nbsp;results</h2>
 <p>Note that there are seven&nbsp;columns:</p>
 <ul>
 <li><code>symbol</code> and <code>geneid</code>: transcript&nbsp;identifiers;</li>
@@ -264,6 +268,9 @@
 <p><a href="https://www.rdocumentation.org/packages/annotate/versions/1.50.0">annotate package | R&nbsp;Documentation</a></p>
 <p><a href="https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html">org.Hs.eg.db&nbsp;package</a></p>
 <p><a href="https://bioconductor.org/packages/release/data/annotation/html/EnsDb.Hsapiens.v79.html">EnsDb.Hsapiens.v79</a></p>
+<p><a href="https://www.rdocumentation.org/packages/ensembldb/versions/1.4.7">ensembldb package | R&nbsp;Documentation</a></p>
+<p><a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/load">load function | R&nbsp;Documentation</a></p>
+<p><a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/source">source function | R&nbsp;Documentation</a></p>
 <p><a href="https://www.ncbi.nlm.nih.gov/Class/MLACourse/Modules/Genes/sample_entrez_gene_record.html">Entrez Gene&nbsp;Records</a></p>
 <p><a href="https://www.ebi.ac.uk/training-beta/online/courses/ensembl-browsing-genomes/navigating-ensembl/investigating-a-gene/">Investigating a gene |&nbsp;Ensembl</a></p>
 <p><a href="https://www.genenames.org/"><span class="caps">HUGO</span> Gene Nomenclature&nbsp;Committee</a></p>
