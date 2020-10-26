@@ -1,7 +1,7 @@
 ---
 Title: Differential Expression Analysis with edgeR in R
-Status: draft
-Date: 2020-10-26 10:00
+Status: published
+Date: 2020-10-26 09:50
 Author: Antonio Victor Campos Coelho
 Categories: R
 Tags: Bioinformatics, gene expression, edgeR
@@ -29,12 +29,14 @@ First, I will install some new packages that I have not talked about. The first 
 
 The second is [`BiocManager`](https://www.rdocumentation.org/packages/BiocManager/versions/1.30.10). It is needed to install packages from [Bioconductor project](https://www.bioconductor.org/), which hosts Bioinformatics analysis packages that are not on the default R package repository.
 
+The command below contains other packages I have used before, edit the comment if you already installed them:
+
 ```r
 # Run only once
 install.packages(c("here", "tidyverse", "openxlsx", "BiocManager"))
 ```
 
-Now I install `edgeR` and some more packages from Bioconductor. I will use them to annotate and convert the transcript/gene IDs to a gene symbol. Check their documentation: [`AnnotationDbi`](https://www.bioconductor.org/packages/release/bioc/html/AnnotationDbi.html), [`annotate`](https://www.rdocumentation.org/packages/annotate/versions/1.50.0), [`org.Hs.eg.db`](https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html), [EnsDb.Hsapiens.v79](https://bioconductor.org/packages/release/data/annotation/html/EnsDb.Hsapiens.v79.html) and [`ensembldb`](https://www.rdocumentation.org/packages/ensembldb/versions/1.4.7):
+Now I install `edgeR` and some more packages from Bioconductor. I will use them to annotate and convert the transcript/gene IDs to a gene symbol. Check their documentation: [`AnnotationDbi`](https://www.bioconductor.org/packages/release/bioc/html/AnnotationDbi.html), [`annotate`](https://www.rdocumentation.org/packages/annotate/versions/1.50.0), [`org.Hs.eg.db`](https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html), [`EnsDb.Hsapiens.v79`](https://bioconductor.org/packages/release/data/annotation/html/EnsDb.Hsapiens.v79.html) and [`ensembldb`](https://www.rdocumentation.org/packages/ensembldb/versions/1.4.7):
 
 ```r
 # Run only once
@@ -61,6 +63,8 @@ Now I load the custom `edgeR_setup()` function I use to perform DEA with `edgeR`
 source(here("src", "edgeR_setup.R"))
 ```
 
+Careful to not confuse the `load()` with `source()` functions. The [former](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/load) is used with R objects (`*.RData`) as input, whereas the [latter](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/source) takes a R script (`*.R`) as input and parses the commands contained in the script.
+
 Check the `edgeR_setup.R` script. First, it loads the packages I installed before:
 
 ```r
@@ -73,6 +77,7 @@ library(annotate)
 library(org.Hs.eg.db)
 library(EnsDb.Hsapiens.v79)
 library(ensembldb)
+library(AnnotationDbi)
 ```
 
 Now, check the function arguments:
@@ -108,7 +113,7 @@ The use of `edgeR` to analyze datasets with no biological replicates (`replicate
 └── main_dea_edgeR.R
 ```
 
-For now, I will use default values and indicate that the transcripts in the data frame are identified by ENSEMBL ids. Before running the function, I assign the output path string to the `out_path` object, which I include in the function call. Note that I gave the name `prostate_cancer` to identify the experiment.
+For now, I will use default values and indicate that the transcripts in the data frame are identified by ENSEMBL ids. Before running the function, I assign the output path string to the `out_path` object, which I include in the function call. Note that I gave the name `prostate_cancer` to identify the experiment, and it will also be the name of the sheet in the spreadsheet.
 
 ```r
 out_path <- here("output", "prostate_cancer.xlsx")
@@ -121,6 +126,8 @@ The function will organize the data into groups based on the sample labels I app
 After a while, the function will generate a spreadsheet with the DEA results. See below an excerpt of the spreadsheet (*with commas as decimal separators*):
 
 ![edgeR differential expression analysis in a prostate cancer dataset]({static}/images/prostate_cancer_edger_result.PNG)
+
+## Interpretation of the results
 
 Note that there are seven columns:
 
@@ -167,6 +174,12 @@ I demonstrated a custom function that uses `edgeR` package to perform differenti
 [org.Hs.eg.db package](https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html)
 
 [EnsDb.Hsapiens.v79](https://bioconductor.org/packages/release/data/annotation/html/EnsDb.Hsapiens.v79.html)
+
+[ensembldb package | R Documentation](https://www.rdocumentation.org/packages/ensembldb/versions/1.4.7)
+
+[load function | R Documentation](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/load)
+
+[source function | R Documentation](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/source)
 
 [Entrez Gene Records](https://www.ncbi.nlm.nih.gov/Class/MLACourse/Modules/Genes/sample_entrez_gene_record.html)
 
