@@ -1,7 +1,7 @@
 ---
 Title: Machine Learning with Python: Supervised Classification of TCGA Prostate Cancer Data (Part 1 - Making Features Datasets) 
 Status: draft
-Date: 2020-11-06 15:00
+Date: 2020-11-05 14:50
 Author: Antonio Victor Campos Coelho
 Categories: Python
 Tags: Bioinformatics, gene expression, machine learning, supervised classification
@@ -222,7 +222,7 @@ In this post, I showed how to:
 * Normalize data (Z-scores);
 * Serialize (pickle) the datasets for future use.
 
-Go to the [Part 2](), where I show how to use the datasets to generate a classification model for predicting risk of prostate cancer disease progression with the `make_model.py` script.
+Go to the [Part 2](https://antoniocampos13.github.io/machine-learning-with-python-supervised-classification-of-tcga-prostate-cancer-data-part-2-making-a-model.html), where I show how to use the datasets to generate a classification model for predicting risk of prostate cancer disease progression with the `make_model.py` script.
 
 *Subscribe to my [RSS feed](https://antoniocampos13.github.io/feeds/all.rss.xml), [Atom feed](https://antoniocampos13.github.io/feeds/all.atom.xml) or [Telegram channel](https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg) to keep you updated whenever I post new content.*
 

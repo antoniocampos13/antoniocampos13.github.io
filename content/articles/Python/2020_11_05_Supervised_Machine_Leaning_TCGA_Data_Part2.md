@@ -1,7 +1,7 @@
 ---
 Title: Machine Learning with Python: Supervised Classification of TCGA Prostate Cancer Data (Part 2 - Making a Model) 
 Status: draft
-Date: 2020-11-06 15:00
+Date: 2020-11-05 14:50
 Author: Antonio Victor Campos Coelho
 Categories: Python
 Tags: Bioinformatics, gene expression, machine learning, supervised classification
