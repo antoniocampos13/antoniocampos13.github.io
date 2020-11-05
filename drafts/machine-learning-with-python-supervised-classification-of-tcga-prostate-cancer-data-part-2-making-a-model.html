@@ -150,7 +150,7 @@
   <div>
     <h2>Introduction</h2>
 <p><em>In a <a href="https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html">previous post</a>, I showed how to retrieve <a href="https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga">The Cancer Genome Atlas (<span class="caps">TCGA</span>)</a> data from the <a href="http://www.cancergenomicscloud.org/">Cancer Genomics Cloud (<span class="caps">CGC</span>) platform</a>. I downloaded gene expression quantification data, created a relational database with PostgreSQL, and created a dataset uniting the raw quantification data for 675 differentially expressed genes <a href="https://antoniocampos13.github.io/differential-expression-analysis-with-edger-in-r.html#differential-expression-analysis-with-edger-in-r">identified by edgeR</a>, race, age at diagnosis and tumor size at&nbsp;diagnosis.</em></p>
-<p><em>In <a href="">Part 1</a>, I used Python to prepare features datasets to use them to produce a classification model using machine learning tools, especially the <code>scikit-learn</code> module. Check its documentation <a href="https://scikit-learn.org/stable/">here</a>.</em></p>
+<p><em>In <a href="https://antoniocampos13.github.io/machine-learning-with-python-supervised-classification-of-tcga-prostate-cancer-data-part-1-making-features-datasets.html">Part 1</a>, I used Python to prepare features datasets to use them to produce a classification model using machine learning tools, especially the <code>scikit-learn</code> module. Check its documentation <a href="https://scikit-learn.org/stable/">here</a>.</em></p>
 <p>Here in Part 2, I develop an illustrative model. If it were a serious model, its objective would be to predict if a person is in risk of developing prostate cancer based on personal characteristics and the expression of differentially expressed&nbsp;genes.</p>
 <p>The dataset and code presented here are available in my <a href="https://github.com/antoniocampos13/portfolio/tree/master/Python/2020_11_05_Supervised_Machine_Leaning_TCGA_Data">portfolio</a>.</p>
 <h2>Prepare&nbsp;workspace</h2>
@@ -280,7 +280,7 @@ Prediction: controls                47             11
 Prediction: cases                    8              5
 </code></pre></div>
 
-<p>Now remember the labels summary I got in <a href="">Part 1</a>:</p>
+<p>Now remember the labels summary I got in <a href="https://antoniocampos13.github.io/machine-learning-with-python-supervised-classification-of-tcga-prostate-cancer-data-part-1-making-features-datasets.html">Part 1</a>:</p>
 <div class="highlight"><pre><span></span><code>Training Set has 38 Positive Labels (cases) and 127 Negative Labels (controls)
 Test Set has 16 Positive Labels (cases) and 55 Negative Labels (controls)
 </code></pre></div>
@@ -395,7 +395,7 @@ F1 Score Before: 0.345 --&gt; Now: 0.490
 <li>Select a classification&nbsp;cutoff;</li>
 <li>Save the model to disk for backup and future&nbsp;use.</li>
 </ul>
-<p>Go back to <a href="">Part 1</a>.</p>
+<p>Go back to <a href="https://antoniocampos13.github.io/machine-learning-with-python-supervised-classification-of-tcga-prostate-cancer-data-part-1-making-features-datasets.html">Part 1</a>.</p>
 <p><em>Subscribe to my <a href="https://antoniocampos13.github.io/feeds/all.rss.xml"><span class="caps">RSS</span> feed</a>, <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom feed</a> or <a href="https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg">Telegram channel</a> to keep you updated whenever I post new&nbsp;content.</em></p>
 <h2>References</h2>
 <p><a href="https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga">The Cancer Genome Atlas&nbsp;Program</a></p>
