@@ -11,7 +11,7 @@ Tags: Bioinformatics, gene expression, machine learning, supervised classificati
 
 *In a [previous post](https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html), I showed how to retrieve [The Cancer Genome Atlas (TCGA)](https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga) data from the [Cancer Genomics Cloud (CGC) platform](http://www.cancergenomicscloud.org/). I downloaded gene expression quantification data, created a relational database with PostgreSQL, and created a dataset uniting the raw quantification data for 675 differentially expressed genes [identified by edgeR](https://antoniocampos13.github.io/differential-expression-analysis-with-edger-in-r.html#differential-expression-analysis-with-edger-in-r), race, age at diagnosis and tumor size at diagnosis.*
 
-*In [Part 1](), I used Python to prepare features datasets to use them to produce a classification model using machine learning tools, especially the `scikit-learn` module. Check its documentation [here](https://scikit-learn.org/stable/).*
+*In [Part 1](https://antoniocampos13.github.io/machine-learning-with-python-supervised-classification-of-tcga-prostate-cancer-data-part-1-making-features-datasets.html), I used Python to prepare features datasets to use them to produce a classification model using machine learning tools, especially the `scikit-learn` module. Check its documentation [here](https://scikit-learn.org/stable/).*
 
 Here in Part 2, I develop an illustrative model. If it were a serious model, its objective would be to predict if a person is in risk of developing prostate cancer based on personal characteristics and the expression of differentially expressed genes.
 
@@ -186,7 +186,7 @@ Prediction: controls                47             11
 Prediction: cases                    8              5
 ```
 
-Now remember the labels summary I got in [Part 1]():
+Now remember the labels summary I got in [Part 1](https://antoniocampos13.github.io/machine-learning-with-python-supervised-classification-of-tcga-prostate-cancer-data-part-1-making-features-datasets.html):
 
 ```text
 Training Set has 38 Positive Labels (cases) and 127 Negative Labels (controls)
@@ -328,7 +328,6 @@ Below is a schematics of my working directory. Check it on [my porfolio](https:/
         └── make_model.py
 ```
 
-
 ## Conclusion
 
 In this part I demonstrated how to:
@@ -340,7 +339,7 @@ In this part I demonstrated how to:
 * Select a classification cutoff;
 * Save the model to disk for backup and future use.
 
-Go back to [Part 1]().
+Go back to [Part 1](https://antoniocampos13.github.io/machine-learning-with-python-supervised-classification-of-tcga-prostate-cancer-data-part-1-making-features-datasets.html).
 
 *Subscribe to my [RSS feed](https://antoniocampos13.github.io/feeds/all.rss.xml), [Atom feed](https://antoniocampos13.github.io/feeds/all.atom.xml) or [Telegram channel](https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg) to keep you updated whenever I post new content.*
 
