@@ -1,5 +1,7 @@
-title: About
-date: 2020-09-29 13:00
+---
+Title: About
+Date: 2020-09-29 13:00
+---
 
 Hi! I am Antonio Victor Campos Coelho and this is my website. Here I showcase my portfolio, which is a compilation of Python, R, Unix and other programming languages codes I developed for data analysis, statistical analysis and Bioinformatics. The corresponding GitHub repository where I deposited all code shown here is located [here](https://github.com/antoniocampos13/portfolio). Go check it out!
 

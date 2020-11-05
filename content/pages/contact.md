@@ -1,6 +1,6 @@
 ---
-title: Contact
-date: 2020-09-29 13:00
+Title: Contact
+Date: 2020-09-29 13:00
 ---
 
 <form  action="https://formspree.io/moqpvnen"
