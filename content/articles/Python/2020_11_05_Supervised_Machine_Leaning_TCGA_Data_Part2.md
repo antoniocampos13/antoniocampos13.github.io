@@ -29,11 +29,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import xgboost
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix, roc_curve, precision_recall_curve
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import KFold, cross_val_score, StratifiedKFold, GridSearchCV
+from sklearn.model_selection import StratifiedKFold, GridSearchCV, KFold, cross_val_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
@@ -73,24 +73,24 @@ The `scikit-learn` module contains code for several classification models. If yo
 
 ```python
 models = [
-#DummyClassifier,
-#LogisticRegression,
-#DecisionTreeClassifier,
-#KNeighborsClassifier,
-#GaussianNB,
-#SVC,
-#RandomForestClassifier,
-#xgboost.XGBClassifier,
+DummyClassifier,
+LogisticRegression,
+DecisionTreeClassifier,
+KNeighborsClassifier,
+GaussianNB,
+SVC,
+RandomForestClassifier,
+xgboost.XGBClassifier,
 ]
 
 for model in models:
-#cls = model()
-
-#kfold = KFold(n_splits=SPLITS, random_state=RANDOM_SEED)
-
-#s = cross_val_score(cls, X_train, y_train, scoring="f1", cv=kfold)
-
-#print(f"{model.__name__:22}  F1 Score: " f"{s.mean():.3f} STD: {s.std():.2f}")
+    cls = model()
+    
+    kfold = KFold(n_splits=SPLITS, random_state=RANDOM_SEED)
+    
+    s = cross_val_score(cls, X_train, y_train, scoring="f1", cv=kfold)
+    
+    print(f"{model.__name__:22}  F1 Score: " f"{s.mean():.3f} STD: {s.std():.2f}")
 ```
 
 I will now explain what the loop does. First, I create a list named `models` with the name of some `sklearn` models. Note the way their names are written: they are the names of the corresponding `sklearn` modules.
