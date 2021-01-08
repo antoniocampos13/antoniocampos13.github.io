@@ -162,11 +162,11 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">xgboost</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">precision_score</span><span class="p">,</span> <span class="n">recall_score</span><span class="p">,</span> <span class="n">f1_score</span><span class="p">,</span> <span class="n">roc_auc_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">precision_score</span><span class="p">,</span> <span class="n">recall_score</span><span class="p">,</span> <span class="n">f1_score</span><span class="p">,</span> <span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">confusion_matrix</span><span class="p">,</span> <span class="n">roc_curve</span><span class="p">,</span> <span class="n">precision_recall_curve</span>
 <span class="kn">from</span> <span class="nn">sklearn.dummy</span> <span class="kn">import</span> <span class="n">DummyClassifier</span>
 <span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
 <span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span><span class="p">,</span> <span class="n">cross_val_score</span><span class="p">,</span> <span class="n">StratifiedKFold</span><span class="p">,</span> <span class="n">GridSearchCV</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedKFold</span><span class="p">,</span> <span class="n">GridSearchCV</span><span class="p">,</span> <span class="n">KFold</span><span class="p">,</span> <span class="n">cross_val_score</span>
 <span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">GaussianNB</span>
 <span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsClassifier</span>
 <span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">SVC</span>
@@ -195,24 +195,24 @@
 <h2>Select classification&nbsp;model</h2>
 <p>The <code>scikit-learn</code> module contains code for several classification models. If you are in doubt, you can select from a list of models using a scoring metric, and the choose the best-performing model. See below a loop command that do just that (hat tip to <a href="https://hairysun.com/">Matt Harrison</a>):</p>
 <div class="highlight"><pre><span></span><code><span class="n">models</span> <span class="o">=</span> <span class="p">[</span>
-<span class="c1">#DummyClassifier,</span>
-<span class="c1">#LogisticRegression,</span>
-<span class="c1">#DecisionTreeClassifier,</span>
-<span class="c1">#KNeighborsClassifier,</span>
-<span class="c1">#GaussianNB,</span>
-<span class="c1">#SVC,</span>
-<span class="c1">#RandomForestClassifier,</span>
-<span class="c1">#xgboost.XGBClassifier,</span>
+<span class="n">DummyClassifier</span><span class="p">,</span>
+<span class="n">LogisticRegression</span><span class="p">,</span>
+<span class="n">DecisionTreeClassifier</span><span class="p">,</span>
+<span class="n">KNeighborsClassifier</span><span class="p">,</span>
+<span class="n">GaussianNB</span><span class="p">,</span>
+<span class="n">SVC</span><span class="p">,</span>
+<span class="n">RandomForestClassifier</span><span class="p">,</span>
+<span class="n">xgboost</span><span class="o">.</span><span class="n">XGBClassifier</span><span class="p">,</span>
 <span class="p">]</span>
 
 <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="p">:</span>
-<span class="c1">#cls = model()</span>
+    <span class="bp">cls</span> <span class="o">=</span> <span class="n">model</span><span class="p">()</span>
 
-<span class="c1">#kfold = KFold(n_splits=SPLITS, random_state=RANDOM_SEED)</span>
+    <span class="n">kfold</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">SPLITS</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_SEED</span><span class="p">)</span>
 
-<span class="c1">#s = cross_val_score(cls, X_train, y_train, scoring=&quot;f1&quot;, cv=kfold)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s2">&quot;f1&quot;</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">kfold</span><span class="p">)</span>
 
-<span class="c1">#print(f&quot;{model.__name__:22}  F1 Score: &quot; f&quot;{s.mean():.3f} STD: {s.std():.2f}&quot;)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="vm">__name__</span><span class="si">:</span><span class="s2">22</span><span class="si">}</span><span class="s2">  F1 Score: &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> STD: </span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 
 <p>I will now explain what the loop does. First, I create a list named <code>models</code> with the name of some <code>sklearn</code> models. Note the way their names are written: they are the names of the corresponding <code>sklearn</code> modules.</p>
