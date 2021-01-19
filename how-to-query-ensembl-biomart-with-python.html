@@ -47,9 +47,9 @@
 <meta property="og:title" content="How to Query Ensembl BioMart with Python"/>
 <meta property="og:description" content="Introduction Recently, me and my colleagues wrote a manuscript involving meta-analysis of RNA-Seq studies. One of my tasks of this project was to perform a Gene Ontology (GO) enrichment analysis: “[G]iven a set of genes that are up-regulated under certain conditions, an enrichment analysis will find which GO …"/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://antoniocampos13.github.io/drafts/how-to-query-ensembl-biomart-with-python.html"/>
+<meta property="og:url" content="https://antoniocampos13.github.io/how-to-query-ensembl-biomart-with-python.html"/>
 <meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2021-01-19 10:00:00-03:00"/>
+<meta property="article:published_time" content="2021-01-19 10:20:00-03:00"/>
 <meta property="article:modified_time" content=""/>
 <meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
 <meta property="article:section" content="Python"/>
@@ -151,7 +151,7 @@
   <div>
     <h2>Introduction</h2>
 <p>Recently, me and my colleagues wrote a manuscript involving meta-analysis of <span class="caps">RNA</span>-Seq studies. One of my tasks of this project was to perform a Gene Ontology (<span class="caps">GO</span>) enrichment analysis: <a href="http://geneontology.org/docs/go-enrichment-analysis/">&#8220;[G]iven a set of genes that are up-regulated under certain conditions, an enrichment analysis will find which <span class="caps">GO</span> terms are over-represented (or under-represented) using annotations for that gene set&#8221;</a>. In other words, I could verify which cellular pathways were in action during the experimental&nbsp;conditions.</p>
-<p>After I finished the <span class="caps">GO</span> analysis, I got a spreadsheet with a list of <span class="caps">GO</span> terms &mdash; brief descriptions of the cellular process performed by each pathway. When I was thinking about the pathways, I started to wonder: &#8220;which proteins participate into each pathway?&#8221; So I decided to go data mining the <a href="https://m.ensembl.org/biomart/martview">Ensembl BioMart</a> to find&nbsp;out.</p>
+<p>After I finished the <span class="caps">GO</span> analysis, I got a spreadsheet with a list of <span class="caps">GO</span> terms &mdash; brief descriptions of the cellular process performed by each pathway. When I was thinking about the pathways, I started to wonder: &#8220;which proteins participate into each pathway?&#8221; So I decided to go data mining the <a href="https://m.ensembl.org/biomart/martview">Ensembl BioMart</a> to find out those protein&nbsp;genes.</p>
 <p>Ensembl is a huge project by the European Bioinformatics Institute and the Wellcome Trust Sanger Institute to provide databases of annotated genomes for several (mainly vertebrate) species. BioMart is one of their data mining tools. In this post, I will describe how I used Python to query BioMart. I will introduce a simple function to generate <a href="https://www.gnu.org/software/wget/"><code>GNU Wget</code></a> commands to retrieve query results via <a href="https://en.wikipedia.org/wiki/Representational_state_transfer">RESTful</a> access. Then, I will show how I aggregated the data to met my objective (i.e. list all genes participating in a biological pathway represented by a <span class="caps">GO</span>&nbsp;term).</p>
 <p>The code and example files presented here are available in my <a href="https://github.com/antoniocampos13/portfolio/tree/master/Python/2021_01_18_How_to_Query_BioMart_Python">portfolio</a>.</p>
 <h2>Prepare&nbsp;identifiers</h2>
