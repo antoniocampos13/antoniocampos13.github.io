@@ -1,7 +1,7 @@
 ---
 Title: How to Query Ensembl BioMart with Python
-Status: draft
-Date: 2021-01-19 10:00
+Status: published
+Date: 2021-01-19 10:20
 Author: Antonio Victor Campos Coelho
 Categories: Python
 Tags: Bioinformatics, Ensembl, BioMart, omics, data mining
@@ -11,7 +11,7 @@ Tags: Bioinformatics, Ensembl, BioMart, omics, data mining
 
 Recently, me and my colleagues wrote a manuscript involving meta-analysis of RNA-Seq studies. One of my tasks of this project was to perform a Gene Ontology (GO) enrichment analysis: ["\[G\]iven a set of genes that are up-regulated under certain conditions, an enrichment analysis will find which GO terms are over-represented (or under-represented) using annotations for that gene set"](http://geneontology.org/docs/go-enrichment-analysis/). In other words, I could verify which cellular pathways were in action during the experimental conditions.
 
-After I finished the GO analysis, I got a spreadsheet with a list of GO terms &mdash; brief descriptions of the cellular process performed by each pathway. When I was thinking about the pathways, I started to wonder: "which proteins participate into each pathway?" So I decided to go data mining the [Ensembl BioMart](https://m.ensembl.org/biomart/martview) to find out.
+After I finished the GO analysis, I got a spreadsheet with a list of GO terms &mdash; brief descriptions of the cellular process performed by each pathway. When I was thinking about the pathways, I started to wonder: "which proteins participate into each pathway?" So I decided to go data mining the [Ensembl BioMart](https://m.ensembl.org/biomart/martview) to find out those protein genes.
 
 Ensembl is a huge project by the European Bioinformatics Institute and the Wellcome Trust Sanger Institute to provide databases of annotated genomes for several (mainly vertebrate) species. BioMart is one of their data mining tools. In this post, I will describe how I used Python to query BioMart. I will introduce a simple function to generate [`GNU Wget`](https://www.gnu.org/software/wget/) commands to retrieve query results via [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) access. Then, I will show how I aggregated the data to met my objective (i.e. list all genes participating in a biological pathway represented by a GO term).
 
