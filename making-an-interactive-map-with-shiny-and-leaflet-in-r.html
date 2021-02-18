@@ -40,14 +40,14 @@
 
 <meta name="author" content="Antonio Victor Campos Coelho" />
 <meta name="description" content="Introduction Shiny is a R package developed and maintained by the RStudio team. With Shiny, anyone can build interactive web apps to help data visualization. Here I present a simple template of an interactive Brazilian map displaying fictitious allelic frequencies with samples sizes across the country. It is a useful …" />
-<meta name="keywords" content="shiny, leaflet, data visualization">
+<meta name="keywords" content="shiny, leaflet, data visualization, web app">
 
 
 <meta property="og:site_name" content="Antonio's Portfolio"/>
 <meta property="og:title" content="Making an Interactive Map with Shiny and Leaflet in R"/>
 <meta property="og:description" content="Introduction Shiny is a R package developed and maintained by the RStudio team. With Shiny, anyone can build interactive web apps to help data visualization. Here I present a simple template of an interactive Brazilian map displaying fictitious allelic frequencies with samples sizes across the country. It is a useful …"/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://antoniocampos13.github.io/drafts/making-an-interactive-map-with-shiny-and-leaflet-in-r.html"/>
+<meta property="og:url" content="https://antoniocampos13.github.io/making-an-interactive-map-with-shiny-and-leaflet-in-r.html"/>
 <meta property="og:type" content="article"/>
 <meta property="article:published_time" content="2021-02-18 09:00:00-03:00"/>
 <meta property="article:modified_time" content=""/>
@@ -56,6 +56,7 @@
 <meta property="article:tag" content="shiny"/>
 <meta property="article:tag" content="leaflet"/>
 <meta property="article:tag" content="data visualization"/>
+<meta property="article:tag" content="web app"/>
 <meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
 
   <title>Antonio's Portfolio &ndash; Making an Interactive Map with Shiny and Leaflet in R</title>
@@ -286,15 +287,15 @@
 
 <p>Notice that I also saved it into the <code>map/data</code> folder.</p>
 <div class="highlight"><pre><span></span><code>.
-# map
-## data
-### genes_variants.RData
-### map_data.RData
-# map_data.R # contains the code demonstrated here
-# state_capitals.xlsx
+├── map
+│   └── data
+│       ├── genes_variants.RData
+│       └── map_data.RData
+├── map_data.R # contains the code demonstrated here
+└── state_capitals.xlsx
 </code></pre></div>
 
-<h2>Creating Shiny <code>ui</code> function</h2>
+<h2>Creating Shiny <code>ui.R</code> file</h2>
 <p>We can divide the Shiny app internals in two main functions: <code>ui</code> and <code>server</code>. The former will manage the user interface of the app (the front-end) and the latter will manipulate the data for interactive visualization (the back-end). I will save each function into two separate files, <code>server.R</code> and <code>ui.R</code>. Let&#8217;s examine the <code>ui.R</code> file:</p>
 <div class="highlight"><pre><span></span><code><span class="n">ui</span> <span class="o">&lt;-</span> <span class="nf">fluidPage</span><span class="p">(</span>
   <span class="nf">titlePanel</span><span class="p">(</span><span class="s">&quot;Toy Dataset: Variants in Brazil&quot;</span><span class="p">),</span>
@@ -318,7 +319,7 @@
 <p>The <code>fluidPage()</code> Shiny function creates an webpage that fits browser dimensions and generate the overall layout of the app. This function receives other functions as arguments. Each function will take care of one aspect of the layout. The first function, <code>titlePanel()</code> generates the main title of the app, the second, <code>sidebarLayout()</code> instructs Shiny to create an app with a sidebar and a main panel. The arguments of this function will control the elements inside each&nbsp;area.</p>
 <p>The <code>sidebarPanel()</code> function builds the sidebar. Since I wanted the dropdown menus to be placed in the sidebar, I enclose two <code>selectInput()</code> functions, one for the genes and one for the variants. Notice that it requires three arguments: an internal name (&#8220;genes&#8221; or &#8220;variant&#8221;) so the <code>server</code> function can access the inputs, a human-readable label (&#8220;Choose a gene&#8221;, &#8220;Choose a variant&#8221;) and the input options. Notice that I am referring to the <code>genes_variants</code> named list I created in the previous&nbsp;step.</p>
 <p>The <code>mainPanel()</code> function builds the main panel. The map will be placed there. The <code>hx()</code> function creates a header, where <code>x</code> is an integer between 1 and 6. The lower the number, the higher is the level of the header. Thus, <code>h1()</code> generates big headers, <code>h2()</code> generates a smaller header and so on. I chose <code>h4()</code> to enclose a brief description of how to interact with the map. The <code>leafletOutput()</code> function will build the map. It is a function from the <code>leaflet</code> package. The argument <code>outputId</code> creates the internal name of the output to be accessed by the <code>server</code> function.</p>
-<h2>Creating Shiny <code>server</code> function</h2>
+<h2>Creating Shiny <code>server.R</code> file</h2>
 <p>It contains the <code>server</code> function that receive three arguments: <code>input</code>, <code>output</code> and <code>session</code>. Notice that we must wrote the <code>server</code> function, whereas the <code>ui</code> function is mostly controlled by the Shiny package itself. See&nbsp;below:</p>
 <div class="highlight"><pre><span></span><code><span class="n">server</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">input</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">session</span><span class="p">)</span> <span class="p">{</span>
 
@@ -424,6 +425,7 @@
       <a href="https://antoniocampos13.github.io/tag/shiny.html">shiny</a>
       <a href="https://antoniocampos13.github.io/tag/leaflet.html">leaflet</a>
       <a href="https://antoniocampos13.github.io/tag/data-visualization.html">data visualization</a>
+      <a href="https://antoniocampos13.github.io/tag/web-app.html">web app</a>
     </p>
   </div>
 
