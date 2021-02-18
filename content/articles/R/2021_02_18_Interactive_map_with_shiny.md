@@ -1,10 +1,10 @@
 ---
 Title: Making an Interactive Map with Shiny and Leaflet in R
-Status: draft
+Status: published
 Date: 2021-02-18 09:00
 Author: Antonio Victor Campos Coelho
 Categories: R
-Tags: shiny, leaflet, data visualization
+Tags: shiny, leaflet, data visualization, web app
 ---
 
 ## Introduction
@@ -193,15 +193,15 @@ Notice that I also saved it into the `map/data` folder.
 
 ```text
 .
-# map
-## data
-### genes_variants.RData
-### map_data.RData
-# map_data.R # contains the code demonstrated here
-# state_capitals.xlsx
+├── map
+│   └── data
+│       ├── genes_variants.RData
+│       └── map_data.RData
+├── map_data.R # contains the code demonstrated here
+└── state_capitals.xlsx
 ```
 
-## Creating Shiny `ui` function
+## Creating Shiny `ui.R` file
 
 We can divide the Shiny app internals in two main functions: `ui` and `server`. The former will manage the user interface of the app (the front-end) and the latter will manipulate the data for interactive visualization (the back-end). I will save each function into two separate files, `server.R` and `ui.R`. Let's examine the `ui.R` file:
 
@@ -231,7 +231,7 @@ The `sidebarPanel()` function builds the sidebar. Since I wanted the dropdown me
 
 The `mainPanel()` function builds the main panel. The map will be placed there. The `hx()` function creates a header, where `x` is an integer between 1 and 6. The lower the number, the higher is the level of the header. Thus, `h1()` generates big headers, `h2()` generates a smaller header and so on. I chose `h4()` to enclose a brief description of how to interact with the map. The `leafletOutput()` function will build the map. It is a function from the `leaflet` package. The argument `outputId` creates the internal name of the output to be accessed by the `server` function.
 
-## Creating Shiny `server` function
+## Creating Shiny `server.R` file
 
 It contains the `server` function that receive three arguments: `input`, `output` and `session`. Notice that we must wrote the `server` function, whereas the `ui` function is mostly controlled by the Shiny package itself. See below:
 
