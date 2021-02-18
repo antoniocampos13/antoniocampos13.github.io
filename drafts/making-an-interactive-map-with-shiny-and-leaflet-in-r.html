@@ -1,0 +1,471 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/stylesheet/style.min.css">
+
+
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+          href="https://antoniocampos13.github.io/theme/pygments/vs.min.css">
+
+
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/solid.css">
+
+
+    <link href="https://antoniocampos13.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Antonio's Portfolio Atom">
+
+    <link href="https://antoniocampos13.github.io/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="Antonio's Portfolio RSS">
+
+
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Microsoft EDGE -->
+    <meta name="msapplication-TileColor" content="#333333">
+
+<meta name="author" content="Antonio Victor Campos Coelho" />
+<meta name="description" content="Introduction Shiny is a R package developed and maintained by the RStudio team. With Shiny, anyone can build interactive web apps to help data visualization. Here I present a simple template of an interactive Brazilian map displaying fictitious allelic frequencies with samples sizes across the country. It is a useful …" />
+<meta name="keywords" content="shiny, leaflet, data visualization">
+
+
+<meta property="og:site_name" content="Antonio's Portfolio"/>
+<meta property="og:title" content="Making an Interactive Map with Shiny and Leaflet in R"/>
+<meta property="og:description" content="Introduction Shiny is a R package developed and maintained by the RStudio team. With Shiny, anyone can build interactive web apps to help data visualization. Here I present a simple template of an interactive Brazilian map displaying fictitious allelic frequencies with samples sizes across the country. It is a useful …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://antoniocampos13.github.io/drafts/making-an-interactive-map-with-shiny-and-leaflet-in-r.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2021-02-18 09:00:00-03:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
+<meta property="article:section" content="R"/>
+<meta property="article:tag" content="shiny"/>
+<meta property="article:tag" content="leaflet"/>
+<meta property="article:tag" content="data visualization"/>
+<meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
+
+  <title>Antonio's Portfolio &ndash; Making an Interactive Map with Shiny and Leaflet in R</title>
+
+</head>
+<body class="light-theme">
+  <aside>
+    <div>
+      <a href="https://antoniocampos13.github.io">
+        <img src="https://avatars.githubusercontent.com/antoniocampos13" alt="Antonio's Portfolio" title="Antonio's Portfolio">
+      </a>
+
+      <h1>
+        <a href="https://antoniocampos13.github.io">Antonio's Portfolio</a>
+      </h1>
+
+<p>PhD in Genetics</p>
+
+      <nav>
+        <ul class="list">
+
+
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/about.html#about">
+                  About
+                </a>
+              </li>
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/contact.html#contact">
+                  Contact
+                </a>
+              </li>
+
+            <li>
+              <a target="_self" href="http://lattes.cnpq.br/2986394950644755" >Brazilian Lattes CV</a>
+            </li>
+            <li>
+              <a target="_self" href="https://scholar.google.com.br/citations?user=d2ij4wUAAAAJ&hl" >Google Scholar</a>
+            </li>
+            <li>
+              <a target="_self" href="https://orcid.org/0000-0003-2143-9701" >ORCID</a>
+            </li>
+            <li>
+              <a target="_self" href="https://publons.com/researcher/2414076/antonio-victor-c-coelho" >Researcher ID/Publons</a>
+            </li>
+        </ul>
+      </nav>
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/antoniocampos13/portfolio" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/antonio-coelho-9aa338164" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://antoniocampos13.github.io">Home</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.rss.xml">RSS</a>
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="making-an-interactive-map-with-shiny-and-leaflet-in-r">Making an Interactive Map with Shiny and Leaflet in&nbsp;R</h1>
+    <p>
+      Posted on Thu 18 February 2021 in <a href="https://antoniocampos13.github.io/category/r.html">R</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h2>Introduction</h2>
+<p><a href="https://shiny.rstudio.com/">Shiny</a> is a R package developed and maintained by the <a href="https://rstudio.com/">RStudio</a> team. With Shiny, anyone can build interactive web apps to help data visualization. Here I present a simple template of an interactive Brazilian map displaying fictitious allelic frequencies with samples sizes across the country. It is a useful visualization for multicentric studies results and systematic reviews, for&nbsp;example.</p>
+<p>As always, the code of this demo will be posted at my <a href="">portfolio</a>.</p>
+<p>The intention of this interactive map is that the user can choose a gene and then a variant in two separate dropdown menus and check the allelic frequencies and sample sizes being automatically plotted on the map. See below a print screen of the final&nbsp;product:</p>
+<p><img alt="The final product: an interactive Shiny/leaflet map" src="https://antoniocampos13.github.io/images/shiny_map_result.PNG"></p>
+<h2>Loading necessary&nbsp;packages</h2>
+<p>First, I will load some packages that will help me create a toy&nbsp;dataset:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">here</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">openxlsx</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">maps</span><span class="p">)</span>
+</code></pre></div>
+
+<p>I have talked about <code>here</code> and <code>dplyr</code> (from <code>tidyverse</code>) packages <a href="https://antoniocampos13.github.io/data-manipulation-with-r.html">before</a>. In my opinion, <code>openxlsx</code> is the best option to read Excel spreadsheets, since it does not require external dependencies, such as Java, to work (I had some problems with Java before trying to read large spreadsheets in R). The package <a href="https://cran.r-project.org/web/packages/ids/index.html"><code>ids</code></a> serves to generate random or human readable and pronounceable identifiers. Lastly, the <a href="https://cran.r-project.org/web/packages/maps/maps.pdf"><code>maps</code></a> package will provide geographic coordinates of the Brazilian states capitals to help center the information in my interactive&nbsp;map.</p>
+<h2>Creating the toy&nbsp;dataset</h2>
+<h3>Creating data&nbsp;points</h3>
+<p>The dataset will contain fictitious allele frequencies from samples across Brazil. Brazil is a large country that has 26 states plus a federal district, making it 27 federative units, but to simplify things, I will call it &#8220;states&#8221; hereafter. Now, let&#8217;s imagine that I would genotype two variants from three genes each in all 27 states and determined the minor allele frequency by counting how many alleles were present among the sample size of the state. Let&#8217;s assume the genes are located on autosomes (the non-sexual chromosomes). Thus, I would have <code>27 * 3 * 2 = 162</code> data points corresponding to the allele frequency for each variant in each state. To make the script customizable, I assign every number to an&nbsp;object:</p>
+<div class="highlight"><pre><span></span><code><span class="n">GENES</span> <span class="o">&lt;-</span> <span class="m">3</span>
+<span class="n">VARIANTS</span> <span class="o">&lt;-</span> <span class="m">2</span>
+<span class="n">STATES</span> <span class="o">&lt;-</span> <span class="m">27</span>
+<span class="n">DATAPOINTS</span> <span class="o">&lt;-</span> <span class="n">GENES</span> <span class="o">*</span> <span class="n">VARIANTS</span> <span class="o">*</span> <span class="n">STATES</span>  
+</code></pre></div>
+
+<p>Now I will set the random seed to make some reproducible dataset and then create two vectors with the base R <code>sample()</code> function. The first vector will contain 162 random numbers between 25 and 80 to represent the allele counts from the variants. The second vector will contain 27 random numbers between 100 and 500 to represent sample sizes for each state. Notice how I am multiplying by two, to ensure that sample sizes will be even numbers only, since every individual usually contributes two alleles to the sample&nbsp;size:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">set.seed</span><span class="p">(</span><span class="m">123</span><span class="p">)</span>
+<span class="n">alleles_count</span> <span class="o">&lt;-</span> <span class="nf">sample</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">25</span><span class="o">:</span><span class="m">80</span><span class="p">),</span> <span class="n">DATAPOINTS</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<span class="n">alleles_total</span> <span class="o">&lt;-</span> <span class="m">2</span> <span class="o">*</span> <span class="nf">sample</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">50</span><span class="o">:</span><span class="m">250</span><span class="p">),</span> <span class="n">STATES</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Then, using the <code>ids</code> package I create two more vectors: one representing fictitious genes and the other, fictitious variants, respectively with the <code>random_id()</code> function:</p>
+<div class="highlight"><pre><span></span><code><span class="n">genes</span> <span class="o">&lt;-</span> <span class="nf">random_id</span><span class="p">(</span><span class="n">GENES</span><span class="p">,</span> <span class="m">4</span><span class="p">,</span> <span class="n">use_openssl</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+<span class="n">var_ids</span> <span class="o">&lt;-</span> <span class="nf">random_id</span><span class="p">(</span><span class="n">GENES</span> <span class="o">*</span> <span class="n">VARIANTS</span><span class="p">,</span> <span class="m">6</span><span class="p">,</span> <span class="n">use_openssl</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Notice the first argument is the number of desired random ids, so I put the constants I defined&nbsp;before.</p>
+<p>Now I have two vectors that will generate the 162 data points (allelic frequencies). I will now prepare the geographic coordinates that will be needed when plotting the&nbsp;map.</p>
+<h3>Getting the&nbsp;coordinates</h3>
+<p>To simplify things, I listed all 27 state capitals in a spreadsheet titled <code>states_capitals.xlsx</code>. I then loaded it in R and associated one sample size to one state (<code>alleles_states</code> data&nbsp;frame):</p>
+<div class="highlight"><pre><span></span><code><span class="n">br</span> <span class="o">&lt;-</span> <span class="nf">read.xlsx</span><span class="p">(</span><span class="s">&quot;states_capitals.xlsx&quot;</span><span class="p">)</span>
+
+<span class="n">alleles_states</span> <span class="o">&lt;-</span> <span class="nf">bind_cols</span><span class="p">(</span><span class="n">state</span> <span class="o">=</span> <span class="n">br</span><span class="o">$</span><span class="n">state</span><span class="p">,</span> <span class="n">alleles_total</span> <span class="o">=</span> <span class="n">alleles_total</span><span class="p">)</span>
+</code></pre></div>
+
+<p><img alt="State capitals spreadsheet" src="https://antoniocampos13.github.io/images/state_capitals.PNG"></p>
+<p>Next, I filter a special dataset named <code>world.cities</code> with the name of the Brazilian state capitals using <code>dplyr</code> pipes. This huge dataset contains names, countries, latitude and longitude from several cities of the world and is imported by the <code>maps</code> package when I loaded&nbsp;it.</p>
+<div class="highlight"><pre><span></span><code><span class="nf">dim</span><span class="p">(</span><span class="n">world.cities</span><span class="p">)</span>
+<span class="c1"># prints out --&gt; [1] 43645     6</span>
+</code></pre></div>
+
+<p>Check the <code>dplyr</code> pipes&nbsp;below:</p>
+<div class="highlight"><pre><span></span><code><span class="n">coords</span> <span class="o">&lt;-</span> <span class="n">world.cities</span> <span class="o">%&gt;%</span> <span class="nf">filter</span><span class="p">(</span><span class="n">country.etc</span> <span class="o">==</span> <span class="s">&quot;Brazil&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+  <span class="nf">filter</span><span class="p">(</span><span class="n">name</span> <span class="o">%in%</span> <span class="n">br</span><span class="o">$</span><span class="n">capital</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="n">lat</span> <span class="o">!=</span> <span class="m">-26.48</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">state</span> <span class="o">=</span> <span class="n">br</span><span class="o">$</span><span class="n">state</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+  <span class="nf">select</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">long</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Now let me explain. First, I obtaining only Brazilian cities by using <code>filter(country.etc == "Brazil")</code>. Then, I filtered the <code>name</code> column to get only the Brazilian state capitals by using the keyword <code>%in%</code> and using the <code>capital</code> column of the <code>br</code> data frame. The <code>filter(lat != -26.48)</code> argument is to remove a city from Paraná state that has the same name of the Tocantins state capital (Palmas). The <code>lat</code> means the latitude column. Next, I create a new column with <code>mutate()</code> to unite latitude and longitude coordinates to their respective capital. Notice that I could only do that because <code>br$capital</code> filter maintained the same order of the cities as it was in the input spreadsheet. Finally, I clean the data frame up by selecting only the coordinates and the state abbreviation. The result is&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">head</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+ <span class="n">lat</span>   <span class="n">long</span> <span class="n">state</span>
+<span class="m">1</span> <span class="m">-10.91</span> <span class="m">-37.07</span>    <span class="n">SE</span>
+<span class="m">2</span>  <span class="m">-1.44</span> <span class="m">-48.50</span>    <span class="n">PA</span>
+<span class="m">3</span> <span class="m">-19.92</span> <span class="m">-43.94</span>    <span class="n">MG</span>
+<span class="m">4</span>   <span class="m">2.83</span> <span class="m">-60.66</span>    <span class="n">RR</span>
+<span class="m">5</span> <span class="m">-15.78</span> <span class="m">-47.91</span>    <span class="n">DF</span>
+<span class="m">6</span> <span class="m">-20.45</span> <span class="m">-54.63</span>    <span class="n">MS</span>
+</code></pre></div>
+
+<h3>Joining&nbsp;everything</h3>
+<p>Now let&#8217;s combine three vectors: state abbreviations, genes and variants in a single data frame. First I create a small data frame combining the gene ids with the variants ids to ensure each gene has two unique&nbsp;variants:</p>
+<div class="highlight"><pre><span></span><code><span class="n">gene_var_comb</span> <span class="o">&lt;-</span> <span class="nf">bind_cols</span><span class="p">(</span><span class="n">gene</span> <span class="o">=</span> <span class="nf">rep</span><span class="p">(</span><span class="n">genes</span><span class="p">,</span> <span class="n">each</span> <span class="o">=</span> <span class="n">VARIANTS</span><span class="p">),</span> <span class="n">variant</span> <span class="o">=</span> <span class="n">var_ids</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Then I combine the state abbreviations vector with the variants vector, making the 162 data points skeleton, and with two inner joins, I can now identify each variant by its corresponding gene and each state with its corresponding sample&nbsp;size:</p>
+<div class="highlight"><pre><span></span><code><span class="n">combinations</span> <span class="o">&lt;-</span> <span class="nf">expand.grid</span><span class="p">(</span><span class="n">state</span> <span class="o">=</span> <span class="n">br</span><span class="o">$</span><span class="n">state</span><span class="p">,</span> <span class="n">variant</span> <span class="o">=</span> <span class="n">gene_var_comb</span><span class="o">$</span><span class="n">variant</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+  <span class="nf">inner_join</span><span class="p">(</span><span class="n">gene_var_comb</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&quot;variant&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">inner_join</span><span class="p">(</span><span class="n">alleles_states</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&quot;state&quot;</span><span class="p">)</span>
+
+<span class="nf">dim</span><span class="p">(</span><span class="n">combinations</span><span class="p">)</span>
+<span class="c1"># [1] 162   4</span>
+</code></pre></div>
+
+<p>See that it has the correct dimensions: 162 rows (data points) and four columns (state, gene, variant and sample size). Now let&#8217;s complete the data frame by merging the <code>alleles_count</code> vector, joining the coordinates and calculating the minor allele&nbsp;frequency:</p>
+<div class="highlight"><pre><span></span><code><span class="n">map_data</span> <span class="o">&lt;-</span> <span class="nf">bind_cols</span><span class="p">(</span><span class="n">combinations</span><span class="p">,</span> 
+<span class="c1">#                  alleles_count = alleles_count) %&gt;%</span>
+  <span class="nf">inner_join</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&quot;state&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">freq</span> <span class="o">=</span> <span class="n">alleles_count</span> <span class="o">/</span> <span class="n">alleles_total</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The result is&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="o">&gt;</span> <span class="nf">head</span><span class="p">(</span><span class="n">map_data</span><span class="p">)</span>
+  <span class="n">state</span>      <span class="n">variant</span>     <span class="n">gene</span> <span class="n">alleles_total</span> <span class="n">alleles_count</span>    <span class="n">lat</span>   <span class="n">long</span>       <span class="n">freq</span>
+<span class="m">1</span>    <span class="n">SE</span> <span class="m">6</span><span class="n">cf8ac7cc786</span> <span class="m">6</span><span class="n">b290a87</span>           <span class="m">426</span>            <span class="m">55</span> <span class="m">-10.91</span> <span class="m">-37.07</span> <span class="m">0.12910798</span>
+<span class="m">2</span>    <span class="n">PA</span> <span class="m">6</span><span class="n">cf8ac7cc786</span> <span class="m">6</span><span class="n">b290a87</span>           <span class="m">264</span>            <span class="m">39</span>  <span class="m">-1.44</span> <span class="m">-48.50</span> <span class="m">0.14772727</span>
+<span class="m">3</span>    <span class="n">MG</span> <span class="m">6</span><span class="n">cf8ac7cc786</span> <span class="m">6</span><span class="n">b290a87</span>           <span class="m">176</span>            <span class="m">75</span> <span class="m">-19.92</span> <span class="m">-43.94</span> <span class="m">0.42613636</span>
+<span class="m">4</span>    <span class="n">RR</span> <span class="m">6</span><span class="n">cf8ac7cc786</span> <span class="m">6</span><span class="n">b290a87</span>           <span class="m">206</span>            <span class="m">38</span>   <span class="m">2.83</span> <span class="m">-60.66</span> <span class="m">0.18446602</span>
+<span class="m">5</span>    <span class="n">DF</span> <span class="m">6</span><span class="n">cf8ac7cc786</span> <span class="m">6</span><span class="n">b290a87</span>           <span class="m">372</span>            <span class="m">27</span> <span class="m">-15.78</span> <span class="m">-47.91</span> <span class="m">0.07258065</span>
+<span class="m">6</span>    <span class="n">MS</span> <span class="m">6</span><span class="n">cf8ac7cc786</span> <span class="m">6</span><span class="n">b290a87</span>           <span class="m">496</span>            <span class="m">66</span> <span class="m">-20.45</span> <span class="m">-54.63</span> <span class="m">0.13306452</span>
+</code></pre></div>
+
+<p>Now, I will save the toy dataset into a R object that will be loaded when we launch the Shiny app. I saved inside the <code>map/data</code> folder for reasons that will be clear in a&nbsp;moment.</p>
+<div class="highlight"><pre><span></span><code><span class="nf">save</span><span class="p">(</span><span class="n">map_data</span><span class="p">,</span> <span class="n">file</span> <span class="o">=</span> <span class="nf">here</span><span class="p">(</span><span class="s">&quot;map&quot;</span><span class="p">,</span><span class="s">&quot;data&quot;</span><span class="p">,</span><span class="s">&quot;map_data.RData&quot;</span><span class="p">))</span>
+</code></pre></div>
+
+<h2>Creating named list of genes and&nbsp;variants</h2>
+<p>I need a named list of genes and variants to make the dropdown menus as intended. So, again I used some <code>dplyr</code> pipes and a <code>lapply</code> loop to accomplish&nbsp;it:</p>
+<div class="highlight"><pre><span></span><code><span class="n">gene_list</span> <span class="o">&lt;-</span> <span class="n">map_data</span> <span class="o">%&gt;%</span> <span class="nf">select</span><span class="p">(</span><span class="n">gene</span><span class="p">,</span> <span class="n">variant</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">distinct</span><span class="p">(</span><span class="n">gene</span><span class="p">,</span> <span class="n">variant</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_by</span><span class="p">(</span><span class="n">gene</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">varstring</span> <span class="o">=</span> <span class="nf">paste0</span><span class="p">(</span><span class="n">variant</span><span class="p">,</span> <span class="n">collapse</span> <span class="o">=</span> <span class="s">&quot;,&quot;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">select</span><span class="p">(</span><span class="o">-</span><span class="n">variant</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">distinct</span><span class="p">(</span><span class="n">gene</span><span class="p">,</span> <span class="n">varstring</span><span class="p">)</span>
+
+<span class="n">genes_variants</span> <span class="o">&lt;-</span> <span class="nf">lapply</span><span class="p">(</span><span class="nf">seq_along</span><span class="p">(</span><span class="n">gene_list</span><span class="o">$</span><span class="n">gene</span><span class="p">),</span> <span class="nf">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+  <span class="nf">unlist</span><span class="p">(</span><span class="nf">strsplit</span><span class="p">(</span><span class="n">gene_list</span><span class="o">$</span><span class="n">varstring</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s">&quot;,&quot;</span><span class="p">))</span>
+
+<span class="p">)</span>
+
+<span class="nf">names</span><span class="p">(</span><span class="n">genes_variants</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">gene_list</span><span class="o">$</span><span class="n">gene</span>
+
+<span class="nf">save</span><span class="p">(</span><span class="n">genes_variants</span><span class="p">,</span> <span class="n">file</span> <span class="o">=</span> <span class="nf">here</span><span class="p">(</span><span class="s">&quot;map&quot;</span><span class="p">,</span><span class="s">&quot;data&quot;</span><span class="p">,</span><span class="s">&quot;genes_variants.RData&quot;</span><span class="p">))</span>
+</code></pre></div>
+
+<p>The result is a named list: each element of the list is a vector, and each of these vectors are named after a gene. Each vector, in turn, contains the corresponding&nbsp;variants:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">head</span><span class="p">(</span><span class="n">genes_variants</span><span class="p">)</span>
+<span class="o">$</span><span class="n">`6b290a87`</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;6cf8ac7cc786&quot;</span> <span class="s">&quot;c1c7fc20d1b9&quot;</span>
+
+<span class="o">$</span><span class="n">`153a782d`</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;6aab8d277c3c&quot;</span> <span class="s">&quot;4c9ff4a7f4fb&quot;</span>
+
+<span class="o">$</span><span class="n">b053b654</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;adf90f0908c9&quot;</span> <span class="s">&quot;c523d6d80697&quot;</span>
+</code></pre></div>
+
+<p>Notice that I also saved it into the <code>map/data</code> folder.</p>
+<div class="highlight"><pre><span></span><code>.
+# map
+## data
+### genes_variants.RData
+### map_data.RData
+# map_data.R # contains the code demonstrated here
+# state_capitals.xlsx
+</code></pre></div>
+
+<h2>Creating Shiny <code>ui</code> function</h2>
+<p>We can divide the Shiny app internals in two main functions: <code>ui</code> and <code>server</code>. The former will manage the user interface of the app (the front-end) and the latter will manipulate the data for interactive visualization (the back-end). I will save each function into two separate files, <code>server.R</code> and <code>ui.R</code>. Let&#8217;s examine the <code>ui.R</code> file:</p>
+<div class="highlight"><pre><span></span><code><span class="n">ui</span> <span class="o">&lt;-</span> <span class="nf">fluidPage</span><span class="p">(</span>
+  <span class="nf">titlePanel</span><span class="p">(</span><span class="s">&quot;Toy Dataset: Variants in Brazil&quot;</span><span class="p">),</span>
+
+  <span class="nf">sidebarLayout</span><span class="p">(</span>
+    <span class="nf">sidebarPanel</span><span class="p">(</span>
+      <span class="nf">selectInput</span><span class="p">(</span><span class="s">&quot;gene&quot;</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s">&quot;Choose a gene&quot;</span><span class="p">,</span> <span class="nf">names</span><span class="p">(</span><span class="n">genes_variants</span><span class="p">)),</span>
+      <span class="nf">selectInput</span><span class="p">(</span><span class="s">&quot;variant&quot;</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s">&quot;Choose a variant&quot;</span><span class="p">,</span> <span class="n">genes_variants</span><span class="p">[[</span><span class="m">1</span><span class="p">]]),</span>
+    <span class="p">),</span>
+
+
+    <span class="nf">mainPanel</span><span class="p">(</span>
+      <span class="nf">h4</span><span class="p">(</span><span class="s">&quot;The circles&#39; diameters are proportional to sample size. Hover them with the cursor to see allelic frequencies. Click to see sample size (number of alleles).&quot;</span><span class="p">),</span>
+
+      <span class="nf">leafletOutput</span><span class="p">(</span><span class="n">outputId</span> <span class="o">=</span> <span class="s">&quot;map&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>The <code>fluidPage()</code> Shiny function creates an webpage that fits browser dimensions and generate the overall layout of the app. This function receives other functions as arguments. Each function will take care of one aspect of the layout. The first function, <code>titlePanel()</code> generates the main title of the app, the second, <code>sidebarLayout()</code> instructs Shiny to create an app with a sidebar and a main panel. The arguments of this function will control the elements inside each&nbsp;area.</p>
+<p>The <code>sidebarPanel()</code> function builds the sidebar. Since I wanted the dropdown menus to be placed in the sidebar, I enclose two <code>selectInput()</code> functions, one for the genes and one for the variants. Notice that it requires three arguments: an internal name (&#8220;genes&#8221; or &#8220;variant&#8221;) so the <code>server</code> function can access the inputs, a human-readable label (&#8220;Choose a gene&#8221;, &#8220;Choose a variant&#8221;) and the input options. Notice that I am referring to the <code>genes_variants</code> named list I created in the previous&nbsp;step.</p>
+<p>The <code>mainPanel()</code> function builds the main panel. The map will be placed there. The <code>hx()</code> function creates a header, where <code>x</code> is an integer between 1 and 6. The lower the number, the higher is the level of the header. Thus, <code>h1()</code> generates big headers, <code>h2()</code> generates a smaller header and so on. I chose <code>h4()</code> to enclose a brief description of how to interact with the map. The <code>leafletOutput()</code> function will build the map. It is a function from the <code>leaflet</code> package. The argument <code>outputId</code> creates the internal name of the output to be accessed by the <code>server</code> function.</p>
+<h2>Creating Shiny <code>server</code> function</h2>
+<p>It contains the <code>server</code> function that receive three arguments: <code>input</code>, <code>output</code> and <code>session</code>. Notice that we must wrote the <code>server</code> function, whereas the <code>ui</code> function is mostly controlled by the Shiny package itself. See&nbsp;below:</p>
+<div class="highlight"><pre><span></span><code><span class="n">server</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">input</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">session</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="nf">observe</span><span class="p">({</span>
+    <span class="nf">updateSelectInput</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="s">&quot;variant&quot;</span><span class="p">,</span> <span class="n">choices</span> <span class="o">=</span> <span class="n">genes_variants</span><span class="p">[[</span><span class="n">input</span><span class="o">$</span><span class="n">gene</span><span class="p">]])</span>
+  <span class="p">})</span>
+
+  <span class="n">data_subset</span> <span class="o">&lt;-</span> <span class="nf">reactive</span><span class="p">({</span>
+    <span class="n">df</span> <span class="o">&lt;-</span> <span class="n">map_data</span> <span class="o">%&gt;%</span> <span class="nf">filter</span><span class="p">(</span><span class="n">gene</span> <span class="o">==</span> <span class="n">input</span><span class="o">$</span><span class="n">gene</span> <span class="o">&amp;</span> <span class="n">variant</span> <span class="o">==</span> <span class="n">input</span><span class="o">$</span><span class="n">variant</span><span class="p">)</span>
+
+    <span class="nf">return</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+  <span class="p">})</span>
+
+  <span class="n">output</span><span class="o">$</span><span class="n">map</span> <span class="o">&lt;-</span> <span class="nf">renderLeaflet</span><span class="p">({</span>
+    <span class="nf">leaflet</span><span class="p">(</span><span class="nf">data_subset</span><span class="p">())</span> <span class="o">%&gt;%</span>
+      <span class="nf">setView</span><span class="p">(</span><span class="n">lat</span> <span class="o">=</span> <span class="m">-14.235004</span><span class="p">,</span> <span class="n">lng</span> <span class="o">=</span> <span class="m">-51.92528</span><span class="p">,</span> <span class="n">zoom</span> <span class="o">=</span> <span class="m">4</span><span class="p">)</span> <span class="o">%&gt;%</span>
+      <span class="nf">addTiles</span><span class="p">()</span> <span class="o">%&gt;%</span>
+      <span class="nf">addCircles</span><span class="p">(</span>
+        <span class="n">lat</span> <span class="o">=</span> <span class="o">~</span><span class="n">lat</span><span class="p">,</span>
+        <span class="n">lng</span> <span class="o">=</span> <span class="o">~</span><span class="n">long</span><span class="p">,</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span>
+        <span class="n">radius</span> <span class="o">=</span> <span class="o">~</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">alleles_total</span><span class="p">)</span> <span class="o">*</span> <span class="m">5000</span><span class="p">,</span>
+        <span class="n">popup</span> <span class="o">=</span> <span class="o">~</span> <span class="nf">as.character</span><span class="p">(</span><span class="nf">paste0</span><span class="p">(</span><span class="s">&quot;Alleles: &quot;</span><span class="p">,</span> <span class="n">alleles_total</span><span class="p">)),</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="o">~</span> <span class="nf">as.character</span><span class="p">(</span><span class="nf">paste0</span><span class="p">(</span><span class="n">input</span><span class="o">$</span><span class="n">variant</span><span class="p">,</span> <span class="s">&quot; Allele frequency: &quot;</span><span class="p">,</span> <span class="nf">round</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">digits</span> <span class="o">=</span> <span class="m">2</span><span class="p">))),</span>
+        <span class="n">fillOpacity</span> <span class="o">=</span> <span class="m">0.5</span>
+      <span class="p">)</span>
+  <span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The user options during the interaction with the app will be stored into the <code>input</code> object. The <code>output</code> will access the output id defined in the <code>ui.R</code> file (&#8220;map&#8221;). The <code>session</code> object will keep track of the different options of the user. For example, the user must choose a gene. Then, the variant dropdown menu must change accordingly to display the variants of said gene. This is why I included the <code>observe()</code> function. Anytime the user chooses a different gene, the <code>updateSelectInput()</code> will change the &#8220;variant&#8221; <code>selectInput()</code>.</p>
+<p>Each user selection will display different data on the map. Therefore, the <code>data_subset(reactive())</code> nested functions will take the user input and <strong>filter</strong> the desired data stored in the <code>map_data</code> object I created earlier. Notice that <code>input$gene</code> and <code>input$variant</code> are referring to the <code>selectInput()</code> defined in the <code>ui.R</code> file. They get the user option and populate the&nbsp;filters.</p>
+<p>Lastly, the <code>renderLeaflet()</code> function output (controlled by the definitions enclosed in the <code>leaflet()</code> function) will be assigned to the <code>output$map</code> object. &#8220;map&#8221; is referring to the <code>outputId</code> defined in the <code>ui.R</code> file, therefore making the map appear on the main&nbsp;panel.</p>
+<p>Let&#8217;s talk more about the <code>leaflet()</code> function arguments. First, it receives as input the <code>data_subset()</code> output, which is the filtered data based on the user input. Using <code>dplyr</code><span class="quo">&#8216;</span>s pipes, I pass other options to the function. The <code>setView()</code> function serves to center the map on the specified latitude and longitude, as well as the zoom level. The <code>addCircles()</code> will plot circles based on the geographic coordinates stored in the filtered <code>map_data</code> object. To make circle size appear proportional as the sample size, I multiply the square root of the sample size by a constant. Next, I created two labels: one that appears on clicking and the other appears on hovering the circle so the user can see sample size and allele frequency,&nbsp;respectively.</p>
+<h2>Creating <code>global.R</code> file</h2>
+<p>The optional <code>global.R</code> file contents are read during the Shiny app initialization and are placed in global scope during the app execution session. Therefore, it is useful when there is the need to load data and packages necessary for the app buildup, which is exactly my case: I need to load the map data, the gene lists, and the <code>leaflet</code> and <code>dplyr</code> packages. Provided that the <code>ui</code> and <code>server</code> functions are saved in two different files (<code>ui.R</code> and <code>server.R</code>), the <code>global.R</code> is automatically loaded during app&nbsp;initialization.</p>
+<p>Check the <code>global.R</code> file&nbsp;contents:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">load</span><span class="p">(</span><span class="s">&quot;data/map_data.RData&quot;</span><span class="p">)</span>
+
+<span class="nf">load</span><span class="p">(</span><span class="s">&quot;data/genes_variants.RData&quot;</span><span class="p">)</span>
+
+<span class="nf">if</span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">leaflet</span><span class="p">)){</span>
+  <span class="nf">install.packages</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;leaflet&quot;</span><span class="p">,</span> <span class="s">&quot;leaflet.extras&quot;</span><span class="p">))</span>
+  <span class="nf">library</span><span class="p">(</span><span class="n">leaflet</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="nf">if</span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)){</span>
+  <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;dplyr&quot;</span><span class="p">)</span>
+  <span class="nf">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>First, I load the data stored into the <code>map/data</code> folder. Next, the <code>if(!require()){}</code> constructs will check if the packages exist and load them or install and then load them&nbsp;otherwise.</p>
+<h2>Executing the Shiny&nbsp;app</h2>
+<p>It is very simple to execute a Shiny app locally. Simply place the <code>ui.R</code>, <code>server.R</code> and <code>global.R</code> (if it exists) inside a folder. I placed everything into the <code>map</code> folder:</p>
+<div class="highlight"><pre><span></span><code>.
+├── map
+│   ├── global.R
+│   ├── server.R
+│   ├── ui.R
+│   └── data
+│       ├── genes_variants.RData
+│       └── map_data.RData
+├── map_data.R
+└── state_capitals.xlsx
+</code></pre></div>
+
+<p>Then, simply run the <code>runApp()</code> Shiny function with the name of the folder (install Shiny if you have not&nbsp;yet):</p>
+<div class="highlight"><pre><span></span><code><span class="nf">if</span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">shiny</span><span class="p">)){</span>
+  <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;shiny&quot;</span><span class="p">)</span>
+  <span class="nf">library</span><span class="p">(</span><span class="n">shiny</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="nf">runApp</span><span class="p">(</span><span class="s">&quot;map&quot;</span><span class="p">)</span>
+<span class="c1"># or</span>
+<span class="c1"># shiny::runApp(&quot;map&quot;)</span>
+</code></pre></div>
+
+<p>Just make sure the R session current working directory is the parent of the Shiny app folder, otherwise it will not work. Since I am running RStudio, a window containing the interactive map opens up and I can interact with the map. Otherwise you would have to open a browser window and go to the address displayed on the R console, something like <code>http://127.0.0.1:&lt;some_port&gt;</code>.</p>
+<p>The interactive map is rather barebones, but it works. Try to replicate and improve it if you&nbsp;wish!</p>
+<h2>Hosting Shiny apps on the&nbsp;web</h2>
+<p>This demo showed how to locally execute a Shiny app. There are some options if you wish to host your app on the web to everyone use, both free and paid. For example, <a href="https://www.shinyapps.io/">RStudio shinyapps.io</a> offers free limited hosting of up to three apps. <a href="https://www.digitalocean.com/products/droplets/">DigitalOcean</a> offer small-scale paid services that can host Shiny apps (check a <a href="https://deanattali.com/2015/05/09/setup-rstudio-shiny-server-digital-ocean/">great tutorial by Dean Attali</a>).</p>
+<h2>Conclusion</h2>
+<p>In conclusion,&nbsp;I:</p>
+<ul>
+<li>Created toy data simulating allele counts across several regions of&nbsp;Brazil;</li>
+<li>Showed how to obtain geographic&nbsp;coordinates;</li>
+<li>Demonstrated how to create an interactive map with Shiny to visualize sample sizes and allelic frequencies displayed on a Brazilian&nbsp;map.</li>
+</ul>
+<h2>References</h2>
+<p><a href="https://shiny.rstudio.com/">Shiny</a></p>
+<p><a href="https://rstudio.com/">RStudio | Open source <span class="amp">&amp;</span> professional software for data science&nbsp;teams</a></p>
+<p><a href="https://antoniocampos13.github.io/data-manipulation-with-r.html">Data manipulation with&nbsp;R</a></p>
+<p><a href="https://cran.r-project.org/web/packages/ids/index.html"><span class="caps">CRAN</span> - Package&nbsp;ids</a></p>
+<p><a href="https://cran.r-project.org/web/packages/maps/maps.pdf"><span class="caps">CRAN</span> - Package&nbsp;maps</a></p>
+<p><a href="https://www.shinyapps.io/">shinyapps.io</a></p>
+<p><a href="https://www.digitalocean.com/products/droplets/">Droplets - Scalable Virtual Machines |&nbsp;DigitalOcean</a></p>
+<p><a href="https://deanattali.com/2015/05/09/setup-rstudio-shiny-server-digital-ocean/">How to get your very own RStudio Server and Shiny Server with&nbsp;DigitalOcean</a></p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://antoniocampos13.github.io/tag/shiny.html">shiny</a>
+      <a href="https://antoniocampos13.github.io/tag/leaflet.html">leaflet</a>
+      <a href="https://antoniocampos13.github.io/tag/data-visualization.html">data visualization</a>
+    </p>
+  </div>
+
+
+
+
+
+</article>
+
+    <footer>
+<p>
+  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+           src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Antonio's Portfolio ",
+  "url" : "https://antoniocampos13.github.io",
+  "image": "https://avatars.githubusercontent.com/antoniocampos13",
+  "description": "Data Science Portfolio by Antonio Victor Campos Coelho"
+}
+</script>
+
+
+</body>
+</html>
