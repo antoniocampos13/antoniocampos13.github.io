@@ -11,11 +11,11 @@ Tags: shiny, leaflet, data visualization
 
 [Shiny](https://shiny.rstudio.com/) is a R package developed and maintained by the [RStudio](https://rstudio.com/) team. With Shiny, anyone can build interactive web apps to help data visualization. Here I present a simple template of an interactive Brazilian map displaying fictitious allelic frequencies with samples sizes across the country. It is a useful visualization for multicentric studies results and systematic reviews, for example.
 
-As always, the code of this demo will be posted at my [portfolio]().
+As always, the code of this demo will be posted at my [portfolio](https://github.com/antoniocampos13/portfolio/tree/master/R/2021-02-18_Interactive_map_with_shiny).
 
 The intention of this interactive map is that the user can choose a gene and then a variant in two separate dropdown menus and check the allelic frequencies and sample sizes being automatically plotted on the map. See below a print screen of the final product:
 
-![The final product: an interactive Shiny/leaflet map]({static}/images/shiny_map_result.PNG)
+![The final product: an interactive Shiny/leaflet map]({static}/images/shiny_map_result.jpg)
 
 ## Loading necessary packages
 
