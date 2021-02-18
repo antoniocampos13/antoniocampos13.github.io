@@ -343,6 +343,8 @@ In conclusion, I:
 - Showed how to obtain geographic coordinates;
 - Demonstrated how to create an interactive map with Shiny to visualize sample sizes and allelic frequencies displayed on a Brazilian map.
 
+*Subscribe to my [RSS feed](https://antoniocampos13.github.io/feeds/all.rss.xml), [Atom feed](https://antoniocampos13.github.io/feeds/all.atom.xml) or [Telegram channel](https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg) to keep you updated whenever I post new content.*
+
 ## References
 
 [Shiny](https://shiny.rstudio.com/)
