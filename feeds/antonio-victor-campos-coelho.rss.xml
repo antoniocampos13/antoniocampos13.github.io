@@ -1,5 +1,538 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>Antonio's Portfolio - Antonio Victor Campos Coelho</title><link>https://antoniocampos13.github.io/</link><description>PhD in Genetics</description><lastBuildDate>Thu, 18 Feb 2021 09:00:00 -0300</lastBuildDate><item><title>Making an Interactive Map with Shiny and Leaflet in R</title><link>https://antoniocampos13.github.io/making-an-interactive-map-with-shiny-and-leaflet-in-r.html</link><description>&lt;h2&gt;Introduction&lt;/h2&gt;
+<rss version="2.0"><channel><title>Antonio's Portfolio - Antonio Victor Campos Coelho</title><link>https://antoniocampos13.github.io/</link><description>PhD in Genetics</description><lastBuildDate>Fri, 09 Jul 2021 16:45:00 -0300</lastBuildDate><item><title>Genomic Analysis With Hail</title><link>https://antoniocampos13.github.io/genomic-analysis-with-hail.html</link><description>&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;Hello, long time no see! Since I lasted posted, many things happened. Since March I have been working as Post-Doc Researcher, hired by the &lt;a href="https://www.einstein.br/Pages/Home.aspx"&gt;Hospital Israelita Albert Einstein (&lt;span class="caps"&gt;HIAE&lt;/span&gt;, São Paulo, Brazil)&lt;/a&gt; to work for the Projeto Genomas Raros (&amp;#8220;Rare Genomes Project&amp;#8221;, &lt;span class="caps"&gt;GRAR&lt;/span&gt; from here on), a public-private partnership between &lt;span class="caps"&gt;HIAE&lt;/span&gt; and the Brazilian Health Ministry to further the implementation of genomic analysis into the Brazilian public healthcare system (&lt;span class="caps"&gt;SUS&lt;/span&gt;), with the intention of improve diagnostic rates of rare diseases in Brazil. Since 2020, thousands of genomes of Brazilian patients with suspected rare diseases have been sequenced, and many more will come in the next two&amp;nbsp;years.&lt;/p&gt;
+&lt;p&gt;Thus, I have been tasked to develop/adapt analysis pipelines to handle whole-genome data at large scales compatible with the scope of &lt;span class="caps"&gt;GRAR&lt;/span&gt;. My team asked me to explore &lt;a href="https://hail.is/"&gt;Hail, a Python/Spark framework for scalable genomic analysis&lt;/a&gt;. It has been developed at &lt;a href="https://www.broadinstitute.org/"&gt;Broad Institute&lt;/a&gt; and was used to generate the &lt;a href="https://gnomAD.broadinstitute.org/"&gt;Genome Aggregation Database (gnomAD)&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;In this post I will share some use cases of this tool full of potential. Please notice that it is not intended to substitute the official documentation of Hail, &lt;span class="caps"&gt;GATK&lt;/span&gt; and other software used here. Just consider it as a demonstration of Hail use cases with commentaries. Also, notice two important things: first, Hail implements &amp;#8220;lazy evaluation&amp;#8221;; new users may think a specific command run blazingly fast, but in reality, Hail just mapped the execution order of functions needed and only will compute anything when necessary, such as saving results to disk and printing the first few rows of a dataset to Python&amp;#8217;s standard output stream. Second, Hail need a lot of &lt;span class="caps"&gt;RAM&lt;/span&gt; and &lt;span class="caps"&gt;CPU&lt;/span&gt; to work properly with big datasets. Hail is intended to be used in cloud/cluster computing environments, but a computer with relatively good hardware configuration can run small&amp;nbsp;datasets.&lt;/p&gt;
+&lt;h2&gt;Installing&amp;nbsp;software&lt;/h2&gt;
+&lt;p&gt;Prepare your Unix computing environment by installing &lt;a href="https://hail.is/#install"&gt;Hail&lt;/a&gt;, &lt;a href="https://pypi.org/project/gnomAD/"&gt;gnomAD utilities for Hail&lt;/a&gt; and &lt;a href="https://gatk.broadinstitute.org/hc/en-us"&gt;Genome Analysis Toolkit version 4 (&lt;span class="caps"&gt;GATK4&lt;/span&gt;)&lt;/a&gt;. Tools for manipulating &lt;span class="caps"&gt;VCF&lt;/span&gt; files are essential too, such as &lt;a href="http://samtools.github.io/bcftools/bcftools.html"&gt;bcftools&lt;/a&gt;. I advise installing the tools into a virtual environment for convenience (see &lt;a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html"&gt;my previous post&lt;/a&gt; for some pointers on how to use conda&amp;nbsp;environments).&lt;/p&gt;
+&lt;h2&gt;Preparing the multi-sample &lt;span class="caps"&gt;VCF&lt;/span&gt;&amp;nbsp;input&lt;/h2&gt;
+&lt;p&gt;Since the &lt;span class="caps"&gt;GRAR&lt;/span&gt; data is coming from whole-genome sequencing (&lt;span class="caps"&gt;WGS&lt;/span&gt;), we have been generating one &lt;a href="https://gatk.broadinstitute.org/hc/en-us/articles/360035531812-GVCF-Genomic-Variant-Call-Format"&gt;genomic variant call format (gVCF) file&lt;/a&gt; per participant through &lt;a href="https://www.illumina.com/products/by-type/informatics-products/dragen-bio-it-platform.html"&gt;Illumina&amp;#8217;s &lt;span class="caps"&gt;DRAGEN&lt;/span&gt; sequencing read analysis platform&lt;/a&gt;. A gVCF file has all the characteristics of a &lt;a href="https://samtools.github.io/hts-specs/VCFv4.2.pdf"&gt;&lt;span class="caps"&gt;VCF&lt;/span&gt; file&lt;/a&gt;, the difference being that the gVCF files have information for all sites in the genome, which give more precision during the integration of variant calls coming from several&amp;nbsp;samples.&lt;/p&gt;
+&lt;p&gt;By integration I mean &lt;strong&gt;combining&lt;/strong&gt; several gVCF files into a single multi-sample &lt;span class="caps"&gt;VCF&lt;/span&gt; file so we can perform analysis (calculate allelic frequencies, assess genotyping quality, and so on) with the &lt;strong&gt;whole cohort&lt;/strong&gt;. We are currently using &lt;span class="caps"&gt;GATK&lt;/span&gt;&amp;#8217;s GenomicsDBImport tool. See &lt;a href="https://gatk.broadinstitute.org/hc/en-us/articles/360036883491-GenomicsDBImport"&gt;here&lt;/a&gt; for a tutorial of how to use it. Briefly, we intend to create a GenomicsDB object and we will update it regularly by appending new gVCFs as they become available, until the last participant is recruited and we have their genome sequenced. When this moment comes, we will extract a multi-sample &lt;span class="caps"&gt;VCF&lt;/span&gt; with &lt;span class="caps"&gt;GATK&lt;/span&gt;&amp;#8217;s &lt;code&gt;GenotypeGVCFs&lt;/code&gt; tool:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;gatk GenotypeGVCFs -R &lt;span class="nv"&gt;$REF&lt;/span&gt; -V &lt;span class="nv"&gt;$DBPATH&lt;/span&gt; -G StandardAnnotation -O cohort.vcf
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Where &lt;code&gt;$REF&lt;/code&gt; and &lt;code&gt;$DBPATH&lt;/code&gt; are the paths of the genome reference (the same used during the variant call process) and the GenomicsDB, respectively (which should have a &lt;code&gt;gendb://&lt;/code&gt; prefix as noted in the GenomicsDBImport tutorial, something like &lt;code&gt;gendb://my_database&lt;/code&gt;). The &lt;code&gt;-O&lt;/code&gt; flag indicates the output name. If you wish to compress the &lt;span class="caps"&gt;VCF&lt;/span&gt; file, you may use &lt;code&gt;bcftools&lt;/code&gt; or &lt;code&gt;bgzip&lt;/code&gt;. Remember to index the compressed&amp;nbsp;file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;bcftools view cohort.vcf -Oz -o cohort.vcf.gz
+bcftools index cohort.vcf.gz
+
+&lt;span class="c1"&gt;# or&lt;/span&gt;
+bgzip -@ &lt;span class="m"&gt;4&lt;/span&gt; cohort.vcf
+tabix cohort.vcf.gz
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The next step is to perform &lt;span class="caps"&gt;GATK&lt;/span&gt;&amp;#8217;s Variant Quality Score Recalibration (&lt;span class="caps"&gt;VQSR&lt;/span&gt;) in the output &lt;span class="caps"&gt;VCF&lt;/span&gt; with &lt;span class="caps"&gt;GATK&lt;/span&gt;&amp;#8217;s &lt;code&gt;VariantRecalibrator&lt;/code&gt;.  See their original tutorial &lt;a href="https://gatk.broadinstitute.org/hc/en-us/articles/360035531112--How-to-Filter-variants-either-with-VQSR-or-by-hard-filtering"&gt;here&lt;/a&gt;. To put it simply, &lt;span class="caps"&gt;VQSR&lt;/span&gt; works by comparing the detected variants with high-confidence variant sites observed by several consortia (HapMap, 1000 Genomes etc.) and applies a filter deeming the variant a true positive (i.e. the observed variation is a true biological event) or a false positive (i.e. the observed variation is not real, it is in a fact sequencing artifact). To this end, I downloaded high-confidence datasets to perform the &lt;span class="caps"&gt;VQSR&lt;/span&gt;. The datasets can be found at the &lt;a href="https://console.cloud.google.com/storage/browser/genomics-public-data/resources/broad/hg38/v0;tab=objects?prefix=&amp;amp;forceOnObjectsSortingFiltering=false"&gt;&lt;span class="caps"&gt;GATK&lt;/span&gt; Google Cloud Storage (Resource Bundle)&lt;/a&gt; and can be downloaded with &lt;a href="https://cloud.google.com/storage/docs/gsutil"&gt;&lt;code&gt;gsutil&lt;/code&gt; application&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I will post a script with slight modification in the steps of the &lt;span class="caps"&gt;VQSR&lt;/span&gt; tutorial in my &lt;a href="https://github.com/antoniocampos13/portfolio/tree/master/Python/2021_07_07_Genomic_Analysis_With_Hail"&gt;portfolio&lt;/a&gt; (I was having errors so I noticed that I had to put spaces after the &lt;code&gt;-resource&lt;/code&gt; flags of the &lt;code&gt;VariantRecalibrator&lt;/code&gt; command). Briefly, the steps&amp;nbsp;are:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Filtering samples with excess of heterozygotes (recommended when working with thousands of&amp;nbsp;samples);&lt;/li&gt;
+&lt;li&gt;Make a sites-only &lt;span class="caps"&gt;VCF&lt;/span&gt;;&lt;/li&gt;
+&lt;li&gt;Recalibration step (separately by indels/mixed and &lt;span class="caps"&gt;SNP&lt;/span&gt;&amp;nbsp;loci);&lt;/li&gt;
+&lt;li&gt;Apply the recalibration&amp;nbsp;filters.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The output of the &lt;span class="caps"&gt;VQSR&lt;/span&gt; is the &lt;code&gt;snp.recalibrated.vcf.gz&lt;/code&gt; file (despite the name, the indels/mixed variants in the file have been recalibrated as well). We can now import the dataset into&amp;nbsp;Hail.&lt;/p&gt;
+&lt;h2&gt;Initiating&amp;nbsp;Hail&lt;/h2&gt;
+&lt;p&gt;Hail&amp;#8217;s frontend is written in Python. Simply importing the Hail module is not sufficient. We must initiate it so it can communicate with Spark. I created the &lt;code&gt;hail_demo_init.py&lt;/code&gt; file as an &amp;#8220;init template&amp;#8221; that can be reused between Hail&amp;nbsp;scripts/sessions:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# hail_demo_init.py&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;hail&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;hl&lt;/span&gt;
+
+&lt;span class="n"&gt;DEFAULT_REF&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;GRCh38&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;init&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="n"&gt;idempotent&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;quiet&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;skip_logging_configuration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;default_reference&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;DEFAULT_REF&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;spark_conf&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="s2"&gt;&amp;quot;spark.executor.cores&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;4&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="s2"&gt;&amp;quot;spark.driver.memory&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;16g&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="p"&gt;},&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Notice the &lt;code&gt;DEFAULT_REF&lt;/code&gt; variable: it establishes that I intend to use the genomic coordinates considering the Genome Reference Consortium Human Reference 38 (GRCh38), the most recent genome version being accepted by the human genome community. Otherwise Hail would use GRCh37 as default. The &lt;code&gt;spark_conf&lt;/code&gt; argument where I setup Spark so it uses four &lt;span class="caps"&gt;CPU&lt;/span&gt; cores and 16 &lt;span class="caps"&gt;GB&lt;/span&gt; of &lt;span class="caps"&gt;RAM&lt;/span&gt;. Change these values as&amp;nbsp;appropriate.&lt;/p&gt;
+&lt;h2&gt;Importing the &lt;span class="caps"&gt;VCF&lt;/span&gt;&amp;nbsp;input&lt;/h2&gt;
+&lt;p&gt;I am now ready to import &lt;code&gt;snp.recalibrated.vcf.gz&lt;/code&gt; into the Hail session and convert it to Hail&amp;#8217;s &lt;code&gt;MatrixTable&lt;/code&gt; object and write it to the disk. In simple terms, a &lt;code&gt;MatrixTable&lt;/code&gt; is a representation of a &lt;span class="caps"&gt;VCF&lt;/span&gt; file that is amenable to be manipulated by Spark. Read the &lt;a href="https://hail.is/docs/0.2/index.html"&gt;Hail Docs&lt;/a&gt; for more details. I initiate Hail and then import and convert the dataset with two chained steps (&lt;code&gt;hl.import_vcf().write()&lt;/code&gt;):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# hail_demo_import_vcf.py&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;hail&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;hl&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;hail_demo_init&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;DEFAULT_REF&lt;/span&gt;
+
+&lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;import_vcf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;snp.recalibrated.vcf.gz&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="n"&gt;force_bgz&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="n"&gt;reference_genome&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;DEFAULT_REF&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="n"&gt;array_elements_required&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;recalibrated.mt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;overwrite&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I can now proceed to prepare the dataset for sample and variant quality control (&lt;span class="caps"&gt;QC&lt;/span&gt;).&lt;/p&gt;
+&lt;h2&gt;Preparing for Sample &lt;span class="caps"&gt;QC&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;Before reading the created matrix table I create some &amp;#8220;magic numbers&amp;#8221; variables to hold some quality metrics thresholds for sample &lt;span class="caps"&gt;QC&lt;/span&gt;&amp;nbsp;later:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# hail_demo_sample_qc.py&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;hail&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;hl&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;hail_demo_init&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;DEFAULT_REF&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;gnomAD.utils.filtering&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;filter_to_autosomes&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;gnomAD.utils.annotations&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;add_variant_type&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Magic numbers&lt;/span&gt;
+&lt;span class="n"&gt;CALL_RATE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mf"&gt;0.90&lt;/span&gt;  &lt;span class="c1"&gt;# Hail team value = 0.97. gnomAD value = 0.99&lt;/span&gt;
+&lt;span class="n"&gt;RELATEDNESS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mf"&gt;0.088&lt;/span&gt;  &lt;span class="c1"&gt;# Hail team value. gnomAD value = 0.08838835&lt;/span&gt;
+&lt;span class="n"&gt;READ_DEPTH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;20&lt;/span&gt;  &lt;span class="c1"&gt;# Hail team value.&lt;/span&gt;
+&lt;span class="n"&gt;FREEMIX_CONTAMINATION&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mf"&gt;0.05&lt;/span&gt;  &lt;span class="c1"&gt;# gnomAD value.&lt;/span&gt;
+&lt;span class="n"&gt;CHIMERIC_READS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mf"&gt;0.05&lt;/span&gt;  &lt;span class="c1"&gt;# gnomAD value.&lt;/span&gt;
+&lt;span class="n"&gt;MEDIAN_LENGTH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;250&lt;/span&gt;  &lt;span class="c1"&gt;# gnomAD value.&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The comment in each line contains the value used by Hail team or gnomAD team. Since this is a demonstration, I may have used different values. Change these values as you feel appropriate as&amp;nbsp;well.&lt;/p&gt;
+&lt;p&gt;I will now read the matrix table from disk and assign it to the &lt;code&gt;mt&lt;/code&gt; object:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read_matrix_table&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;recalibrated.mt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;To check the first few sample ids, I use the &lt;code&gt;show()&lt;/code&gt; method (I explain the &lt;code&gt;s&lt;/code&gt; here&amp;nbsp;later):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;show&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;To check the matrix table structure, I use the &lt;code&gt;describe()&lt;/code&gt; method:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;describe&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The output is as&amp;nbsp;follows:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;----------------------------------------
+Global fields:
+    None
+----------------------------------------
+Column fields:
+    &amp;#39;s&amp;#39;: str
+----------------------------------------
+Row fields:
+    &amp;#39;locus&amp;#39;: locus&amp;lt;GRCh38&amp;gt;
+    &amp;#39;alleles&amp;#39;: array&amp;lt;str&amp;gt;
+    &amp;#39;rsid&amp;#39;: str
+    &amp;#39;qual&amp;#39;: float64
+    &amp;#39;filters&amp;#39;: set&amp;lt;str&amp;gt;
+    &amp;#39;info&amp;#39;: struct {
+        AC: array&amp;lt;int32&amp;gt;, 
+        AF: array&amp;lt;float64&amp;gt;, 
+        AN: int32, 
+        BaseQRankSum: float64, 
+        DB: bool, 
+        DP: int32, 
+        END: int32, 
+        ExcessHet: float64, 
+        FS: float64, 
+        FractionInformativeReads: float64, 
+        InbreedingCoeff: float64, 
+        LOD: float64, 
+        MLEAC: array&amp;lt;int32&amp;gt;, 
+        MLEAF: array&amp;lt;float64&amp;gt;, 
+        MQ: float64, 
+        MQRankSum: float64, 
+        NEGATIVE_TRAIN_SITE: bool, 
+        POSITIVE_TRAIN_SITE: bool, 
+        QD: float64, 
+        R2_5P_bias: float64, 
+        ReadPosRankSum: float64, 
+        SOR: float64, 
+        VQSLOD: float64, 
+        culprit: str
+    }
+----------------------------------------
+Entry fields:
+    &amp;#39;AD&amp;#39;: array&amp;lt;int32&amp;gt;
+    &amp;#39;AF&amp;#39;: array&amp;lt;float64&amp;gt;
+    &amp;#39;DP&amp;#39;: int32
+    &amp;#39;F1R2&amp;#39;: array&amp;lt;int32&amp;gt;
+    &amp;#39;F2R1&amp;#39;: array&amp;lt;int32&amp;gt;
+    &amp;#39;GP&amp;#39;: array&amp;lt;float64&amp;gt;
+    &amp;#39;GQ&amp;#39;: int32
+    &amp;#39;GT&amp;#39;: call
+    &amp;#39;ICNT&amp;#39;: array&amp;lt;int32&amp;gt;
+    &amp;#39;MB&amp;#39;: array&amp;lt;int32&amp;gt;
+    &amp;#39;MIN_DP&amp;#39;: int32
+    &amp;#39;PL&amp;#39;: array&amp;lt;int32&amp;gt;
+    &amp;#39;PRI&amp;#39;: array&amp;lt;float64&amp;gt;
+    &amp;#39;PS&amp;#39;: int32
+    &amp;#39;RGQ&amp;#39;: int32
+    &amp;#39;SB&amp;#39;: array&amp;lt;int32&amp;gt;
+    &amp;#39;SPL&amp;#39;: array&amp;lt;int32&amp;gt;
+    &amp;#39;SQ&amp;#39;: float64
+----------------------------------------
+Column key: [&amp;#39;s&amp;#39;]
+Row key: [&amp;#39;locus&amp;#39;, &amp;#39;alleles&amp;#39;]
+----------------------------------------
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;We can see that a Hail &lt;code&gt;MatrixTable&lt;/code&gt; objects has four types of information&amp;nbsp;&amp;#8220;compartments&amp;#8221;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Global fields: information values that are identical for every&amp;nbsp;row&lt;/li&gt;
+&lt;li&gt;Column fields: sample-level information (id, phenotype, sex&amp;nbsp;etc.)&lt;/li&gt;
+&lt;li&gt;Row fields: variant-level information (locus, alleles, type of variant, allele frequency&amp;nbsp;etc.)&lt;/li&gt;
+&lt;li&gt;Entry fields: variant-by-sample-level (genotype, genotype quality,&amp;nbsp;etc.)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Also notice that the &lt;code&gt;MatrixTable&lt;/code&gt; is keyed by column (&lt;code&gt;s&lt;/code&gt;: &lt;strong&gt;s&lt;/strong&gt;ample id field) and rows (locus and allele row fields) allowing us to perform &lt;span class="caps"&gt;SQL&lt;/span&gt;-style table joins. For each field type you can see the name of each field. The info field contains the &lt;span class="caps"&gt;INFO&lt;/span&gt; field from the input &lt;span class="caps"&gt;VCF&lt;/span&gt;. The entries fields contain the values listed into the &lt;span class="caps"&gt;FORMAT&lt;/span&gt; &lt;span class="caps"&gt;VCF&lt;/span&gt; field. For more details check the &lt;a href="https://hail.is/docs/0.2/tutorials/07-matrixtable.html"&gt;&lt;code&gt;MatrixTable&lt;/code&gt; Hail Docs&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Now I will modify an entry field and create other row fields that I will need to use later during variant &lt;span class="caps"&gt;QC&lt;/span&gt;. The commands to create/modify fields is &lt;code&gt;hl.annotate_cols()&lt;/code&gt;, &lt;code&gt;hl.annotate_rows()&lt;/code&gt; or &lt;code&gt;hl.annotate_entries()&lt;/code&gt; depending on the field type (columns, rows, entries, respectively). Notice that in one of them I used a gnomAD&amp;nbsp;function.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Mixture of non-empty with empty PL fields causes problems with sample QC for some reason; setting field to all empty&lt;/span&gt;
+&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;annotate_entries&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;missing&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;PL&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dtype&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Add variant-level annotations necessary for variant QC later&lt;/span&gt;
+&lt;span class="c1"&gt;## Annotate variants in one of the categories: SNV, multi-SNV, indel, multi-indel, mixed&lt;/span&gt;
+&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;annotate_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;add_variant_type&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;alleles&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="c1"&gt;# gnomAD function&lt;/span&gt;
+
+&lt;span class="c1"&gt;## Number of alleles at the site&lt;/span&gt;
+&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;annotate_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n_alleles&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;alleles&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="c1"&gt;## Mixed sites (SNVs and indels present at the site)&lt;/span&gt;
+&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;annotate_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mixed_site&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;if_else&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;variant_type&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;mixed&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="c1"&gt;## Spanning deletions&lt;/span&gt;
+&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;annotate_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;spanning_deletion&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;any&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;*&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;alleles&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;To check the dimensions of the &lt;code&gt;MatrixTable&lt;/code&gt;, I can use the following&amp;nbsp;commands:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Number of Rows, Columns&lt;/span&gt;
+&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;count&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Number of Columns&lt;/span&gt;
+&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;count_cols&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;To see a variant breakdown (types, number of variants per chromosome and several other information), there is the following&amp;nbsp;command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;summarize_variants&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;A recommended step for further downstream analyses is to split multiallelic variants into biallelic&amp;nbsp;configuration:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;split_multi_hts&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;To remove any monomorphic (invariant) loci I&amp;nbsp;use:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;n_alleles&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Try the &lt;code&gt;hl.summarize_variants()&lt;/code&gt; to check how the numbers changed after&amp;nbsp;splitting.&lt;/p&gt;
+&lt;p&gt;Up until this moment, I have only genetics-related information into the &lt;code&gt;MatrixTable&lt;/code&gt;. I can instruct Hail to import &lt;span class="caps"&gt;TSV&lt;/span&gt;/&lt;span class="caps"&gt;CSV&lt;/span&gt; file with sample-level (column) annotations with the &lt;code&gt;hl.import_table()&lt;/code&gt; command and then associate each observation by keying the &lt;code&gt;s&lt;/code&gt; field with &lt;code&gt;hl.annotate_cols()&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;sa&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;import_table&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;sample_info.txt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;impute&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;key&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;s&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;annotate_cols&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sample_info&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;sa&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;sample_info.txt&lt;/code&gt; example file has the following&amp;nbsp;format:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;s sex phenotype mean_coverage chimeric_reads contamination median_length
+sample1 XX case 25 0.02 0.00 300
+sample2 XY case 22 0.01 0.00 250
+sample3 XY control 30 0.03 0.00 265
+sample4 XX control 29 0.01 0.00 250
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;In this mock sample information file I included the sex karyotype, a fictitious phenotype and sequencing metrics to support the sample &lt;span class="caps"&gt;QC&lt;/span&gt; procedure. As you may have guessed, any number and type (numeric, string, float, integer, Boolean) of important sample metadata columns can be&amp;nbsp;included.&lt;/p&gt;
+&lt;p&gt;Whenever we annotate columns, rows or entries in Hail, we must provide the name of the new field. In this case is &lt;code&gt;sample_info&lt;/code&gt;. So if I wanted to manipulate, say the sex karyotype field, I would refer the field name this&amp;nbsp;way:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sample_info&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sex&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This is because the information in the file will be assigned to a dictionary-like field named &lt;code&gt;sample_info&lt;/code&gt; within the &lt;code&gt;MatrixTable&lt;/code&gt;; the &lt;code&gt;sex&lt;/code&gt;, &lt;code&gt;phenotype&lt;/code&gt;, etc. fields are &lt;em&gt;inside&lt;/em&gt; &lt;code&gt;sample_info&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;Performing Sample &lt;span class="caps"&gt;QC&lt;/span&gt;&lt;/h2&gt;
+&lt;h3&gt;Plotting quality&amp;nbsp;metrics&lt;/h3&gt;
+&lt;p&gt;Hail has a very convenient function to calculate descriptive statistics of fields in a &lt;code&gt;MatrixTable&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sample_qc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This function will calculate overall call rate per sample, mean read depth (coverage) and other &lt;a href="https://hail.is/docs/0.2/methods/genetics.html#hail.methods.sample_qc"&gt;things&lt;/a&gt;. We can plot the calculated fields to assess call rate and coverage (read depth) across samples. The code below will output a &lt;span class="caps"&gt;HTML&lt;/span&gt; plot to disk (make sure you have the &lt;a href="https://docs.bokeh.org/en/latest/index.html"&gt;bokeh&lt;/a&gt; Python module&amp;nbsp;installed).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;bokeh.embed&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;file_html&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;bokeh.resources&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;CDN&lt;/span&gt;
+
+&lt;span class="n"&gt;p&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;plot&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;scatter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sample_qc&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dp_stats&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mean&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sample_qc&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;call_rate&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;xlabel&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Mean DP&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;ylabel&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Call Rate&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;hover_fields&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;ID&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;
+    &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;html&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;file_html&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;CDN&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Chart&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Call Rate by Mean DP.html&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;w&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;html&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Filter samples by quality&amp;nbsp;thresholds&lt;/h3&gt;
+&lt;p&gt;I can finally filter out samples that do not meet the quality thresholds I established before. For example, the lines below will keep only samples that meet overall call rate and mean coverage quality&amp;nbsp;criteria:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter_cols&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sample_qc&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;call_rate&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="n"&gt;CALL_RATE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter_cols&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sample_qc&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dp_stats&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mean&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="n"&gt;READ_DEPTH&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;If you have other quality criteria, you could filter in a similar way by correctly referring the field name (remember that dictionary-like fields contain other fields, as is the case of &lt;code&gt;sample_info&lt;/code&gt; I mentioned earlier and &lt;code&gt;sample_qc&lt;/code&gt; above) and a logical expression (which must follow the Python syntax for equalities and&amp;nbsp;inequalities).&lt;/p&gt;
+&lt;h3&gt;Principal component analysis (&lt;span class="caps"&gt;PCA&lt;/span&gt;) to filter related&amp;nbsp;samples&lt;/h3&gt;
+&lt;p&gt;To ensure that each sample in the cohort is unrelated to any other sample, we can run a principal component analysis (&lt;span class="caps"&gt;PCA&lt;/span&gt;) to evidence samples with kinship too higher according to our chosen threshold. The &lt;span class="caps"&gt;PCA&lt;/span&gt; will only work with autosome (diploid) biallelic variants. The code below will filter our &lt;code&gt;MatrixTable&lt;/code&gt; keeping only variants meeting these&amp;nbsp;conditions:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;for_pca&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;filter_to_autosomes&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# gnomAD function. Will keep variants in chromosomes 1 to 22 only.&lt;/span&gt;
+&lt;span class="n"&gt;for_pca&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;for_pca&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;for_pca&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;n_alleles&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# will remove sites that were multi-allelic before splitting as well to ensure &amp;quot;pure&amp;quot; biallelic sites&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Then, I determine the sample number to calculate &lt;code&gt;k&lt;/code&gt;, the number of principal&amp;nbsp;components.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;sample_num&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;for_pca&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cols&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;count&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Next, using the &lt;a href="https://hail.is/docs/0.2/methods/genetics.html#hail.methods.hwe_normalized_pca"&gt;&lt;code&gt;hl.hwe_normalized_pca()&lt;/code&gt; function&lt;/a&gt; I calculate the principal component&amp;nbsp;scores:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;_&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;scores&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;hwe_normalized_pca&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="n"&gt;for_pca&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;GT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;max&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;min&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sample_num&lt;/span&gt; &lt;span class="o"&gt;//&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt; &lt;span class="n"&gt;compute_loadings&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;False&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;With big sample sizes, the code above will restrict &lt;code&gt;k&lt;/code&gt; to the maximum of 10 principal&amp;nbsp;components.&lt;/p&gt;
+&lt;p&gt;The scores are one of the inputs of the &lt;a href="https://hail.is/docs/0.2/methods/relatedness.html#hail.methods.pc_relate"&gt;&lt;code&gt;hl.pc_relate()&lt;/code&gt; function&lt;/a&gt; that will estimate the relatedness between samples in a pairwise manner. To speed things up, I will estimate only the kinship statistic (&lt;code&gt;statistics="kin"&lt;/code&gt;, while the default is &lt;code&gt;statistics="all"&lt;/code&gt;. Check the function documentation in the previous link for more&amp;nbsp;details).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;relatedness_ht&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pc_relate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="n"&gt;for_pca&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;GT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;min_individual_maf&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mf"&gt;0.01&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;scores_expr&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;scores&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;for_pca&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;col_key&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;scores&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;block_size&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;min_kinship&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mf"&gt;0.05&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;statistics&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;kin&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;relatedness_ht&lt;/code&gt; object is a Hail &lt;code&gt;Table&lt;/code&gt;. It differs from a &lt;code&gt;MatrixTable&lt;/code&gt; by not having column nor entries fields. We determine related samples by filtering this table to keep only the samples above the kinship threshold and then passing the object to &lt;a href="https://hail.is/docs/0.2/methods/misc.html#hail.methods.maximal_independent_set"&gt;&lt;code&gt;hl.maximal_independent_set()&lt;/code&gt; function&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;pairs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;relatedness_ht&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;relatedness_ht&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;kin&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;RELATEDNESS&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;related_samples_to_remove&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;maximal_independent_set&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pairs&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pairs&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;related_samples_to_remove&lt;/code&gt; object will contain a selection of samples to be removed from the dataset because they come from related individuals in the sample. We perform this filtering with the command below. Notice the use of the keyword &lt;code&gt;keep=False&lt;/code&gt; to &lt;em&gt;negate&lt;/em&gt; the selection (I do &lt;em&gt;not&lt;/em&gt; want to keep related&amp;nbsp;samples).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter_cols&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;is_defined&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;related_samples_to_remove&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;col_key&lt;/span&gt;&lt;span class="p"&gt;]),&lt;/span&gt; &lt;span class="n"&gt;keep&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Use &lt;code&gt;mt.count_cols()&lt;/code&gt; to assess if any sample was&amp;nbsp;removed.&lt;/p&gt;
+&lt;h3&gt;Wrapping up the sample &lt;span class="caps"&gt;QC&lt;/span&gt;&lt;/h3&gt;
+&lt;p&gt;Here I finish the sample &lt;span class="caps"&gt;QC&lt;/span&gt; process. I then save the &lt;code&gt;relatedness_ht&lt;/code&gt; and the dataset object &lt;code&gt;mt&lt;/code&gt; to disk with &lt;code&gt;write()&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;relatedness_ht&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;relatedness.ht&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;overwrite&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;sampleqc_pass.mt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;overwrite&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I can now proceed to variant &lt;span class="caps"&gt;QC&lt;/span&gt;.&lt;/p&gt;
+&lt;h2&gt;Variant &lt;span class="caps"&gt;QC&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;I init Hail again if needed, import some more functions from gnomAD, create variables with variant quality thresholds, read the &lt;code&gt;MatrixTable&lt;/code&gt; with the data passing sample &lt;span class="caps"&gt;QC&lt;/span&gt; and calculate common variant statistics (such as allelic frequency) with &lt;a href="https://hail.is/docs/0.2/methods/genetics.html#hail.methods.variant_qc"&gt;&lt;code&gt;hl.variant_qc()&lt;/code&gt;&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# hail_demo_variant_qc.py&lt;/span&gt;
+&lt;span class="c1"&gt;# Import modules and init Hail&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;hail&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;hl&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;gnomAD.utils.annotations&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;bi_allelic_site_inbreeding_expr&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;gnomAD.variant_qc.random_forest&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;apply_rf_model&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;median_impute_features&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;gnomAD.variant_qc.pipeline&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;train_rf_model&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;hail_init&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;DEFAULT_REF&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Variant Quality hard filters&lt;/span&gt;
+&lt;span class="n"&gt;INBR_COEFF&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;0.3&lt;/span&gt;
+&lt;span class="n"&gt;AB_LOWER_LIM&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mf"&gt;0.2&lt;/span&gt;
+&lt;span class="n"&gt;AB_UPPER_LIM&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;AB_LOWER_LIM&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Read MatrixTable with sample QC-passing dataset&lt;/span&gt;
+&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read_matrix_table&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;sampleqc_pass.mt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;variant_qc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Even though allelic frequency may be already been lift over from the original &lt;span class="caps"&gt;VCF&lt;/span&gt; input, I recommend using &lt;code&gt;hl.variant_qc()&lt;/code&gt; since it calculates potentially useful information besides allelic frequency, such as p-values from the test of Hardy-Weinberg equilibrium. Check the function documentation at Hail to see the complete list of&amp;nbsp;statistics.&lt;/p&gt;
+&lt;h3&gt;Filter variants by genotype-related quality&amp;nbsp;thresholds&lt;/h3&gt;
+&lt;p&gt;Next, I calculate two variant-level metrics: inbreeding coefficient and the maximum p-value for sampling the observed allele balance under a binomial&amp;nbsp;model.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;annotate_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;inbr_coeff&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;bi_allelic_site_inbreeding_expr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;GT&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;annotate_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="n"&gt;pab_max&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;agg&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;max&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;binom_test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;AD&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DP&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;two-sided&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Next, I remove variants with excess of heterozygotes by inbreeding coefficient and variants for which no sample had high-quality genotypes by evaluating allele balance (the proportion of sequencing reads that support the&amp;nbsp;variant):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;inbr_coeff&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;INBR_COEFF&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Removing variants for which no sample had high quality genotypes with hl.any()&lt;/span&gt;
+&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;agg&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;any&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;GQ&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;agg&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;any&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DP&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;annotate_entries&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AB&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;AD&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;AD&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt; &lt;span class="c1"&gt;# AB = allele balance&lt;/span&gt;
+
+&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;agg&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;any&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;GT&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;is_hom_ref&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;AB&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;AB_LOWER_LIM&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+        &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;GT&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;is_het&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;AB&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="n"&gt;AB_LOWER_LIM&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;AB&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;=&lt;/span&gt; &lt;span class="n"&gt;AB_UPPER_LIM&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+        &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;GT&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;is_hom_var&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;AB&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;AB_UPPER_LIM&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Variant &lt;span class="caps"&gt;QC&lt;/span&gt; by random forest&amp;nbsp;model&lt;/h3&gt;
+&lt;p&gt;The gnomAD team adopted a &lt;a href="https://gnomAD.broadinstitute.org/news/2018-10-gnomAD-v2-1/"&gt;random forest model&lt;/a&gt; to filter out sequencing artifacts. Briefly, they labelled variants passing quality thresholds (such as &lt;span class="caps"&gt;GATK&lt;/span&gt;&amp;#8217;s &lt;span class="caps"&gt;VQSR&lt;/span&gt;) as true positives and variants not passing as false positives. Next, they performed a supervised random forest training with some variant-level features. From now on, I try to replicate their method with the best of my&amp;nbsp;understanding.&lt;/p&gt;
+&lt;p&gt;I label the variants as true and false&amp;nbsp;positives:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;annotate_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tp&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;if_else&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filters&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="n"&gt;mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;annotate_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fp&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;if_else&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filters&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The logic is that if the &lt;code&gt;filters&lt;/code&gt; field (which is carried over from the GenomicsDB-exported &lt;span class="caps"&gt;VCF&lt;/span&gt;) is empty, it indicates the variant passed the &lt;span class="caps"&gt;VQSR&lt;/span&gt; filter and is a false positive otherwise. Thus, I create two Boolean-type columns indicating it. Next, I create a Hail &lt;code&gt;Table&lt;/code&gt; extracting the needed features and the &lt;code&gt;tp&lt;/code&gt; and &lt;code&gt;fp&lt;/code&gt; fields and assigning it to the &lt;code&gt;rf_ht&lt;/code&gt; object:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;rf_ht&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;select_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;inbr_coeff&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SOR&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ReadPosRankSum&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;MQRankSum&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;QD&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pab_max&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;variant_type&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;n_alleles&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mixed_site&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;spanning_deletion&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;tp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;rows&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Remember that most of these features are brought over from the &lt;span class="caps"&gt;VCF&lt;/span&gt; &lt;span class="caps"&gt;INFO&lt;/span&gt; field, while the others were generated with the help of Hail. I also generate a Python list with the features&amp;nbsp;names:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;features&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;inbr_coeff&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;SOR&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;ReadPosRankSum&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;MQRankSum&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;QD&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;pab_max&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;variant_type&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;n_alleles&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;mixed_site&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;spanning_deletion&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Since random forest models do not tolerate missing data, I use a gnomAD function to impute any missing data with the median of the&amp;nbsp;field:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;rf_ht&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;median_impute_features&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rf_ht&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I will reserve all variants located in chromosome 20 to perform model evaluation with the help of the &lt;a href="https://hail.is/docs/0.2/functions/genetics.html#hail.expr.functions.parse_locus_interval"&gt;&lt;code&gt;hl.parse_locus_interval()&lt;/code&gt; function&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;test_intervals&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;chr20&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+
+&lt;span class="n"&gt;test_intervals&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+    &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse_locus_interval&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;reference_genome&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;GRCh38&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;test_intervals&lt;/span&gt;
+&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I now may train the model with the help of gnomAD&amp;#8217;s &lt;code&gt;train_rf_model()&lt;/code&gt; function. Internally, the function will select a balanced dataset of true positives and false positives to train the&amp;nbsp;model.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;rf_trained_ht&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;rf_model&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;train_rf_model&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="n"&gt;rf_ht&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;rf_features&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;features&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;tp_expr&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;rf_ht&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;tp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;fp_expr&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;rf_ht&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;test_expr&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;literal&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test_intervals&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;any&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;interval&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;interval&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;contains&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rf_ht&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;locus&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;),&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;rf_trained_ht&lt;/code&gt; output is a Hail &lt;code&gt;Table&lt;/code&gt; with annotations related with the random forest model training. The &lt;code&gt;rf_model&lt;/code&gt; object is the model binary generated by Spark. The inputs include the &lt;code&gt;rf_ht Table&lt;/code&gt;, the &lt;code&gt;features&lt;/code&gt; list, the &lt;code&gt;rf_ht.tp&lt;/code&gt; and &lt;code&gt;rf_ht.fp&lt;/code&gt; Boolean columns and a &lt;code&gt;test_expr&lt;/code&gt; argument receives a expression that will ensure that the loci contained in the interval object &lt;code&gt;test_intervals&lt;/code&gt; will be used for model&amp;nbsp;evaluation.&lt;/p&gt;
+&lt;p&gt;After model training, I left join the &lt;code&gt;rf_ht&lt;/code&gt; with the model-annotated &lt;code&gt;rf_trained_ht&lt;/code&gt; into the &lt;code&gt;ht Table&lt;/code&gt;. I use it as the input for the gnomAD&amp;#8217;s &lt;code&gt;apply_rf_model()&lt;/code&gt; function. It will apply the random forest model in all variants in the genome, including those not selected for&amp;nbsp;training.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;ht&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;rf_ht&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rf_trained_ht&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;how&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;left&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;rf_results&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;apply_rf_model&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="n"&gt;ht&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;ht&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;rf_model&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;rf_model&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;features&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;eval&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rf_trained_ht&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;features&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="n"&gt;label&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;rf_label&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;prediction_col_name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;rf_prediction&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I then write to disk the Hail &lt;code&gt;Table&lt;/code&gt; containing a summary of the number of variants originally labeled as true or false positives and the prediction by the model. In other words - a confusion&amp;nbsp;matrix:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;rf_summary_ht&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;rf_results&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;group_by&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;tp&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;fp&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;rf_train&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;rf_label&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;rf_prediction&amp;quot;&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;aggregate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;agg&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;count&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+
+&lt;span class="n"&gt;rf_summary_ht&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;rf_summary.ht&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;overwrite&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I unpack the &lt;code&gt;rf_results Table&lt;/code&gt; fields and join them in the sample &lt;span class="caps"&gt;QC&lt;/span&gt; &lt;code&gt;MatrixTable&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;variantqc_pass&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;annotate_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;rf_results&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;locus&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;alleles&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;It can be easily filtered to keep only variants predicted to be true positives by the model and then written to&amp;nbsp;disk:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;variantqc_pass&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;variantqc_pass&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;rf_prediction&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;TP&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;variantqc_pass&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;variantqc_pass.mt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;overwrite&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Filter loci by coordinates or allelic&amp;nbsp;frequency&lt;/h2&gt;
+&lt;p&gt;Now the dataset has passed all &lt;span class="caps"&gt;QC&lt;/span&gt;, I may query it to search for new variants or answer other scientific questions. To illustrate that, I will filter the dataset to contain variants in delimited regions of the genome with a certain range of allelic frequencies. To parse specific regions from a genome, I can create a Python list of strings representing exact or approximate&amp;nbsp;coordinates:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;intervals&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;chr10:52765380-52772784&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;chr1:100M-200M&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Now I will apply the filter to a &lt;code&gt;MatrixTable&lt;/code&gt; with &lt;code&gt;hl.parse_locus_interval()&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;filtered_mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter_intervals&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="n"&gt;variantqc_pass&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse_locus_interval&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;reference_genome&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;DEFAULT_REF&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;intervals&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I can also pinpoint an individual locus and create a window of nucleotides before and after it. In the code below I create a window of 100,000 nucleotides before and after a specific position in chromosome&amp;nbsp;X.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;locus&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;hl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse_locus&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;chrX:23833353&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;DEFAULT_REF&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;window&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;locus&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;window&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;100000&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;100000&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;filtered_mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;variantqc_pass&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;window&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;contains&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;variantqc_pass&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;locus&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;If I wanted to check the first few genotypes of the filtered &lt;code&gt;MatrixTable&lt;/code&gt; by the specified window I would use the command&amp;nbsp;below:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;filtered_mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;GT&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;show&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Since this coordinate is not on the pseudoautosomal region (&lt;span class="caps"&gt;PAR&lt;/span&gt;) of the X chromosomes, karyotypically normal male individuals will be haploid around this region, and Hail would correctly show only one allele instead of two in the &lt;code&gt;GT&lt;/code&gt; call.&lt;/p&gt;
+&lt;p&gt;Since I used &lt;code&gt;hl.variant_qc()&lt;/code&gt; at the beginning of variant &lt;span class="caps"&gt;QC&lt;/span&gt;, I may filter the variants by their allelic frequency. For example, If I wanted to keep only the variants with less than 1% frequency I would&amp;nbsp;do:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;filtered_mt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;filtered_mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;filtered_mt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;variant_qc&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;AF&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mf"&gt;0.01&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Remember to &lt;code&gt;write()&lt;/code&gt; the &lt;code&gt;MatrixTable&lt;/code&gt; if you want to save the dataset with any applied&amp;nbsp;filters.&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;In this post&amp;nbsp;I:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Introduced the Hail&amp;nbsp;framework;&lt;/li&gt;
+&lt;li&gt;Mentioned software used for preparing multi-sample &lt;span class="caps"&gt;VCF&lt;/span&gt; input starting with multiple gVCF&amp;nbsp;files;&lt;/li&gt;
+&lt;li&gt;Demonstrated how to perform sample and variant &lt;span class="caps"&gt;QC&lt;/span&gt; with&amp;nbsp;Hail;&lt;/li&gt;
+&lt;li&gt;Demonstrated how filter dataset according to quality metrics, locus or loci&amp;nbsp;interval.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Acknowledgements&lt;/h2&gt;
+&lt;p&gt;This demonstration was made possible with the help of by insights acquired by reading through&amp;nbsp;the:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://discuss.hail.is/"&gt;Hail Discussion Forum&lt;/a&gt;&amp;nbsp;posts;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/populationgenomics/joint-calling"&gt;Centre for Population Genomics GitHub repository&lt;/a&gt;;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/broadinstitute/gnomad_methods"&gt;gnomADs&amp;#8217; utilities GitHub repository&lt;/a&gt;;&lt;/li&gt;
+&lt;li&gt;gnomAD team&amp;#8217;s supplementary material from their &lt;a href="https://www.nature.com/articles/s41586-020-2308-7"&gt;2020 Nature paper&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Appendix&lt;/h2&gt;
+&lt;p&gt;In this post I gave general directions how to combine multiple gVCF files into one single &lt;span class="caps"&gt;VCF&lt;/span&gt; input. Hail actually has an experimental function that has this very purpose: &lt;a href="https://hail.is/docs/0.2/experimental/vcf_combiner.html"&gt;&lt;code&gt;hl.experimental.run_combiner()&lt;/code&gt;&lt;/a&gt;. However, I tried to use this function and had problems with it. It generates a &amp;#8220;sparse&amp;#8221; &lt;code&gt;MatrixTable&lt;/code&gt; and unfortunately I found the function documentation insufficiently clear on how to work with this slightly different form of intermediate input, so I resorted to &lt;span class="caps"&gt;GATK&lt;/span&gt;&amp;#8217;s &lt;code&gt;GenomicsDBImport&lt;/code&gt; as stated. Since Hail is in active development, I expect improvement on both the function and on its&amp;nbsp;documentation.&lt;/p&gt;
+&lt;p&gt;Throughout the demonstration I used &lt;code&gt;write()&lt;/code&gt; method to write &lt;code&gt;MatrixTable&lt;/code&gt;s to disk and later read them back into the session with &lt;code&gt;read_matrix_table()&lt;/code&gt;. Alternatively I could have used Hail&amp;#8217;s &lt;code&gt;checkpoint()&lt;/code&gt; method as an alias for these sequential operations. Read the documentation &lt;a href="https://hail.is/docs/0.2/hail.MatrixTable.html#hail.MatrixTable.checkpoint"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Subscribe to my &lt;a href="https://antoniocampos13.github.io/feeds/all.rss.xml"&gt;&lt;span class="caps"&gt;RSS&lt;/span&gt; feed&lt;/a&gt;, &lt;a href="https://antoniocampos13.github.io/feeds/all.atom.xml"&gt;Atom feed&lt;/a&gt; or &lt;a href="https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg"&gt;Telegram channel&lt;/a&gt; to keep you updated whenever I post new&amp;nbsp;content.&lt;/em&gt;&lt;/p&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://www.einstein.br/Pages/Home.aspx"&gt;Hospital Israelita Albert&amp;nbsp;Einstein&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://hail.is/"&gt;Hail |&amp;nbsp;Index&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.broadinstitute.org/"&gt;Broad&amp;nbsp;Institute&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://gnomAD.broadinstitute.org/"&gt;gnomAD&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://hail.is/#install"&gt;Hail |&amp;nbsp;Index&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://pypi.org/project/gnomAD/"&gt;gnomAD module |&amp;nbsp;PyPi&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://gatk.broadinstitute.org/hc/en-us"&gt;Genomic Analysis&amp;nbsp;Toolkit&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://samtools.github.io/bcftools/bcftools.html"&gt;bcftools&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html"&gt;Setting Up Your Unix Computer for Bioinformatics&amp;nbsp;Analysis&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://gatk.broadinstitute.org/hc/en-us/articles/360035531812-GVCF-Genomic-Variant-Call-Format"&gt;Genomic Variant Call Format&amp;nbsp;(gVCF)&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.illumina.com/products/by-type/informatics-products/dragen-bio-it-platform.html"&gt;Illumina &lt;span class="caps"&gt;DRAGEN&lt;/span&gt; Bio-&lt;span class="caps"&gt;IT&lt;/span&gt; Platform| Variant calling &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; secondary genomic analysis software&amp;nbsp;tool&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://samtools.github.io/hts-specs/VCFv4.2.pdf"&gt;Variant Call Format specification | version&amp;nbsp;4.2&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://gatk.broadinstitute.org/hc/en-us/articles/360036883491-GenomicsDBImport"&gt;&lt;span class="caps"&gt;GATK&lt;/span&gt; |&amp;nbsp;GenomicsDBImport&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://gatk.broadinstitute.org/hc/en-us/articles/360035531112--How-to-Filter-variants-either-with-VQSR-or-by-hard-filtering"&gt;&lt;span class="caps"&gt;GATK&lt;/span&gt; | Variant Qualit Score Recalibration (&lt;span class="caps"&gt;VQSR&lt;/span&gt;)&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://console.cloud.google.com/storage/browser/genomics-public-data/resources/broad/hg38/v0;tab=objects?prefix=&amp;amp;forceOnObjectsSortingFiltering=false"&gt;&lt;span class="caps"&gt;GATK&lt;/span&gt; Resource Bundle at Google&amp;nbsp;Cloud&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://cloud.google.com/storage/docs/gsutil"&gt;gsutil tool | Google&amp;nbsp;Cloud&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://hail.is/docs/0.2/index.html"&gt;Hail | Hail&amp;nbsp;0.2&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://hail.is/docs/0.2/tutorials/07-matrixtable.html"&gt;Hail | MatrixTable&amp;nbsp;Tutorial&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://hail.is/docs/0.2/methods/genetics.html#hail.methods.sample_qc"&gt;Hail | Genetics |&amp;nbsp;sample_qc&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://docs.bokeh.org/en/latest/index.html"&gt;Bokeh&amp;nbsp;documentation&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://hail.is/docs/0.2/methods/genetics.html#hail.methods.hwe_normalized_pca"&gt;Hail | Genetics |&amp;nbsp;hwe_normalized_pca&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://hail.is/docs/0.2/methods/relatedness.html#hail.methods.pc_relate"&gt;Hail |&amp;nbsp;Relatedness&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://hail.is/docs/0.2/methods/misc.html#hail.methods.maximal_independent_set"&gt;Hail |&amp;nbsp;Miscellaneous&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://hail.is/docs/0.2/methods/genetics.html#hail.methods.variant_qc"&gt;Hail | Genetics |&amp;nbsp;variant_qc&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://gnomAD.broadinstitute.org/news/2018-10-gnomAD-v2-1/"&gt;gnomAD v2.1 | gnomAD&amp;nbsp;news&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://hail.is/docs/0.2/functions/genetics.html#hail.expr.functions.parse_locus_interval"&gt;Hail | Genetics&amp;nbsp;functions&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://discuss.hail.is/"&gt;Hail&amp;nbsp;Discussion&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/populationgenomics/joint-calling"&gt;Centre for Population Genomics GitHub&amp;nbsp;repository&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/broadinstitute/gnomad_methods"&gt;gnomADs&amp;#8217; utilities GitHub&amp;nbsp;repository&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.nature.com/articles/s41586-020-2308-7"&gt;The mutational constraint spectrum quantified from variation in 141,456&amp;nbsp;humans&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://hail.is/docs/0.2/experimental/vcf_combiner.html"&gt;Hail | &lt;span class="caps"&gt;VCF&lt;/span&gt;&amp;nbsp;Combiner&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://hail.is/docs/0.2/hail.MatrixTable.html#hail.MatrixTable.checkpoint"&gt;Hail | MatrixTable |&amp;nbsp;checkpoint&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Antonio Victor Campos Coelho</dc:creator><pubDate>Fri, 09 Jul 2021 16:45:00 -0300</pubDate><guid isPermaLink="false">tag:antoniocampos13.github.io,2021-07-09:/genomic-analysis-with-hail.html</guid><category>Python</category><category>Bioinformatics</category><category>Genomics</category><category>Hail</category></item><item><title>Making an Interactive Map with Shiny and Leaflet in R</title><link>https://antoniocampos13.github.io/making-an-interactive-map-with-shiny-and-leaflet-in-r.html</link><description>&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;&lt;a href="https://shiny.rstudio.com/"&gt;Shiny&lt;/a&gt; is a R package developed and maintained by the &lt;a href="https://rstudio.com/"&gt;RStudio&lt;/a&gt; team. With Shiny, anyone can build interactive web apps to help data visualization. Here I present a simple template of an interactive Brazilian map displaying fictitious allelic frequencies with samples sizes across the country. It is a useful visualization for multicentric studies results and systematic reviews, for&amp;nbsp;example.&lt;/p&gt;
 &lt;p&gt;As always, the code of this demo will be posted at my &lt;a href="https://github.com/antoniocampos13/portfolio/tree/master/R/2021-02-18_Interactive_map_with_shiny"&gt;portfolio&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;The intention of this interactive map is that the user can choose a gene and then a variant in two separate dropdown menus and check the allelic frequencies and sample sizes being automatically plotted on the map. See below a print screen of the final&amp;nbsp;product:&lt;/p&gt;
