@@ -1,7 +1,7 @@
 ---
 Title: Genomic Analysis With Hail
-Status: draft
-Date: 2021-07-09 17:00
+Status: published
+Date: 2021-07-09 16:45
 Author: Antonio Victor Campos Coelho
 Categories: Python
 Tags: Bioinformatics, Genomics, Hail
@@ -561,10 +561,16 @@ rf_summary_ht = rf_results.group_by(
 rf_summary_ht.write("rf_summary.ht", overwrite=True)
 ```
 
-I unpack the `rf_results Table` fields and join them in the sample QC `MatrixTable`, and finally write it to disk:
+I unpack the `rf_results Table` fields and join them in the sample QC `MatrixTable`:
 
 ```python
 variantqc_pass = mt.annotate_rows(**rf_results[mt.locus, mt.alleles])
+```
+
+It can be easily filtered to keep only variants predicted to be true positives by the model and then written to disk:
+
+```python
+variantqc_pass = hl.filter_rows(variantqc_pass.rf_prediction == "TP")
 
 variantqc_pass.write("variantqc_pass.mt", overwrite=True)
 ```
@@ -622,7 +628,12 @@ In this post I:
 
 ## Acknowledgements
 
-This demonstration was made possible with the help of by insights acquired by reading through [Hail Discussion Forum](https://discuss.hail.is/) posts, [Centre for Population Genomics GitHub repository](https://github.com/populationgenomics/joint-calling), [gnomADs' utilities GitHub repository](https://github.com/broadinstitute/gnomad_methods) and gnomAD team's supplementary material from their [2020 Nature paper](https://www.nature.com/articles/s41586-020-2308-7).
+This demonstration was made possible with the help of by insights acquired by reading through the:
+
+- [Hail Discussion Forum](https://discuss.hail.is/) posts;
+- [Centre for Population Genomics GitHub repository](https://github.com/populationgenomics/joint-calling);
+- [gnomADs' utilities GitHub repository](https://github.com/broadinstitute/gnomad_methods);
+- gnomAD team's supplementary material from their [2020 Nature paper](https://www.nature.com/articles/s41586-020-2308-7).
 
 ## Appendix
 
