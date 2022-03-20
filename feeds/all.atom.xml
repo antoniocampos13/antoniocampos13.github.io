@@ -1,5 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Antonio's Portfolio</title><link href="https://antoniocampos13.github.io/" rel="alternate"></link><link href="https://antoniocampos13.github.io/feeds/all.atom.xml" rel="self"></link><id>https://antoniocampos13.github.io/</id><updated>2021-07-09T16:45:00-03:00</updated><subtitle>PhD in Genetics</subtitle><entry><title>Genomic Analysis With Hail</title><link href="https://antoniocampos13.github.io/genomic-analysis-with-hail.html" rel="alternate"></link><published>2021-07-09T16:45:00-03:00</published><updated>2021-07-09T16:45:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2021-07-09:/genomic-analysis-with-hail.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Antonio's Portfolio</title><link href="https://antoniocampos13.github.io/" rel="alternate"></link><link href="https://antoniocampos13.github.io/feeds/all.atom.xml" rel="self"></link><id>https://antoniocampos13.github.io/</id><updated>2022-03-20T16:40:00-03:00</updated><subtitle>PhD in Genetics</subtitle><entry><title>Integrating R and Python with reticulate</title><link href="https://antoniocampos13.github.io/integrating-r-and-python-with-reticulate.html" rel="alternate"></link><published>2022-03-20T16:40:00-03:00</published><updated>2022-03-20T16:40:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2022-03-20:/integrating-r-and-python-with-reticulate.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://rstudio.github.io/reticulate/"&gt;reticulate&lt;/a&gt; is an R package that allows interoperability between R and Python. I recently discovered this package, and I have been excited to efficiently run Python scripts inside an R session, bringing the best of both&amp;nbsp;worlds.&lt;/p&gt;
+&lt;p&gt;In this post, I will demonstrate &lt;code&gt;reticulate&lt;/code&gt; with two scripts. First, I …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://rstudio.github.io/reticulate/"&gt;reticulate&lt;/a&gt; is an R package that allows interoperability between R and Python. I recently discovered this package, and I have been excited to efficiently run Python scripts inside an R session, bringing the best of both&amp;nbsp;worlds.&lt;/p&gt;
+&lt;p&gt;In this post, I will demonstrate &lt;code&gt;reticulate&lt;/code&gt; with two scripts. First, I will start an R session with an R script. Then I will call a Python script inside the R session and manipulate the Python&amp;nbsp;output.&lt;/p&gt;
+&lt;p&gt;The demonstration output will be a data frame containing exon coordinates of two genes and the nucleotide sequences of those&amp;nbsp;exons.&lt;/p&gt;
+&lt;p&gt;As always, I will post the code of this demo at my &lt;a href="https://github.com/antoniocampos13/portfolio/tree/master/R/2022-03-21_Integrate_R_Python_Reticulate"&gt;portfolio&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;R script: part&amp;nbsp;1/2&lt;/h2&gt;
+&lt;p&gt;I will start by listing the R packages I will use for the demonstration. Install them with &lt;code&gt;install.packages()&lt;/code&gt; or &lt;code&gt;BiocManager::install()&lt;/code&gt; if they are &lt;a href="https://bioconductor.org/"&gt;Bioconductor&lt;/a&gt; packages (install &lt;code&gt;BiocManager&lt;/code&gt; with &lt;code&gt;install.packages()&lt;/code&gt; as&amp;nbsp;well).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;here&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tidyverse&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;reticulate&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;glue&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Biocondutctor packages&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;GenomicRanges&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BSgenome&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BSgenome.Hsapiens.UCSC.hg38&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Next, using &lt;code&gt;here()&lt;/code&gt; package, I will create the full path of a &lt;a href="http://gmod.org/wiki/GFF3"&gt;&lt;code&gt;GFF3&lt;/code&gt;&lt;/a&gt; file. The &lt;code&gt;GFF3&lt;/code&gt; format stores genomic features in a text file to help represent genomic data. This file in question contains features of the whole human genome. Since it is a big file, download it at the &lt;a href="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/"&gt;&lt;span class="caps"&gt;NCBI&lt;/span&gt;&amp;#8217;s &lt;span class="caps"&gt;FTP&lt;/span&gt; site&lt;/a&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;gffPath&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;GCA_000001405.15_GRCh38_full_analysis_set.refseq_annotation.gff&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Edit the path using &lt;a href="https://here.r-lib.org/"&gt;&lt;code&gt;here()&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s&lt;/a&gt; syntax if&amp;nbsp;necessary.&lt;/p&gt;
+&lt;p&gt;To keep things simple, I create a vector with just two&amp;nbsp;genes:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;genes&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;HTT&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;FMR1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now I can start working with the Python script. If you use &lt;code&gt;conda&lt;/code&gt; environments to work with Python as I do, you can select the environment with &lt;code&gt;reticulate&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;use_condaenv()&lt;/code&gt; function. In this case, I will use my &lt;a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html"&gt;&lt;code&gt;bioenv&lt;/code&gt;&lt;/a&gt;&amp;nbsp;environment.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;use_condaenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;bioenv&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Using &lt;code&gt;here()&lt;/code&gt; again, I set up the path for the Python script. Then, I use &lt;code&gt;reticulate&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;source_python()&lt;/code&gt; function to run the Python&amp;nbsp;script.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;pythonScript&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;reticulate_demo_Python_side.py&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;source_python&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pythonScript&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Let me show you the contents of this&amp;nbsp;script.&lt;/p&gt;
+&lt;h2&gt;Python&amp;nbsp;script&lt;/h2&gt;
+&lt;p&gt;The modules I will use for the demonstration will be &lt;a href="https://github.com/biocore-ntnu/pyranges"&gt;&lt;code&gt;pyranges&lt;/code&gt;&lt;/a&gt; and &lt;a href="https://pandas.pydata.org/"&gt;&lt;code&gt;pandas&lt;/code&gt;&lt;/a&gt;. I surmise &lt;code&gt;pyranges&lt;/code&gt;  calls &lt;code&gt;pandas&lt;/code&gt; in the background, but &lt;a href="https://peps.python.org/pep-0020/"&gt;explicit is better than implicit&lt;/a&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;pyranges&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;pr&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;pandas&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;pd&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;(Remember to install all the necessary Python modules in the environment beforehand with &lt;code&gt;conda&lt;/code&gt; or &lt;code&gt;pip&lt;/code&gt;).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;conda install -c bioconda pyranges
+&lt;span class="c1"&gt;# or&lt;/span&gt;
+pip install pyranges
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then, I read the &lt;code&gt;GFF3&lt;/code&gt; file into the Python session using &lt;code&gt;pyranges&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;read_gff3()&lt;/code&gt; function. Since I saved the file path into R&amp;#8217;s &lt;code&gt;gffPath&lt;/code&gt; object, I must use the &lt;code&gt;r.&lt;/code&gt; prefix to bring it into the Python session, like&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;grch38_gff&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read_gff3&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;gffPath&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Next, I append the &lt;code&gt;.df&lt;/code&gt; suffix into the  &lt;code&gt;grch38_gff&lt;/code&gt; Python object to convert it into a &lt;code&gt;pandas&lt;/code&gt; data frame to facilitate the search for the genes I established into the R&amp;nbsp;session:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;grch38_gff&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I will search for the genes with &lt;code&gt;pandas&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;str.contains()&lt;/code&gt; method. To do this, I must create a regex string. I will append a &lt;code&gt;$&lt;/code&gt; to the end of each gene name to match the whole gene&amp;nbsp;string:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;suffix&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Next, I will use a list comprehension and Python&amp;#8217;s &lt;code&gt;join()&lt;/code&gt; method to create the search string&amp;nbsp;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;search_string&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;|&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="n"&gt;gene&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;suffix&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;gene&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;genes&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;search_string&lt;/code&gt; object turns up like this (remember that the pipe &lt;code&gt;|&lt;/code&gt; character means &amp;#8220;or&amp;#8221; in&amp;nbsp;regex):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;search_string&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="c1"&gt;# outputs: &lt;/span&gt;
+&lt;span class="c1"&gt;# HTT$|FMR1$&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then I can finally filter the data frame to include only those&amp;nbsp;genes:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;df&lt;/span&gt;&lt;span class="p"&gt;[(&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;gene&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;str&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;contains&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;search_string&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Feature&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;exon&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The line above concludes the Python script. Now let us return to the R script to wrap things&amp;nbsp;up.&lt;/p&gt;
+&lt;h2&gt;R script: part&amp;nbsp;2/2&lt;/h2&gt;
+&lt;p&gt;We can retrieve Python objects into the R session similarly to the other around. We must use the prefix &lt;code&gt;py$&lt;/code&gt; in R to get the objects generated by Python (the ones outputted by the&amp;nbsp;script).&lt;/p&gt;
+&lt;p&gt;Therefore, I will retrieve the data frame &lt;code&gt;df&lt;/code&gt; object and assign it to the &lt;code&gt;exonsCoordinates&lt;/code&gt; R&amp;nbsp;object:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;exonsCoordinates&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;py&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Before working with it, let me source a function that will retrieve the exon sequences using the &lt;a href="https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html"&gt;&lt;code&gt;GenomicRanges&lt;/code&gt;&lt;/a&gt; (&lt;code&gt;pyranges&lt;/code&gt; is Python&amp;#8217;s &lt;code&gt;GenomicRanges&lt;/code&gt; analog), &lt;a href="https://bioconductor.org/packages/release/bioc/html/BSgenome.html"&gt;&lt;code&gt;BSgenome&lt;/code&gt;&lt;/a&gt; and &lt;a href="https://bioconductor.org/packages/release/data/annotation/html/BSgenome.Hsapiens.UCSC.hg38.html"&gt;&lt;code&gt;BSgenome.Hsapiens.UCSC.hg38&lt;/code&gt;&lt;/a&gt;&amp;nbsp;packages.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;source&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;src&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;getSequence.R&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Function code (getSequence.R file):&lt;/span&gt;
+&lt;span class="n"&gt;getSequence&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;chr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;start&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;end&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;gr&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;GenomicRanges&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="nf"&gt;GRanges&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;glue&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="nf"&gt;glue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;{chr}:{start}-{end}&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+  &lt;span class="n"&gt;refBase&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;BSgenome&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="nf"&gt;getSeq&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BSgenome.Hsapiens.UCSC.hg38&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;BSgenome.Hsapiens.UCSC.hg38&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;gr&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="n"&gt;refBase&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;as.data.frame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;refBase&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+
+  &lt;span class="nf"&gt;return&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;refBase&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;Important&lt;/strong&gt;: The first use of BSgenome/BSgenome.Hsapiens.&lt;span class="caps"&gt;UCSC&lt;/span&gt;.hg38 will prompt the download of human genomic sequence caches to be saved into a specific location on your computer. Be sure you have sufficient data allowances and&amp;nbsp;space.&lt;/p&gt;
+&lt;p&gt;Finally, using &lt;code&gt;tidyverse&lt;/code&gt; (&lt;code&gt;dplyr&lt;/code&gt;) pipe &lt;code&gt;%&amp;gt;%&lt;/code&gt; syntax, I create a new column in the data frame (&lt;code&gt;mutate()&lt;/code&gt;) using the &lt;code&gt;Chromosome&lt;/code&gt;, &lt;code&gt;Start&lt;/code&gt;, and &lt;code&gt;End&lt;/code&gt; columns as arguments to my custom &lt;code&gt;getSequence()&lt;/code&gt; function. The new column will contain the exon sequences. Observe the use of &lt;code&gt;rowwise()&lt;/code&gt; and &lt;code&gt;ungroup()&lt;/code&gt;. Since my function is not vectorized, I must use it row-wise instead of column-wise. The first function ensures this. The second function restores the data frame to its column-wise nature after &lt;code&gt;getSequence()&lt;/code&gt; finishes its job. Then, I select just some of the columns of the data frame with &lt;code&gt;dplyr&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;select()&lt;/code&gt; function:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;exonsCoordinatesClean&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;exonsCoordinates&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span class="nf"&gt;rowwise&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;mutate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sequence&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;getSequence&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Chromosome&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Start&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;End&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;ungroup&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;select&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Chromosome&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Feature&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Start&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;End&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Score&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Strand&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Frame&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ID&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;gene&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sequence&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;In conclusion, I&amp;nbsp;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Demonstrated how to run a Python script with &lt;code&gt;reticulate&lt;/code&gt; without leaving an active R&amp;nbsp;session;&lt;/li&gt;
+&lt;li&gt;Explained how to retrieve Python objects into an R session and&amp;nbsp;vice-versa.&lt;/li&gt;
+&lt;li&gt;Demonstrated a simple function that retrieves nucleotide sequences from human genome using chromosome&amp;nbsp;coordinates.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Subscribe to my &lt;a href="https://antoniocampos13.github.io/feeds/all.rss.xml"&gt;&lt;span class="caps"&gt;RSS&lt;/span&gt; feed&lt;/a&gt;, &lt;a href="https://antoniocampos13.github.io/feeds/all.atom.xml"&gt;Atom feed&lt;/a&gt; or &lt;a href="https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg"&gt;Telegram channel&lt;/a&gt; to keep you updated whenever I post new&amp;nbsp;content.&lt;/em&gt;&lt;/p&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://rstudio.github.io/reticulate/"&gt;Interface to&amp;nbsp;Python&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://bioconductor.org/"&gt;Bioconductor -&amp;nbsp;Home&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://gmod.org/wiki/GFF3"&gt;&lt;span class="caps"&gt;GFF3&lt;/span&gt; - &lt;span class="caps"&gt;GMOD&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/"&gt;Index of /genomes/all/&lt;span class="caps"&gt;GCA&lt;/span&gt;/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://here.r-lib.org/"&gt;here | A Simpler Way to Find Your&amp;nbsp;Files&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html"&gt;Setting Up Your Unix Computer for Bioinformatics&amp;nbsp;Analysis&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/biocore-ntnu/pyranges"&gt;GitHub - biocore-ntnu/pyranges: Performant Pythonic&amp;nbsp;GenomicRanges&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://pandas.pydata.org/"&gt;pandas - Python Data Analysis&amp;nbsp;Library&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://peps.python.org/pep-0020/"&gt;&lt;span class="caps"&gt;PEP&lt;/span&gt; 20 – The Zen of Python |&amp;nbsp;peps.python.org&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html"&gt;GenomicRanges&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://bioconductor.org/packages/release/bioc/html/BSgenome.html"&gt;BSgenome&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://bioconductor.org/packages/release/data/annotation/html/BSgenome.Hsapiens.UCSC.hg38.html"&gt;BSgenome.Hsapiens.&lt;span class="caps"&gt;UCSC&lt;/span&gt;.hg38&lt;/a&gt;&lt;/p&gt;</content><category term="R"></category><category term="reticulate"></category><category term="gff"></category><category term="GenomicRanges"></category><category term="pyranges"></category><category term="BSgenome"></category></entry><entry><title>Genomic Analysis With Hail</title><link href="https://antoniocampos13.github.io/genomic-analysis-with-hail.html" rel="alternate"></link><published>2021-07-09T16:45:00-03:00</published><updated>2021-07-09T16:45:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2021-07-09:/genomic-analysis-with-hail.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;Hello, long time no see! Since I lasted posted, many things happened. Since March I have been working as Post-Doc Researcher, hired by the &lt;a href="https://www.einstein.br/Pages/Home.aspx"&gt;Hospital Israelita Albert Einstein (&lt;span class="caps"&gt;HIAE&lt;/span&gt;, São Paulo, Brazil)&lt;/a&gt; to work for the Projeto Genomas Raros (&amp;#8220;Rare Genomes Project&amp;#8221;, &lt;span class="caps"&gt;GRAR&lt;/span&gt; from here on), a public-private partnership …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;Hello, long time no see! Since I lasted posted, many things happened. Since March I have been working as Post-Doc Researcher, hired by the &lt;a href="https://www.einstein.br/Pages/Home.aspx"&gt;Hospital Israelita Albert Einstein (&lt;span class="caps"&gt;HIAE&lt;/span&gt;, São Paulo, Brazil)&lt;/a&gt; to work for the Projeto Genomas Raros (&amp;#8220;Rare Genomes Project&amp;#8221;, &lt;span class="caps"&gt;GRAR&lt;/span&gt; from here on), a public-private partnership between &lt;span class="caps"&gt;HIAE&lt;/span&gt; and the Brazilian Health Ministry to further the implementation of genomic analysis into the Brazilian public healthcare system (&lt;span class="caps"&gt;SUS&lt;/span&gt;), with the intention of improve diagnostic rates of rare diseases in Brazil. Since 2020, thousands of genomes of Brazilian patients with suspected rare diseases have been sequenced, and many more will come in the next two&amp;nbsp;years.&lt;/p&gt;
 &lt;p&gt;Thus, I have been tasked to develop/adapt analysis pipelines to handle whole-genome data at large scales compatible with the scope of &lt;span class="caps"&gt;GRAR&lt;/span&gt;. My team asked me to explore &lt;a href="https://hail.is/"&gt;Hail, a Python/Spark framework for scalable genomic analysis&lt;/a&gt;. It has been developed at &lt;a href="https://www.broadinstitute.org/"&gt;Broad Institute&lt;/a&gt; and was used to generate the &lt;a href="https://gnomAD.broadinstitute.org/"&gt;Genome Aggregation Database (gnomAD)&lt;/a&gt;.&lt;/p&gt;
