@@ -1,0 +1,194 @@
+---
+Title: Integrating R and Python with reticulate
+Status: draft
+Date: 2022-03-21 10:00
+Author: Antonio Victor Campos Coelho
+Categories: R, Python
+Tags: reticulate, gff, GenomicRanges, pyranges, BSgenome
+---
+
+## Introduction
+
+[reticulate](https://rstudio.github.io/reticulate/) is an R package that allows interoperability between R and Python. I recently discovered this package, and I have been excited to efficiently run Python scripts inside an R session, bringing the best of both worlds.
+
+In this post, I will demonstrate `reticulate` with two scripts. First, I will start an R session with an R script. Then I will call a Python script inside the R session and manipulate the Python output.
+
+The demonstration output will be a data frame containing exon coordinates of two genes and the nucleotide sequences of those exons.
+
+As always, I will post the code of this demo at my [portfolio](https://github.com/antoniocampos13/portfolio/tree/master/R/2022-03-21_Integrate_R_Python_Reticulate).
+
+## R script: part 1/2
+
+I will start by listing the R packages I will use for the demonstration. Install them with `install.packages()` or `BiocManager::install()` if they are [Bioconductor](https://bioconductor.org/) packages (install `BiocManager` with `install.packages()` as well).
+
+```r
+library(here)
+library(tidyverse)
+library(reticulate)
+library(glue)
+
+# Biocondutctor packages
+library(GenomicRanges)
+library(BSgenome)
+library(BSgenome.Hsapiens.UCSC.hg38)
+```
+
+Next, using `here()` package, I will create the full path of a [`GFF3`](http://gmod.org/wiki/GFF3) file. The `GFF3` format stores genomic features in a text file to help represent genomic data. This file in question contains features of the whole human genome. Since it is a big file, download it at the [NCBI's FTP site](https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/).
+
+```r
+gffPath <- here("GCA_000001405.15_GRCh38_full_analysis_set.refseq_annotation.gff")
+```
+
+Edit the path using [`here()`'s](https://here.r-lib.org/) syntax if necessary.
+
+To keep things simple, I create a vector with just two genes:
+
+```r
+genes <- c("HTT", "FMR1")
+```
+
+Now I can start working with the Python script. If you use `conda` environments to work with Python as I do, you can select the environment with `reticulate`'s `use_condaenv()` function. In this case, I will use my [`bioenv`](https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html) environment.
+
+```r
+use_condaenv("bioenv")
+```
+
+Using `here()` again, I set up the path for the Python script. Then, I use `reticulate`'s `source_python()` function to run the Python script.
+
+```r
+pythonScript <- here("reticulate_demo_Python_side.py")
+
+source_python(pythonScript)
+```
+
+Let me show you the contents of this script.
+
+## Python script
+
+The modules I will use for the demonstration will be [`pyranges`](https://github.com/biocore-ntnu/pyranges) and [`pandas`](https://pandas.pydata.org/). I surmise `pyranges`  calls `pandas` in the background, but [explicit is better than implicit](https://peps.python.org/pep-0020/).
+
+```python
+import pyranges as pr
+import pandas as pd
+```
+
+(Remember to install all the necessary Python modules in the environment beforehand with `conda` or `pip`).
+
+```bash
+conda install -c bioconda pyranges
+# or
+pip install pyranges
+```
+
+Then, I read the `GFF3` file into the Python session using `pyranges`'s `read_gff3()` function. Since I saved the file path into R's `gffPath` object, I must use the `r.` prefix to bring it into the Python session, like this:
+
+```python
+grch38_gff = pr.read_gff3(r.gffPath)
+```
+
+Next, I append the `.df` suffix into the  `grch38_gff` Python object to convert it into a `pandas` data frame to facilitate the search for the genes I established into the R session:
+
+```python
+df = grch38_gff.df
+```
+
+I will search for the genes with `pandas`'s `str.contains()` method. To do this, I must create a regex string. I will append a `$` to the end of each gene name to match the whole gene string:
+
+```python
+suffix = "$"
+```
+
+Next, I will use a list comprehension and Python's `join()` method to create the search string :
+
+```python
+search_string = "|".join([gene + suffix for gene in r.genes])
+```
+
+The `search_string` object turns up like this (remember that the pipe `|` character means "or" in regex):
+
+```python
+print(search_string)
+# outputs: 
+# HTT$|FMR1$
+```
+
+Then I can finally filter the data frame to include only those genes:
+
+```python
+df = df[(df["gene"].str.contains(search_string)) & (df["Feature"] == "exon")]
+```
+
+The line above concludes the Python script. Now let us return to the R script to wrap things up.
+
+## R script: part 2/2
+
+We can retrieve Python objects into the R session similarly to the other around. We must use the prefix `py$` in R to get the objects generated by Python (the ones outputted by the script).
+
+Therefore, I will retrieve the data frame `df` object and assign it to the `exonsCoordinates` R object:
+
+```r
+exonsCoordinates <- py$df
+```
+
+Before working with it, let me source a function that will retrieve the exon sequences using the [`GenomicRanges`](https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html) (`pyranges` is Python's `GenomicRanges` analog), [`BSgenome`](https://bioconductor.org/packages/release/bioc/html/BSgenome.html) and [`BSgenome.Hsapiens.UCSC.hg38`](https://bioconductor.org/packages/release/data/annotation/html/BSgenome.Hsapiens.UCSC.hg38.html) packages.
+
+```r
+source(here("src", "getSequence.R"))
+
+# Function code (getSequence.R file):
+getSequence <- function(chr, start, end) {
+  gr <- GenomicRanges::GRanges(glue::glue("{chr}:{start}-{end}"))
+  refBase <- BSgenome::getSeq(BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38, gr)
+  refBase <- as.data.frame(refBase)$x[1]
+  
+  return(refBase)
+}
+```
+
+**Important**: The first use of BSgenome/BSgenome.Hsapiens.UCSC.hg38 will prompt the download of human genomic sequence caches to be saved into a specific location on your computer. Be sure you have sufficient data allowances and space.
+
+Finally, using `tidyverse` (`dplyr`) pipe `%>%` syntax, I create a new column in the data frame (`mutate()`) using the `Chromosome`, `Start`, and `End` columns as arguments to my custom `getSequence()` function. The new column will contain the exon sequences. Observe the use of `rowwise()` and `ungroup()`. Since my function is not vectorized, I must use it row-wise instead of column-wise. The first function ensures this. The second function restores the data frame to its column-wise nature after `getSequence()` finishes its job. Then, I select just some of the columns of the data frame with `dplyr`'s `select()` function:
+
+```r
+exonsCoordinatesClean <- exonsCoordinates %>% 
+  rowwise() %>%
+  mutate(sequence = getSequence(Chromosome, Start, End)) %>%
+  ungroup() %>%
+  select(Chromosome, Feature, Start, End, Score, Strand, Frame, ID, gene, sequence)
+```
+
+## Conclusion
+
+In conclusion, I :
+
+- Demonstrated how to run a Python script with `reticulate` without leaving an active R session;
+- Explained how to retrieve Python objects into an R session and vice-versa.
+- Demonstrated a simple function that retrieves nucleotide sequences from human genome using chromosome coordinates.
+
+*Subscribe to my [RSS feed](https://antoniocampos13.github.io/feeds/all.rss.xml), [Atom feed](https://antoniocampos13.github.io/feeds/all.atom.xml) or [Telegram channel](https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg) to keep you updated whenever I post new content.*
+
+## References
+
+[Interface to Python](https://rstudio.github.io/reticulate/)
+
+[Bioconductor - Home](https://bioconductor.org/)
+
+[GFF3 - GMOD](http://gmod.org/wiki/GFF3)
+
+[Index of /genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids](https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/)
+
+[here | A Simpler Way to Find Your Files](https://here.r-lib.org/)
+
+[Setting Up Your Unix Computer for Bioinformatics Analysis](https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html)
+
+[GitHub - biocore-ntnu/pyranges: Performant Pythonic GenomicRanges](https://github.com/biocore-ntnu/pyranges)
+
+[pandas - Python Data Analysis Library](https://pandas.pydata.org/)
+
+[PEP 20 – The Zen of Python | peps.python.org](https://peps.python.org/pep-0020/)
+
+[GenomicRanges](https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html)
+
+[BSgenome](https://bioconductor.org/packages/release/bioc/html/BSgenome.html)
+
+[BSgenome.Hsapiens.UCSC.hg38](https://bioconductor.org/packages/release/data/annotation/html/BSgenome.Hsapiens.UCSC.hg38.html)
