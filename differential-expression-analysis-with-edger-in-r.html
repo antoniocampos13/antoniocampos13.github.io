@@ -1,0 +1,339 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/stylesheet/style.min.css">
+
+
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+          href="https://antoniocampos13.github.io/theme/pygments/vs.min.css">
+
+
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/solid.css">
+
+
+    <link href="https://antoniocampos13.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Antonio's Portfolio Atom">
+
+    <link href="https://antoniocampos13.github.io/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="Antonio's Portfolio RSS">
+
+
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Microsoft EDGE -->
+    <meta name="msapplication-TileColor" content="#333333">
+
+<meta name="author" content="Antonio Victor Campos Coelho" />
+<meta name="description" content="Introduction In my previous post I demonstrated how to organize the CGC prostate cancer data to a format suited to differential expression analysis (DEA). Nowadays, DEA usually arises from high-throughput sequencing of a collection (library) of RNA molecules expressed by single cells or tissue given their conditions upon collection and …" />
+<meta name="keywords" content="Bioinformatics, gene expression, edgeR">
+
+
+<meta property="og:site_name" content="Antonio's Portfolio"/>
+<meta property="og:title" content="Differential Expression Analysis with edgeR in R"/>
+<meta property="og:description" content="Introduction In my previous post I demonstrated how to organize the CGC prostate cancer data to a format suited to differential expression analysis (DEA). Nowadays, DEA usually arises from high-throughput sequencing of a collection (library) of RNA molecules expressed by single cells or tissue given their conditions upon collection and …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://antoniocampos13.github.io/differential-expression-analysis-with-edger-in-r.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2020-10-26 09:50:00-03:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
+<meta property="article:section" content="R"/>
+<meta property="article:tag" content="Bioinformatics"/>
+<meta property="article:tag" content="gene expression"/>
+<meta property="article:tag" content="edgeR"/>
+<meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
+
+  <title>Antonio's Portfolio &ndash; Differential Expression Analysis with edgeR in R</title>
+
+</head>
+<body class="light-theme">
+  <aside>
+    <div>
+      <a href="https://antoniocampos13.github.io">
+        <img src="https://avatars.githubusercontent.com/antoniocampos13" alt="Antonio's Portfolio" title="Antonio's Portfolio">
+      </a>
+
+      <h1>
+        <a href="https://antoniocampos13.github.io">Antonio's Portfolio</a>
+      </h1>
+
+<p>PhD in Genetics</p>
+
+      <nav>
+        <ul class="list">
+
+
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/about.html#about">
+                  About
+                </a>
+              </li>
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/contact.html#contact">
+                  Contact
+                </a>
+              </li>
+
+            <li>
+              <a target="_self" href="http://lattes.cnpq.br/2986394950644755" >Brazilian Lattes CV</a>
+            </li>
+            <li>
+              <a target="_self" href="https://scholar.google.com.br/citations?user=d2ij4wUAAAAJ&hl" >Google Scholar</a>
+            </li>
+            <li>
+              <a target="_self" href="https://orcid.org/0000-0003-2143-9701" >ORCID</a>
+            </li>
+            <li>
+              <a target="_self" href="https://publons.com/researcher/2414076/antonio-victor-c-coelho" >Researcher ID/Publons</a>
+            </li>
+        </ul>
+      </nav>
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/antoniocampos13/portfolio" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/antonio-coelho-9aa338164" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://antoniocampos13.github.io">Home</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.rss.xml">RSS</a>
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="differential-expression-analysis-with-edger-in-r">Differential Expression Analysis with edgeR in&nbsp;R</h1>
+    <p>
+      Posted on Mon 26 October 2020 in <a href="https://antoniocampos13.github.io/category/r.html">R</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h2>Introduction</h2>
+<p>In my <a href="https://antoniocampos13.github.io/data-manipulation-with-r.html#data-manipulation-with-r">previous post</a> I demonstrated how to organize the <a href="https://antoniocampos13.github.io/working-with-cancer-genomics-cloud-datasets-in-a-postgresql-database-part-1.html"><span class="caps">CGC</span> prostate cancer data</a> to a format suited to differential expression analysis (<span class="caps">DEA</span>).</p>
+<p>Nowadays, <span class="caps">DEA</span> usually arises from high-throughput sequencing of a collection (library) of <span class="caps">RNA</span> molecules expressed by single cells or tissue given their conditions upon collection and <span class="caps">RNA</span>&nbsp;extraction.</p>
+<p>In terms of statistical analysis, <span class="caps">DEA</span> <a href="https://www.ebi.ac.uk/training/online/course/functional-genomics-ii-common-technologies-and-data-analysis-methods/differential-gene">&#8220;means taking the normalized read count data and performing statistical analysis to discover quantitative changes in expression levels between experimental groups&#8221;</a>. What are experimental groups? Consider for example, diseased versus healthy cells, treated cells versus non-treated cells (when someone is testing new drugs for example), and so&nbsp;on.</p>
+<h2>The edgeR&nbsp;package</h2>
+<p>There are some statistical packages in R that deal with <span class="caps">DEA</span>, such as <code>edgeR</code>, <code>DESeq2</code> and <code>limma</code>. Here I will demonstrate a custom script to perform <span class="caps">DEA</span> with <a href="https://bioconductor.org/packages/release/bioc/html/edgeR.html"><code>edgeR</code></a>. The demonstration here is on Windows 10, but the same steps can be performed on Unix&nbsp;systems.</p>
+<p><code>edgeR</code> performs <span class="caps">DEA</span> for pre-defined genomic features, which can be genes, transcripts or exons, for example. In the present demonstration, we will quantify transcripts. Remember that genes can produce several transcripts through alternative splicing. The <code>edgeR</code> statistical model is based on negative binomial distribution. Prior to statistical analysis, <code>edgeR</code> normalizes gene/transcript expression counts via the Trimmed Mean of M-values (<span class="caps">TMM</span>) method. See <a href="https://www.biostars.org/p/284775/#284893">Dr. Kevin Blighe&#8217;s comment in a Biostars forum topic</a> for a brief discussion of <code>edgeR</code> and other <span class="caps">DEA</span>&nbsp;packages.</p>
+<p>Without further ado, I will show how to set up a R session to run a <span class="caps">DEA</span> with <code>edgeR</code>, and how to interpret results. As usual, the code presented here is deposited on my <a href="https://github.com/antoniocampos13/portfolio/tree/master/R/2020_10_22_DEA_with_edgeR">portfolio at GitHub</a>.</p>
+<h2>Install and load&nbsp;packages</h2>
+<p>First, I will install some new packages that I have not talked about. The first one is <a href="https://www.rdocumentation.org/packages/openxlsx/versions/4.2.2"><code>openxlsx</code></a>, which is a package used to read/write Microsoft Office Excel spreadsheets. I will use it to conveniently save the output of the <span class="caps">DEA</span>.</p>
+<p>The second is <a href="https://www.rdocumentation.org/packages/BiocManager/versions/1.30.10"><code>BiocManager</code></a>. It is needed to install packages from <a href="https://www.bioconductor.org/">Bioconductor project</a>, which hosts Bioinformatics analysis packages that are not on the default R package&nbsp;repository.</p>
+<p>The command below contains other packages I have used before, edit the comment if you already installed&nbsp;them:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run only once</span>
+<span class="nf">install.packages</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;here&quot;</span><span class="p">,</span> <span class="s">&quot;tidyverse&quot;</span><span class="p">,</span> <span class="s">&quot;openxlsx&quot;</span><span class="p">,</span> <span class="s">&quot;BiocManager&quot;</span><span class="p">))</span>
+</code></pre></div>
+
+
+<p>Now I install <code>edgeR</code> and some more packages from Bioconductor. I will use them to annotate and convert the transcript/gene IDs to a gene symbol. Check their documentation: <a href="https://www.bioconductor.org/packages/release/bioc/html/AnnotationDbi.html"><code>AnnotationDbi</code></a>, <a href="https://www.rdocumentation.org/packages/annotate/versions/1.50.0"><code>annotate</code></a>, <a href="https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html"><code>org.Hs.eg.db</code></a>, <a href="https://bioconductor.org/packages/release/data/annotation/html/EnsDb.Hsapiens.v79.html"><code>EnsDb.Hsapiens.v79</code></a> and <a href="https://www.rdocumentation.org/packages/ensembldb/versions/1.4.7"><code>ensembldb</code></a>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run only once</span>
+<span class="n">BiocManager</span><span class="o">::</span><span class="nf">install</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;edgeR&quot;</span><span class="p">,</span><span class="s">&quot;AnnotationDbi&quot;</span><span class="p">,</span> <span class="s">&quot;annotate&quot;</span><span class="p">,</span> <span class="s">&quot;org.Hs.eg.db&quot;</span><span class="p">,</span> <span class="s">&quot;EnsDb.Hsapiens.v79&quot;</span><span class="p">,</span><span class="s">&quot;ensembldb&quot;</span><span class="p">))</span>
+</code></pre></div>
+
+
+<p>The <code>::</code> is used when we wish to invoke the mentioned package directly (<code>BiocManager</code> in this case), without loading it into the&nbsp;memory.</p>
+<p>Now, I will load just the <code>here</code> package to handle file paths for now, the rest will be loaded into R&nbsp;later.</p>
+<div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">here</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>I will use the <code>counts</code> data frame I produced <a href="https://antoniocampos13.github.io/data-manipulation-with-r.html">last time</a>. Since I have saved it to my disk, I load it into the current R session. If you already have the <code>counts</code> data frame loaded in the session from the previous demonstration, this step is not&nbsp;necessary.</p>
+<div class="highlight"><pre><span></span><code><span class="nf">load</span><span class="p">(</span><span class="nf">here</span><span class="p">(</span><span class="s">&quot;data&quot;</span><span class="p">,</span> <span class="s">&quot;counts.RData&quot;</span><span class="p">))</span>
+</code></pre></div>
+
+
+<p>Now I load the custom <code>edgeR_setup()</code> function I use to perform <span class="caps">DEA</span> with <code>edgeR</code>. I wrote the function in a R script with the same name and saved it on my <code>src</code> folder:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">source</span><span class="p">(</span><span class="nf">here</span><span class="p">(</span><span class="s">&quot;src&quot;</span><span class="p">,</span> <span class="s">&quot;edgeR_setup.R&quot;</span><span class="p">))</span>
+</code></pre></div>
+
+
+<p>Careful to not confuse the <code>load()</code> with <code>source()</code> functions. The <a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/load">former</a> is used with R objects (<code>*.RData</code>) as input, whereas the <a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/source">latter</a> takes a R script (<code>*.R</code>) as input and parses the commands contained in the&nbsp;script.</p>
+<p>Check the <code>edgeR_setup.R</code> script. First, it loads the packages I installed&nbsp;before:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">openxlsx</span><span class="p">)</span>
+
+<span class="c1"># Install trough BiocManager</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">edgeR</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">annotate</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">EnsDb.Hsapiens.v79</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">ensembldb</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">AnnotationDbi</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>Now, check the function&nbsp;arguments:</p>
+<div class="highlight"><pre><span></span><code><span class="n">edger_setup</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">counts</span><span class="p">,</span> <span class="n">replicates</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">filter</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">gene_id</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&quot;NCBI&quot;</span><span class="p">,</span> <span class="s">&quot;ENSEMBL&quot;</span><span class="p">,</span> <span class="s">&quot;SYMBOL&quot;</span><span class="p">),</span> <span class="n">output_path</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="c1"># ... the function goes here ...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<ul>
+<li><code>name</code>: A string. An identifier for the&nbsp;experiment.</li>
+<li><code>counts</code>: The data frame containing the transcript&nbsp;counts.</li>
+<li><code>replicates</code>: A Boolean indicating if the samples are biological replicates. Defaults to <code>TRUE</code>.</li>
+<li><code>filter</code>: A Boolean indicating if lowly expressed transcripts should be filter out. Defaults to <code>TRUE</code>.</li>
+<li><code>gene_id</code>: A string indicating how transcripts are identified in the data frame. There are three options:<ul>
+<li><code>NCBI</code>: <a href="https://www.ncbi.nlm.nih.gov/Class/MLACourse/Modules/Genes/sample_entrez_gene_record.html">Entrez Gene Record&nbsp;ids</a></li>
+<li><code>ENSEMBL</code>: <a href="https://www.ebi.ac.uk/training-beta/online/courses/ensembl-browsing-genomes/navigating-ensembl/investigating-a-gene/"><span class="caps">ENSEMBL</span> ids (<span class="caps">ENS</span>#)</a></li>
+<li><code>SYMBOL</code>: <a href="https://www.genenames.org/">Official <span class="caps">HGNC</span> gene&nbsp;symbol</a></li>
+</ul>
+</li>
+<li><code>output_path</code>: A path and filename string where the results will be saved in Excel spreadsheet format. Example: <code>"\some\path\results.xlsx"</code>.</li>
+</ul>
+<p>The use of <code>edgeR</code> to analyze datasets with no biological replicates (<code>replicates = FALSE</code>) is discouraged. However, I prepared a special dataset of housekeeping genes based on the work by <a href="https://www.cell.com/trends/genetics/fulltext/S0168-9525(13)00089-9?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS0168952513000899%3Fshowall%3Dtrue">Eisenberg and Levanon (2013)</a>. I downloaded the <code>HK_genes.txt</code> supplementary file <a href="https://www.tau.ac.il/~elieis/HKG/">here</a> and placed it in the <code>data</code> folder at my current work directory. I also wrote an auxiliary script named <code>hk_genes.R</code> and placed it in the <code>src</code> folder. Check below a representation of my current work directory, where <code>main_dea_edgeR.R</code> contains the commands of this&nbsp;demonstration.</p>
+<div class="highlight"><pre><span></span><code>.
+├── data
+│   ├── counts.RData
+│   └── HK_genes.txt
+├── output
+├── src
+│   ├── edgeR_setup.R
+│   └── hk_genes.R
+└── main_dea_edgeR.R
+</code></pre></div>
+
+
+<p>For now, I will use default values and indicate that the transcripts in the data frame are identified by <span class="caps">ENSEMBL</span> ids. Before running the function, I assign the output path string to the <code>out_path</code> object, which I include in the function call. Note that I gave the name <code>prostate_cancer</code> to identify the experiment, and it will also be the name of the sheet in the&nbsp;spreadsheet.</p>
+<div class="highlight"><pre><span></span><code><span class="n">out_path</span> <span class="o">&lt;-</span> <span class="nf">here</span><span class="p">(</span><span class="s">&quot;output&quot;</span><span class="p">,</span> <span class="s">&quot;prostate_cancer.xlsx&quot;</span><span class="p">)</span>
+
+<span class="nf">edger_setup</span><span class="p">(</span><span class="s">&quot;prostate_cancer&quot;</span><span class="p">,</span> <span class="n">counts</span><span class="p">,</span> <span class="n">replicates</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">filter</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">gene_id</span> <span class="o">=</span> <span class="s">&quot;ENSEMBL&quot;</span><span class="p">,</span> <span class="n">out_path</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>The function will organize the data into groups based on the sample labels I applied previously (&#8220;case&#8221; and &#8220;control&#8221;), filter out genes with negligible expression and calculate the expression metrics, such as the logarithm of the fold-change (logFC) and counts per million transcripts (logCPM), as well as fit a statistical generalized linear model (<span class="caps">GLM</span>), calculating <span class="caps">GLM</span> coefficients (&beta;) for each gene. The <span class="caps">DEA</span> then consists in perform a hypothesis test (quasi-likelihood F-test in this case), to test the null hypothesis that the coefficients are equal (or that &beta;<sub><em>control</em></sub> - &beta;<sub><em>case</em></sub> = 0). From the F-test statistics is then derived a p-value, which is adjusted by false discovery rate (<span class="caps">FDR</span>) to account for multiple&nbsp;comparisons.</p>
+<p>After a while, the function will generate a spreadsheet with the <span class="caps">DEA</span> results. See below an excerpt of the spreadsheet (<em>with commas as decimal separators</em>):</p>
+<p><img alt="edgeR differential expression analysis in a prostate cancer dataset" src="https://antoniocampos13.github.io/images/prostate_cancer_edger_result.PNG"></p>
+<h2>Interpretation of the&nbsp;results</h2>
+<p>Note that there are seven&nbsp;columns:</p>
+<ul>
+<li><code>symbol</code> and <code>geneid</code>: transcript&nbsp;identifiers;</li>
+<li><code>logfc</code>: the base 2 logarithm of the <strong>fold-change</strong> (logFC), which is how much a quantity changes between two measurements &#8212; it is a ratio of two quantities. A logFC = 1 means that the expression of a certain gene was double in one condition than the other, a logFC = 2 means four-times higher expression, and so on. A logFC = -1 means half of the expression, a logFC = -2 means a quarter, and so&nbsp;on.</li>
+<li><code>logcpm</code>: the logarithm of the counts per million&nbsp;transcripts.</li>
+<li><code>f</code>: the quasi-likelihood F-test&nbsp;statistic.</li>
+<li><code>pvalue</code> and <code>adjpvalue</code>: the quasi-likelihood F-test statistic raw and <span class="caps">FDR</span>-adjusted p-values,&nbsp;respectively.</li>
+</ul>
+<p>Note that the <code>logfc</code> column is the expression in cases group relative to control group. The <code>edger_setup()</code> custom function automatically organizes data to this&nbsp;end.</p>
+<p>Usually, the researcher may want to further filter these results. For example, I like to consider not only the adjusted p-value, but also check which genes presented |logFC &gt;= 1| (note the absolute value symbols here). Thus, if a gene passes these two criteria, I usually assume that it may have biological relevance for the disease/characteristic in&nbsp;study.</p>
+<h2>Conclusion</h2>
+<p>I demonstrated a custom function that uses <code>edgeR</code> package to perform differential expression analysis. Here is a summary of the requirements of the&nbsp;function:</p>
+<ul>
+<li>A R data frame: rows are the transcripts, columns are the&nbsp;samples;</li>
+<li>The samples must be labeled as &#8220;case&#8221; or &#8220;control&#8221; (in the column&nbsp;names);</li>
+<li>The function outputs a spreadsheet with logFC and&nbsp;p-values;</li>
+<li>The reported logFC are relative to the control group (control group is the&nbsp;reference);</li>
+<li>The result spreadsheets can be filtered as the researcher&nbsp;wishes.</li>
+</ul>
+<p><em>Subscribe to my <a href="https://antoniocampos13.github.io/feeds/all.rss.xml"><span class="caps">RSS</span> feed</a>, <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom feed</a> or <a href="https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg">Telegram channel</a> to keep you updated whenever I post new&nbsp;content.</em></p>
+<h2>References</h2>
+<p><a href="https://www.ebi.ac.uk/training/online/course/functional-genomics-ii-common-technologies-and-data-analysis-methods/differential-gene">Differential gene expression&nbsp;analysis</a></p>
+<p><a href="https://bioconductor.org/packages/release/bioc/html/edgeR.html">edgeR</a></p>
+<p><a href="https://www.biostars.org/p/284775/#284893">How do I explain the difference between edgeR, <span class="caps">LIMMA</span>, DESeq etc. to experimental&nbsp;Biologist/non-bioinformatician</a></p>
+<p><a href="https://www.rdocumentation.org/packages/openxlsx/versions/4.2.2">openxlsx package | R&nbsp;Documentation</a></p>
+<p><a href="https://www.rdocumentation.org/packages/BiocManager/versions/1.30.10">BiocManager package | R&nbsp;Documentation</a></p>
+<p><a href="https://www.bioconductor.org/">Bioconductor -&nbsp;Home</a></p>
+<p><a href="https://www.bioconductor.org/packages/release/bioc/html/AnnotationDbi.html">AnnotationDbi</a></p>
+<p><a href="https://www.rdocumentation.org/packages/annotate/versions/1.50.0">annotate package | R&nbsp;Documentation</a></p>
+<p><a href="https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html">org.Hs.eg.db&nbsp;package</a></p>
+<p><a href="https://bioconductor.org/packages/release/data/annotation/html/EnsDb.Hsapiens.v79.html">EnsDb.Hsapiens.v79</a></p>
+<p><a href="https://www.rdocumentation.org/packages/ensembldb/versions/1.4.7">ensembldb package | R&nbsp;Documentation</a></p>
+<p><a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/load">load function | R&nbsp;Documentation</a></p>
+<p><a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/source">source function | R&nbsp;Documentation</a></p>
+<p><a href="https://www.ncbi.nlm.nih.gov/Class/MLACourse/Modules/Genes/sample_entrez_gene_record.html">Entrez Gene&nbsp;Records</a></p>
+<p><a href="https://www.ebi.ac.uk/training-beta/online/courses/ensembl-browsing-genomes/navigating-ensembl/investigating-a-gene/">Investigating a gene |&nbsp;Ensembl</a></p>
+<p><a href="https://www.genenames.org/"><span class="caps">HUGO</span> Gene Nomenclature&nbsp;Committee</a></p>
+<p><a href="https://www.cell.com/trends/genetics/fulltext/S0168-9525(13)00089-9?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS0168952513000899%3Fshowall%3Dtrue">Human housekeeping genes,&nbsp;revisited</a></p>
+<p><a href="https://www.tau.ac.il/~elieis/HKG/">Human housekeeping genes, revisited - Supplementary&nbsp;material</a></p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://antoniocampos13.github.io/tag/bioinformatics.html">Bioinformatics</a>
+      <a href="https://antoniocampos13.github.io/tag/gene-expression.html">gene expression</a>
+      <a href="https://antoniocampos13.github.io/tag/edger.html">edgeR</a>
+    </p>
+  </div>
+
+
+
+
+
+</article>
+
+    <footer>
+<p>
+  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+           src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Antonio's Portfolio ",
+  "url" : "https://antoniocampos13.github.io",
+  "image": "https://avatars.githubusercontent.com/antoniocampos13",
+  "description": "Data Science Portfolio by Antonio Victor Campos Coelho"
+}
+</script>
+
+
+</body>
+</html>

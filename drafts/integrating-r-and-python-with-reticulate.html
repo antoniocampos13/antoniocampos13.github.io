@@ -1,0 +1,347 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/stylesheet/style.min.css">
+
+
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+          href="https://antoniocampos13.github.io/theme/pygments/vs.min.css">
+
+
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/solid.css">
+
+
+    <link href="https://antoniocampos13.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Antonio's Portfolio Atom">
+
+    <link href="https://antoniocampos13.github.io/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="Antonio's Portfolio RSS">
+
+
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Microsoft EDGE -->
+    <meta name="msapplication-TileColor" content="#333333">
+
+<meta name="author" content="Antonio Victor Campos Coelho" />
+<meta name="description" content="Introduction reticulate is an R package that allows interoperability between R and Python. I recently discovered this package, and I have been excited to efficiently run Python scripts inside an R session, bringing the best of both worlds. In this post, I will demonstrate reticulate with two scripts. First, I …" />
+<meta name="keywords" content="reticulate, gff, GenomicRanges, pyranges, BSgenome">
+
+
+<meta property="og:site_name" content="Antonio's Portfolio"/>
+<meta property="og:title" content="Integrating R and Python with reticulate"/>
+<meta property="og:description" content="Introduction reticulate is an R package that allows interoperability between R and Python. I recently discovered this package, and I have been excited to efficiently run Python scripts inside an R session, bringing the best of both worlds. In this post, I will demonstrate reticulate with two scripts. First, I …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://antoniocampos13.github.io/drafts/integrating-r-and-python-with-reticulate.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2022-03-21 10:00:00-03:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
+<meta property="article:section" content="R"/>
+<meta property="article:tag" content="reticulate"/>
+<meta property="article:tag" content="gff"/>
+<meta property="article:tag" content="GenomicRanges"/>
+<meta property="article:tag" content="pyranges"/>
+<meta property="article:tag" content="BSgenome"/>
+<meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
+
+  <title>Antonio's Portfolio &ndash; Integrating R and Python with reticulate</title>
+
+</head>
+<body class="light-theme">
+  <aside>
+    <div>
+      <a href="https://antoniocampos13.github.io">
+        <img src="https://avatars.githubusercontent.com/antoniocampos13" alt="Antonio's Portfolio" title="Antonio's Portfolio">
+      </a>
+
+      <h1>
+        <a href="https://antoniocampos13.github.io">Antonio's Portfolio</a>
+      </h1>
+
+<p>PhD in Genetics</p>
+
+      <nav>
+        <ul class="list">
+
+
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/about.html#about">
+                  About
+                </a>
+              </li>
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/contact.html#contact">
+                  Contact
+                </a>
+              </li>
+
+            <li>
+              <a target="_self" href="http://lattes.cnpq.br/2986394950644755" >Brazilian Lattes CV</a>
+            </li>
+            <li>
+              <a target="_self" href="https://scholar.google.com.br/citations?user=d2ij4wUAAAAJ&hl" >Google Scholar</a>
+            </li>
+            <li>
+              <a target="_self" href="https://orcid.org/0000-0003-2143-9701" >ORCID</a>
+            </li>
+            <li>
+              <a target="_self" href="https://publons.com/researcher/2414076/antonio-victor-c-coelho" >Researcher ID/Publons</a>
+            </li>
+        </ul>
+      </nav>
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/antoniocampos13/portfolio" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/antonio-coelho-9aa338164" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://antoniocampos13.github.io">Home</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.rss.xml">RSS</a>
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="integrating-r-and-python-with-reticulate">Integrating R and Python with&nbsp;reticulate</h1>
+    <p>
+      Posted on Mon 21 March 2022 in <a href="https://antoniocampos13.github.io/category/r.html">R</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h2>Introduction</h2>
+<p><a href="https://rstudio.github.io/reticulate/">reticulate</a> is an R package that allows interoperability between R and Python. I recently discovered this package, and I have been excited to efficiently run Python scripts inside an R session, bringing the best of both&nbsp;worlds.</p>
+<p>In this post, I will demonstrate <code>reticulate</code> with two scripts. First, I will start an R session with an R script. Then I will call a Python script inside the R session and manipulate the Python&nbsp;output.</p>
+<p>The demonstration output will be a data frame containing exon coordinates of two genes and the nucleotide sequences of those&nbsp;exons.</p>
+<p>As always, I will post the code of this demo at my <a href="https://github.com/antoniocampos13/portfolio/tree/master/R/2022-03-21_Integrate_R_Python_Reticulate">portfolio</a>.</p>
+<h2>R script: part&nbsp;1/2</h2>
+<p>I will start by listing the R packages I will use for the demonstration. Install them with <code>install.packages()</code> or <code>BiocManager::install()</code> if they are <a href="https://bioconductor.org/">Bioconductor</a> packages (install <code>BiocManager</code> with <code>install.packages()</code> as&nbsp;well).</p>
+<div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">here</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">reticulate</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">glue</span><span class="p">)</span>
+
+<span class="c1"># Biocondutctor packages</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">GenomicRanges</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">BSgenome</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">BSgenome.Hsapiens.UCSC.hg38</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>Next, using <code>here()</code> package, I will create the full path of a <a href="http://gmod.org/wiki/GFF3"><code>GFF3</code></a> file. The <code>GFF3</code> format stores genomic features in a text file to help represent genomic data. This file in question contains features of the whole human genome. Since it is a big file, download it at the <a href="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/"><span class="caps">NCBI</span>&#8217;s <span class="caps">FTP</span> site</a>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">gffPath</span> <span class="o">&lt;-</span> <span class="nf">here</span><span class="p">(</span><span class="s">&quot;GCA_000001405.15_GRCh38_full_analysis_set.refseq_annotation.gff&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>Edit the path using <a href="https://here.r-lib.org/"><code>here()</code><span class="quo">&#8216;</span>s</a> syntax if&nbsp;necessary.</p>
+<p>To keep things simple, I create a vector with just two&nbsp;genes:</p>
+<div class="highlight"><pre><span></span><code><span class="n">genes</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="s">&quot;HTT&quot;</span><span class="p">,</span> <span class="s">&quot;FMR1&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>Now I can start working with the Python script. If you use <code>conda</code> environments to work with Python as I do, you can select the environment with <code>reticulate</code><span class="quo">&#8216;</span>s <code>use_condaenv()</code> function. In this case, I will use my <a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html"><code>bioenv</code></a>&nbsp;environment.</p>
+<div class="highlight"><pre><span></span><code><span class="nf">use_condaenv</span><span class="p">(</span><span class="s">&quot;bioenv&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>Using <code>here()</code> again, I set up the path for the Python script. Then, I use <code>reticulate</code><span class="quo">&#8216;</span>s <code>source_python()</code> function to run the Python&nbsp;script.</p>
+<div class="highlight"><pre><span></span><code><span class="n">pythonScript</span> <span class="o">&lt;-</span> <span class="nf">here</span><span class="p">(</span><span class="s">&quot;reticulate_demo_Python_side.py&quot;</span><span class="p">)</span>
+
+<span class="nf">source_python</span><span class="p">(</span><span class="n">pythonScript</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>Let me show you the contents of this&nbsp;script.</p>
+<h2>Python&nbsp;script</h2>
+<p>The modules I will use for the demonstration will be <a href="https://github.com/biocore-ntnu/pyranges"><code>pyranges</code></a> and <a href="https://pandas.pydata.org/"><code>pandas</code></a>. I surmise <code>pyranges</code>  calls <code>pandas</code> in the background, but <a href="https://peps.python.org/pep-0020/">explicit is better than implicit</a>.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">pyranges</span> <span class="k">as</span> <span class="nn">pr</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</code></pre></div>
+
+
+<p>(Remember to install all the necessary Python modules in the environment beforehand with <code>conda</code> or <code>pip</code>).</p>
+<div class="highlight"><pre><span></span><code>conda install -c bioconda pyranges
+<span class="c1"># or</span>
+pip install pyranges
+</code></pre></div>
+
+
+<p>Then, I read the <code>GFF3</code> file into the Python session using <code>pyranges</code><span class="quo">&#8216;</span>s <code>read_gff3()</code> function. Since I saved the file path into R&#8217;s <code>gffPath</code> object, I must use the <code>r.</code> prefix to bring it into the Python session, like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="n">grch38_gff</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">read_gff3</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">gffPath</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>Next, I append the <code>.df</code> suffix into the  <code>grch38_gff</code> Python object to convert it into a <code>pandas</code> data frame to facilitate the search for the genes I established into the R&nbsp;session:</p>
+<div class="highlight"><pre><span></span><code><span class="n">df</span> <span class="o">=</span> <span class="n">grch38_gff</span><span class="o">.</span><span class="n">df</span>
+</code></pre></div>
+
+
+<p>I will search for the genes with <code>pandas</code><span class="quo">&#8216;</span>s <code>str.contains()</code> method. To do this, I must create a regex string. I will append a <code>$</code> to the end of each gene name to match the whole gene&nbsp;string:</p>
+<div class="highlight"><pre><span></span><code><span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;$&quot;</span>
+</code></pre></div>
+
+
+<p>Next, I will use a list comprehension and Python&#8217;s <code>join()</code> method to create the search string&nbsp;:</p>
+<div class="highlight"><pre><span></span><code><span class="n">search_string</span> <span class="o">=</span> <span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">gene</span> <span class="o">+</span> <span class="n">suffix</span> <span class="k">for</span> <span class="n">gene</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">genes</span><span class="p">])</span>
+</code></pre></div>
+
+
+<p>The <code>search_string</code> object turns up like this (remember that the pipe <code>|</code> character means &#8220;or&#8221; in&nbsp;regex):</p>
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">search_string</span><span class="p">)</span>
+<span class="c1"># outputs: </span>
+<span class="c1"># HTT$|FMR1$</span>
+</code></pre></div>
+
+
+<p>Then I can finally filter the data frame to include only those&nbsp;genes:</p>
+<div class="highlight"><pre><span></span><code><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;gene&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">search_string</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Feature&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;exon&quot;</span><span class="p">)]</span>
+</code></pre></div>
+
+
+<p>The line above concludes the Python script. Now let us return to the R script to wrap things&nbsp;up.</p>
+<h2>R script: part&nbsp;2/2</h2>
+<p>We can retrieve Python objects into the R session similarly to the other around. We must use the prefix <code>py$</code> in R to get the objects generated by Python (the ones outputted by the&nbsp;script).</p>
+<p>Therefore, I will retrieve the data frame <code>df</code> object and assign it to the <code>exonsCoordinates</code> R&nbsp;object:</p>
+<div class="highlight"><pre><span></span><code><span class="n">exonsCoordinates</span> <span class="o">&lt;-</span> <span class="n">py</span><span class="o">$</span><span class="n">df</span>
+</code></pre></div>
+
+
+<p>Before working with it, let me source a function that will retrieve the exon sequences using the <a href="https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html"><code>GenomicRanges</code></a> (<code>pyranges</code> is Python&#8217;s <code>GenomicRanges</code> analog), <a href="https://bioconductor.org/packages/release/bioc/html/BSgenome.html"><code>BSgenome</code></a> and <a href="https://bioconductor.org/packages/release/data/annotation/html/BSgenome.Hsapiens.UCSC.hg38.html"><code>BSgenome.Hsapiens.UCSC.hg38</code></a>&nbsp;packages.</p>
+<div class="highlight"><pre><span></span><code><span class="nf">source</span><span class="p">(</span><span class="nf">here</span><span class="p">(</span><span class="s">&quot;src&quot;</span><span class="p">,</span> <span class="s">&quot;getSequence.R&quot;</span><span class="p">))</span>
+
+<span class="c1"># Function code (getSequence.R file):</span>
+<span class="n">getSequence</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">chr</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">gr</span> <span class="o">&lt;-</span> <span class="n">GenomicRanges</span><span class="o">::</span><span class="nf">GRanges</span><span class="p">(</span><span class="n">glue</span><span class="o">::</span><span class="nf">glue</span><span class="p">(</span><span class="s">&quot;{chr}:{start}-{end}&quot;</span><span class="p">))</span>
+  <span class="n">refBase</span> <span class="o">&lt;-</span> <span class="n">BSgenome</span><span class="o">::</span><span class="nf">getSeq</span><span class="p">(</span><span class="n">BSgenome.Hsapiens.UCSC.hg38</span><span class="o">::</span><span class="n">BSgenome.Hsapiens.UCSC.hg38</span><span class="p">,</span> <span class="n">gr</span><span class="p">)</span>
+  <span class="n">refBase</span> <span class="o">&lt;-</span> <span class="nf">as.data.frame</span><span class="p">(</span><span class="n">refBase</span><span class="p">)</span><span class="o">$</span><span class="n">x</span><span class="p">[</span><span class="m">1</span><span class="p">]</span>
+
+  <span class="nf">return</span><span class="p">(</span><span class="n">refBase</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p><strong>Important</strong>: The first use of BSgenome/BSgenome.Hsapiens.<span class="caps">UCSC</span>.hg38 will prompt the download of human genomic sequence caches to be saved into a specific location on your computer. Be sure you have sufficient data allowances and&nbsp;space.</p>
+<p>Finally, using <code>tidyverse</code> (<code>dplyr</code>) pipe <code>%&gt;%</code> syntax, I create a new column in the data frame (<code>mutate()</code>) using the <code>Chromosome</code>, <code>Start</code>, and <code>End</code> columns as arguments to my custom <code>getSequence()</code> function. The new column will contain the exon sequences. Observe the use of <code>rowwise()</code> and <code>ungroup()</code>. Since my function is not vectorized, I must use it row-wise instead of column-wise. The first function ensures this. The second function restores the data frame to its column-wise nature after <code>getSequence()</code> finishes its job. Then, I select just some of the columns of the data frame with <code>dplyr</code><span class="quo">&#8216;</span>s <code>select()</code> function:</p>
+<div class="highlight"><pre><span></span><code><span class="n">exonsCoordinatesClean</span> <span class="o">&lt;-</span> <span class="n">exonsCoordinates</span> <span class="o">%&gt;%</span> 
+  <span class="nf">rowwise</span><span class="p">()</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">sequence</span> <span class="o">=</span> <span class="nf">getSequence</span><span class="p">(</span><span class="n">Chromosome</span><span class="p">,</span> <span class="n">Start</span><span class="p">,</span> <span class="n">End</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">ungroup</span><span class="p">()</span> <span class="o">%&gt;%</span>
+  <span class="nf">select</span><span class="p">(</span><span class="n">Chromosome</span><span class="p">,</span> <span class="n">Feature</span><span class="p">,</span> <span class="n">Start</span><span class="p">,</span> <span class="n">End</span><span class="p">,</span> <span class="n">Score</span><span class="p">,</span> <span class="n">Strand</span><span class="p">,</span> <span class="n">Frame</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">gene</span><span class="p">,</span> <span class="n">sequence</span><span class="p">)</span>
+</code></pre></div>
+
+
+<h2>Conclusion</h2>
+<p>In conclusion, I&nbsp;:</p>
+<ul>
+<li>Demonstrated how to run a Python script with <code>reticulate</code> without leaving an active R&nbsp;session;</li>
+<li>Explained how to retrieve Python objects into an R session and&nbsp;vice-versa.</li>
+<li>Demonstrated a simple function that retrieves nucleotide sequences from human genome using chromosome&nbsp;coordinates.</li>
+</ul>
+<p><em>Subscribe to my <a href="https://antoniocampos13.github.io/feeds/all.rss.xml"><span class="caps">RSS</span> feed</a>, <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom feed</a> or <a href="https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg">Telegram channel</a> to keep you updated whenever I post new&nbsp;content.</em></p>
+<h2>References</h2>
+<p><a href="https://rstudio.github.io/reticulate/">Interface to&nbsp;Python</a></p>
+<p><a href="https://bioconductor.org/">Bioconductor -&nbsp;Home</a></p>
+<p><a href="http://gmod.org/wiki/GFF3"><span class="caps">GFF3</span> - <span class="caps">GMOD</span></a></p>
+<p><a href="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/">Index of /genomes/all/<span class="caps">GCA</span>/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids</a></p>
+<p><a href="https://here.r-lib.org/">here | A Simpler Way to Find Your&nbsp;Files</a></p>
+<p><a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html">Setting Up Your Unix Computer for Bioinformatics&nbsp;Analysis</a></p>
+<p><a href="https://github.com/biocore-ntnu/pyranges">GitHub - biocore-ntnu/pyranges: Performant Pythonic&nbsp;GenomicRanges</a></p>
+<p><a href="https://pandas.pydata.org/">pandas - Python Data Analysis&nbsp;Library</a></p>
+<p><a href="https://peps.python.org/pep-0020/"><span class="caps">PEP</span> 20 – The Zen of Python |&nbsp;peps.python.org</a></p>
+<p><a href="https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html">GenomicRanges</a></p>
+<p><a href="https://bioconductor.org/packages/release/bioc/html/BSgenome.html">BSgenome</a></p>
+<p><a href="https://bioconductor.org/packages/release/data/annotation/html/BSgenome.Hsapiens.UCSC.hg38.html">BSgenome.Hsapiens.<span class="caps">UCSC</span>.hg38</a></p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://antoniocampos13.github.io/tag/reticulate.html">reticulate</a>
+      <a href="https://antoniocampos13.github.io/tag/gff.html">gff</a>
+      <a href="https://antoniocampos13.github.io/tag/genomicranges.html">GenomicRanges</a>
+      <a href="https://antoniocampos13.github.io/tag/pyranges.html">pyranges</a>
+      <a href="https://antoniocampos13.github.io/tag/bsgenome.html">BSgenome</a>
+    </p>
+  </div>
+
+
+
+
+
+</article>
+
+    <footer>
+<p>
+  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+           src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Antonio's Portfolio ",
+  "url" : "https://antoniocampos13.github.io",
+  "image": "https://avatars.githubusercontent.com/antoniocampos13",
+  "description": "Data Science Portfolio by Antonio Victor Campos Coelho"
+}
+</script>
+
+
+</body>
+</html>
