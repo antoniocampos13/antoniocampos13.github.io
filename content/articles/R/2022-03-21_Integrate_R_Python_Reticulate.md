@@ -1,7 +1,7 @@
 ---
 Title: Integrating R and Python with reticulate
-Status: draft
-Date: 2022-03-21 10:00
+Status: published
+Date: 2022-03-20 16:40
 Author: Antonio Victor Campos Coelho
 Categories: R, Python
 Tags: reticulate, gff, GenomicRanges, pyranges, BSgenome
