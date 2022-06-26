@@ -1,6 +1,6 @@
 ---
 Title: Opening files of size larger than RAM with pandas
-Status: draft
+Status: published
 Date: 2022-06-27 10:00
 Author: Antonio Victor Campos Coelho
 Categories: Python
@@ -11,7 +11,7 @@ Tags: pandas, Genomics, Bioinformatics
 
 Dealing with big files is a routine for everyone working in genomics. FASTQ, VCF, BAM, and GTF/GFF3 files, to name a few, can range from some hundreds of megabytes to several gigabytes in size. Usually, we can use cloud services to configure computing instances with a lot of RAM, but we may use some ways to read and manipulate large-than-RAM files in our personal/work machines.
 
-This post will demonstrate how to work with big tabular data using the `chunksize` option with `pandas`. You can find the code in my portfolio.
+This post will demonstrate how to work with big tabular data using the `chunksize` option with `pandas`. You can find the code in my [portfolio](https://github.com/antoniocampos13/portfolio/tree/master/Python/2022_06_27_Opening_files_of_size_larger_than_RAM_with_pandas).
 
 ### Chunking: divide and conquer
 
