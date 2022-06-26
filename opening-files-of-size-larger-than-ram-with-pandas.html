@@ -50,7 +50,7 @@
   <meta property="og:title" content="Opening files of size larger than RAM with pandas"/>
   <meta property="og:description" content="Introduction Dealing with big files is a routine for everyone working in genomics. FASTQ, VCF, BAM, and GTF/GFF3 files, to name a few, can range from some hundreds of megabytes to several gigabytes in size. Usually, we can use cloud services to configure computing instances with a lot of …"/>
   <meta property="og:locale" content="en_US"/>
-  <meta property="og:url" content="https://antoniocampos13.github.io/drafts/opening-files-of-size-larger-than-ram-with-pandas.html"/>
+  <meta property="og:url" content="https://antoniocampos13.github.io/opening-files-of-size-larger-than-ram-with-pandas.html"/>
   <meta property="og:type" content="article"/>
   <meta property="article:published_time" content="2022-06-27 10:00:00-03:00"/>
   <meta property="article:modified_time" content=""/>
@@ -152,7 +152,7 @@
   <div>
     <h2>Introduction</h2>
 <p>Dealing with big files is a routine for everyone working in genomics. <span class="caps">FASTQ</span>, <span class="caps">VCF</span>, <span class="caps">BAM</span>, and <span class="caps">GTF</span>/<span class="caps">GFF3</span> files, to name a few, can range from some hundreds of megabytes to several gigabytes in size. Usually, we can use cloud services to configure computing instances with a lot of <span class="caps">RAM</span>, but we may use some ways to read and manipulate large-than-<span class="caps">RAM</span> files in our personal/work&nbsp;machines.</p>
-<p>This post will demonstrate how to work with big tabular data using the <code>chunksize</code> option with <code>pandas</code>. You can find the code in my&nbsp;portfolio.</p>
+<p>This post will demonstrate how to work with big tabular data using the <code>chunksize</code> option with <code>pandas</code>. You can find the code in my <a href="https://github.com/antoniocampos13/portfolio/tree/master/Python/2022_06_27_Opening_files_of_size_larger_than_RAM_with_pandas">portfolio</a>.</p>
 <h3>Chunking: divide and&nbsp;conquer</h3>
 <p><span class="dquo">&#8220;</span>Chunking&#8221; means splitting the big file into chunks (partitions) so the Python session can work with each part separately, meaning it would not need to hold the big data in memory all at once. Keep in mind that not every problem can be solved by chunking. Therefore, if your goal does <span class="caps">NOT</span> involve coordination between chunks, such as some filtering and little edition, chunking could help. However, if your task is more complicated than this, other modules such as <a href="https://www.dask.org/"><code>dask</code></a> are the better option. The panda&#8217;s documentation has an excellent <a href="https://pandas.pydata.org/docs/user_guide/scale.html#">chapter</a> explaining ways to go when scaling to large&nbsp;datasets.</p>
 <h2>The input: the human reference genome <span class="caps">GTF</span>/<span class="caps">GFF3</span>&nbsp;file</h2>
