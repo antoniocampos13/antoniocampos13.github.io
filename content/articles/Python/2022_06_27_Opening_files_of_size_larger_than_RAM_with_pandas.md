@@ -80,10 +80,10 @@ column_names = [
 Since the file is tab-delimited, I can use the `pd.read_table()` function, passing the `column_names` list as the value for the `names` argument and the `chunksize` as well:
 
 ```python
-chunks = pd.read_table(TABLE, names=column_names, chunksize=CHUNKSIZE)
+chunks = pd.read_table(TABLE, names=column_names, chunksize=CHUNKSIZE, comment="#")
 
 # Or:
-chunks = pd.read_csv(TABLE, names=column_names, chunksize=CHUNKSIZE, sep="\t")
+chunks = pd.read_csv(TABLE, names=column_names, chunksize=CHUNKSIZE, sep="\t", comment="#")
 ```
 
 If I had not decompressed the file, I could also use the argument `compression="infer"` so `pandas` would decompress it on-the-fly.
@@ -97,7 +97,7 @@ Therefore, the `for` loop I wrote will perform the same action on every `pd.Data
 These are the steps I will perform with each chunk:
 
 1. Filter for rows with "exon" values in the `type` column;
-2. Drop (remove) all columns except for `seqid`, `type`, `start`, and `end`;
+2. Drop (remove) all columns except for `seqid`, `type`, `start`, `end` and `attributes`;
 3. Save the edited chunk directly to disk by appending the chunk to a tab-delimited file.
 
 Below is the loop code:
@@ -108,7 +108,7 @@ for chunk in chunks:
     temp_df = chunk[chunk["type"] == "exon"]
 
     # Step 2
-    temp_df = temp_df.drop(["source", "score", "strand", "phase", "attributes"])
+    temp_df = temp_df.drop(columns=["source", "score", "strand", "phase"])
 
     # Step 3
     temp_df.to_csv(EDITED_TABLE, header=False, mode="a", sep="\t", index=False)
