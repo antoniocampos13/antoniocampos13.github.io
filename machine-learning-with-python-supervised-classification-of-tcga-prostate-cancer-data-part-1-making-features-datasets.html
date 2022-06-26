@@ -27,6 +27,7 @@
     <link href="https://antoniocampos13.github.io/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="Antonio's Portfolio RSS">
 
 
+  
 
     <!-- Chrome, Firefox OS and Opera -->
     <meta name="theme-color" content="#333333">
@@ -38,26 +39,28 @@
     <!-- Microsoft EDGE -->
     <meta name="msapplication-TileColor" content="#333333">
 
+ 
+
 <meta name="author" content="Antonio Victor Campos Coelho" />
 <meta name="description" content="Introduction In a previous post, I showed how to retrieve The Cancer Genome Atlas (TCGA) data from the Cancer Genomics Cloud (CGC) platform. I downloaded gene expression quantification data, created a relational database with PostgreSQL, and created a dataset uniting the raw quantification data for 675 differentially expressed genes identified …" />
 <meta name="keywords" content="Bioinformatics, gene expression, machine learning, supervised classification">
 
 
-<meta property="og:site_name" content="Antonio's Portfolio"/>
-<meta property="og:title" content="Machine Learning with Python: Supervised Classification of TCGA Prostate Cancer Data (Part 1 - Making Features Datasets)"/>
-<meta property="og:description" content="Introduction In a previous post, I showed how to retrieve The Cancer Genome Atlas (TCGA) data from the Cancer Genomics Cloud (CGC) platform. I downloaded gene expression quantification data, created a relational database with PostgreSQL, and created a dataset uniting the raw quantification data for 675 differentially expressed genes identified …"/>
-<meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://antoniocampos13.github.io/machine-learning-with-python-supervised-classification-of-tcga-prostate-cancer-data-part-1-making-features-datasets.html"/>
-<meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2020-11-05 14:50:00-03:00"/>
-<meta property="article:modified_time" content=""/>
-<meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
-<meta property="article:section" content="Python"/>
-<meta property="article:tag" content="Bioinformatics"/>
-<meta property="article:tag" content="gene expression"/>
-<meta property="article:tag" content="machine learning"/>
-<meta property="article:tag" content="supervised classification"/>
-<meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
+  <meta property="og:site_name" content="Antonio's Portfolio"/>
+  <meta property="og:title" content="Machine Learning with Python: Supervised Classification of TCGA Prostate Cancer Data (Part 1 - Making Features Datasets)"/>
+  <meta property="og:description" content="Introduction In a previous post, I showed how to retrieve The Cancer Genome Atlas (TCGA) data from the Cancer Genomics Cloud (CGC) platform. I downloaded gene expression quantification data, created a relational database with PostgreSQL, and created a dataset uniting the raw quantification data for 675 differentially expressed genes identified …"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="https://antoniocampos13.github.io/machine-learning-with-python-supervised-classification-of-tcga-prostate-cancer-data-part-1-making-features-datasets.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2020-11-05 14:50:00-03:00"/>
+  <meta property="article:modified_time" content=""/>
+  <meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
+  <meta property="article:section" content="Python"/>
+  <meta property="article:tag" content="Bioinformatics"/>
+  <meta property="article:tag" content="gene expression"/>
+  <meta property="article:tag" content="machine learning"/>
+  <meta property="article:tag" content="supervised classification"/>
+  <meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
 
   <title>Antonio's Portfolio &ndash; Machine Learning with Python: Supervised Classification of TCGA Prostate Cancer Data (Part 1 - Making Features Datasets)</title>
 
@@ -65,12 +68,12 @@
 <body class="light-theme">
   <aside>
     <div>
-      <a href="https://antoniocampos13.github.io">
+      <a href="https://antoniocampos13.github.io/">
         <img src="https://avatars.githubusercontent.com/antoniocampos13" alt="Antonio's Portfolio" title="Antonio's Portfolio">
       </a>
 
       <h1>
-        <a href="https://antoniocampos13.github.io">Antonio's Portfolio</a>
+        <a href="https://antoniocampos13.github.io/">Antonio's Portfolio</a>
       </h1>
 
 <p>PhD in Genetics</p>
@@ -125,7 +128,7 @@
   <main>
 
     <nav>
-      <a href="https://antoniocampos13.github.io">Home</a>
+      <a href="https://antoniocampos13.github.io/">Home</a>
 
       <a href="/archives.html">Archives</a>
       <a href="/categories.html">Categories</a>
@@ -162,7 +165,6 @@
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">preprocessing</span><span class="p">,</span> <span class="n">model_selection</span>
 </code></pre></div>
 
-
 <p><code>pathlib</code> is a module from the Python standard library. It helps file path management. <code>janitor</code> is a module for data clean-up and manipulation. <code>pandas</code> is also used for data manipulation and transformation, especially if it is contained on data frames. <code>sklearn</code> is an alias for <code>scikit-learn</code>. It is a powerhouse of several machine learning functions and utilities. Install all non-standard library modules using your Python package manager, usually <code>pip</code> or through anaconda, if you are using a conda environment with&nbsp;Python.</p>
 <p>Next, I set up some constants that I will use&nbsp;later:</p>
 <div class="highlight"><pre><span></span><code><span class="n">RANDOM_SEED</span><span class="o">=</span><span class="mi">42</span>
@@ -170,7 +172,6 @@
 <span class="n">INDEX</span><span class="o">=</span><span class="mi">676</span>
 <span class="n">CORR_THRESHOLD</span><span class="o">=</span><span class="mf">0.80</span>
 </code></pre></div>
-
 
 <ul>
 <li><code>RANDOM_SEED</code>: An integer used to initialize the pseudo-random number generator. It helps generate reproducible outputs in different&nbsp;sessions/computers;</li>
@@ -182,7 +183,6 @@
 <div class="highlight"><pre><span></span><code><span class="n">project_folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
 <span class="n">CSV_FILE</span> <span class="o">=</span> <span class="n">project_folder</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span> <span class="o">/</span> <span class="s2">&quot;interim&quot;</span> <span class="o">/</span> <span class="s2">&quot;prostate_cancer_dataset.csv&quot;</span>
 </code></pre></div>
-
 
 <p>See below the structure of the current working&nbsp;directory:</p>
 <div class="highlight"><pre><span></span><code>.
@@ -198,17 +198,14 @@
         └── make_model.py
 </code></pre></div>
 
-
 <h2>Load data into&nbsp;Pandas</h2>
 <p>Now, I create a <code>pandas.DataFrame</code> using the <code>read_csv</code> function, and assign it to <code>df</code> object:</p>
 <div class="highlight"><pre><span></span><code><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">CSV_FILE</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>Check the column names with the <code>columns</code> method:</p>
 <div class="highlight"><pre><span></span><code><span class="n">df</span><span class="o">.</span><span class="n">columms</span>
 </code></pre></div>
-
 
 <p>The <code>status</code> column contains the sample labels: <code>0</code> means &#8220;control&#8221; and <code>1</code> means &#8220;case&#8221;. The other columns are the variables (or features) of each&nbsp;sample.</p>
 <h2>Dummy-encode categorical&nbsp;variables</h2>
@@ -216,7 +213,6 @@
 <div class="highlight"><pre><span></span><code><span class="n">df</span><span class="o">.</span><span class="n">dtypes</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h2>Split&nbsp;datasets</h2>
 <p>With the transformed dataset, let&#8217;s go ahead and split the dataset into training and testing&nbsp;datasets.</p>
@@ -227,7 +223,6 @@
 <span class="p">)</span>
 </code></pre></div>
 
-
 <p>The <code>get_features_targets</code> from <code>janitor</code> module will get the <code>df</code> object and separate the sample labels from the variables (features). The features will then be assigned to object <code>X</code>, which will be instanced as a <code>pandas.DataFrame</code> and the <code>status</code> column (see the <code>target_columns</code> argument) will be put in the <code>y</code> object, which will be instanced as a <code>pandas.Series</code>.</p>
 <p>The second function, <code>model_selection.train_test_split</code> from <code>sklearn</code> will split the <code>X</code> and <code>y</code> objects into its training and testing counterparts &#8212; therefore, four objects: <code>X_train</code>, <code>X_test</code>, <code>y_train</code> and <code>y_test</code>. Check the <code>TEST_SIZE</code> and <code>RANDOM_SEED</code> constants I set up in the beginning of the script being used here. They indicate that 30% of the dataset must be included as a test dataset (therefore 70% in the training dataset) and setting a integer into the <code>random_state</code> argument ensures that the splitting outputs can be&nbsp;reproduced.</p>
 <p>Also note the <code>stratify</code> argument. It ensures that the same proportion of cases and controls are drawn for training and testing datasets. For this, I indicate the object containing the labels, which is <code>y</code>.</p>
@@ -236,12 +231,10 @@
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Test Set has </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">y_test</span><span class="p">)</span><span class="si">}</span><span class="s2"> Positive Labels (cases) and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="p">)</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">y_test</span><span class="p">)</span><span class="si">}</span><span class="s2"> Negative Labels (controls)&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>The&nbsp;output:</p>
 <div class="highlight"><pre><span></span><code>Training Set has 38 Positive Labels (cases) and 127 Negative Labels (controls)
 Test Set has 16 Positive Labels (cases) and 55 Negative Labels (controls)
 </code></pre></div>
-
 
 <h2>Normalize&nbsp;data</h2>
 <p>Now I will standardize (scale or <a href="https://en.wikipedia.org/wiki/Standard_score">Z-score normalize</a>) the numerical columns. For each numerical feature, I will calculate its mean and standard deviation. Then, for each observed value of the variable, I will subtract the mean and divide by the standard&nbsp;deviation.</p>
@@ -249,14 +242,12 @@ Test Set has 16 Positive Labels (cases) and 55 Negative Labels (controls)
 <div class="highlight"><pre><span></span><code><span class="n">num_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">)[:</span><span class="n">INDEX</span><span class="p">]</span>
 </code></pre></div>
 
-
 <p>That&#8217;s why I conveniently saved the index number into the <code>INDEX</code> variable at the beginning of the script. It helps code reusability with different data. It is one of the advantages of avoiding the so called <a href="https://www.pluralsight.com/tech-blog/avoiding-magic-numbers/">&#8220;magic numbers&#8221;</a>.</p>
 <p>With the numeric columns identified, I then used the <code>StandardScaler()</code> function from <code>sklearn</code><span class="quo">&#8216;</span>s <code>preprocessing</code> module:</p>
 <div class="highlight"><pre><span></span><code><span class="n">sca</span> <span class="o">=</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">StandardScaler</span><span class="p">()</span>
 <span class="n">X_train</span><span class="p">[</span><span class="n">num_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">sca</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">[</span><span class="n">num_cols</span><span class="p">])</span>
 <span class="n">X_test</span><span class="p">[</span><span class="n">num_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">sca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">[</span><span class="n">num_cols</span><span class="p">])</span>
 </code></pre></div>
-
 
 <p>I used the function <code>fit_transform()</code> function in the <code>X_train</code> dataset, passing the <code>num_cols</code> list as the indication of which columns need to be normalized (using the brackets <code>[]</code> notation) and saving the resulting transformation with the same names into the <code>X_train</code> object. Thus, for all effects and purposes, I am replacing the old columns with the normalized&nbsp;columns.</p>
 <p>Note that for <code>X_test</code> dataset I used a different formula, <code>transform()</code>. This is because I am using just the coefficients fitted by <code>fit_transform()</code> in the train dataset to generate the normalization in the test dataset. This way I am sure that the scaling is not &#8220;contaminated&#8221; by the test data, that is supposed to not seem before the classification model&nbsp;fitting.</p>
@@ -272,17 +263,14 @@ Test Set has 16 Positive Labels (cases) and 55 Negative Labels (controls)
             <span class="n">correlated_features</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">colname</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>The commands above will calculate the pairwise correlation between all features in the dataset, creating a <code>correlation_matrix</code>. If the correlation between two features is above <code>CORR_THRESHOLD</code> (currently 0.80), the loop will store the name of one of them into the <code>correlated_features</code> set, ensuring that no names are repeated. If you want to know how may pairs of correlated features were present in the dataset, run the command below to print to the&nbsp;console:</p>
 <div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of correlated feature pairs: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">correlated_features</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>Then I can convert the set as list and pass it to <code>pandas</code><span class="quo">&#8216;</span> <code>drop()</code> method:</p>
 <div class="highlight"><pre><span></span><code><span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">correlated_features</span><span class="p">),</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">correlated_features</span><span class="p">),</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>I dropped the columns and saved the data frames with the same name for convenience. Note the <code>axis=1</code> argument, it tells <code>drop()</code> to look the <em>columns</em> for the list elements and then remove&nbsp;them.</p>
 <h2>Serializing datasets for future&nbsp;use</h2>
@@ -292,7 +280,6 @@ Test Set has 16 Positive Labels (cases) and 55 Negative Labels (controls)
 <span class="n">y_train</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span><span class="n">project_folder</span><span class="o">/</span><span class="s2">&quot;data&quot;</span><span class="o">/</span><span class="s2">&quot;processed&quot;</span><span class="o">/</span><span class="s2">&quot;y_train&quot;</span><span class="p">)</span>
 <span class="n">y_test</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span><span class="n">project_folder</span><span class="o">/</span><span class="s2">&quot;data&quot;</span><span class="o">/</span><span class="s2">&quot;processed&quot;</span><span class="o">/</span><span class="s2">&quot;y_test&quot;</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p><strong>Note: pickled objects are Python-specific only &#8212; non-Python programs may not be able to reconstruct pickled Python objects. <span class="caps">WARNING</span>: never, <span class="caps">NEVER</span>, unpickle data you do not trust. As it says in the Python documentation: <a href="https://docs.python.org/3/library/pickle.html">&#8220;It is possible to construct malicious pickle data which will execute arbitrary code during unpickling&#8221;</a>.</strong></p>
 <p>Now, my folders are like&nbsp;this:</p>
@@ -312,7 +299,6 @@ Test Set has 16 Positive Labels (cases) and 55 Negative Labels (controls)
     └── models
         └── make_model.py
 </code></pre></div>
-
 
 <h2>Conclusion</h2>
 <p>In this post, I showed how&nbsp;to:</p>
@@ -352,7 +338,7 @@ Test Set has 16 Positive Labels (cases) and 55 Negative Labels (controls)
 
     <footer>
 <p>
-  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike</a>
 </p>
 <p>
 Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
@@ -383,7 +369,6 @@ Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a 
   "description": "Data Science Portfolio by Antonio Victor Campos Coelho"
 }
 </script>
-
 
 </body>
 </html>

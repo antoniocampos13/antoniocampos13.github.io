@@ -1,0 +1,305 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/stylesheet/style.min.css">
+
+
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+          href="https://antoniocampos13.github.io/theme/pygments/vs.min.css">
+
+
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/solid.css">
+
+
+    <link href="https://antoniocampos13.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Antonio's Portfolio Atom">
+
+    <link href="https://antoniocampos13.github.io/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="Antonio's Portfolio RSS">
+
+
+  
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Microsoft EDGE -->
+    <meta name="msapplication-TileColor" content="#333333">
+
+ 
+
+<meta name="author" content="Antonio Victor Campos Coelho" />
+<meta name="description" content="Introduction Dealing with big files is a routine for everyone working in genomics. FASTQ, VCF, BAM, and GTF/GFF3 files, to name a few, can range from some hundreds of megabytes to several gigabytes in size. Usually, we can use cloud services to configure computing instances with a lot of …" />
+<meta name="keywords" content="pandas, Genomics, Bioinformatics">
+
+
+  <meta property="og:site_name" content="Antonio's Portfolio"/>
+  <meta property="og:title" content="Opening files of size larger than RAM with pandas"/>
+  <meta property="og:description" content="Introduction Dealing with big files is a routine for everyone working in genomics. FASTQ, VCF, BAM, and GTF/GFF3 files, to name a few, can range from some hundreds of megabytes to several gigabytes in size. Usually, we can use cloud services to configure computing instances with a lot of …"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="https://antoniocampos13.github.io/drafts/opening-files-of-size-larger-than-ram-with-pandas.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2022-06-27 10:00:00-03:00"/>
+  <meta property="article:modified_time" content=""/>
+  <meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
+  <meta property="article:section" content="Python"/>
+  <meta property="article:tag" content="pandas"/>
+  <meta property="article:tag" content="Genomics"/>
+  <meta property="article:tag" content="Bioinformatics"/>
+  <meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
+
+  <title>Antonio's Portfolio &ndash; Opening files of size larger than RAM with pandas</title>
+
+</head>
+<body class="light-theme">
+  <aside>
+    <div>
+      <a href="https://antoniocampos13.github.io/">
+        <img src="https://avatars.githubusercontent.com/antoniocampos13" alt="Antonio's Portfolio" title="Antonio's Portfolio">
+      </a>
+
+      <h1>
+        <a href="https://antoniocampos13.github.io/">Antonio's Portfolio</a>
+      </h1>
+
+<p>PhD in Genetics</p>
+
+      <nav>
+        <ul class="list">
+
+
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/about.html#about">
+                  About
+                </a>
+              </li>
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/contact.html#contact">
+                  Contact
+                </a>
+              </li>
+
+            <li>
+              <a target="_self" href="http://lattes.cnpq.br/2986394950644755" >Brazilian Lattes CV</a>
+            </li>
+            <li>
+              <a target="_self" href="https://scholar.google.com.br/citations?user=d2ij4wUAAAAJ&hl" >Google Scholar</a>
+            </li>
+            <li>
+              <a target="_self" href="https://orcid.org/0000-0003-2143-9701" >ORCID</a>
+            </li>
+            <li>
+              <a target="_self" href="https://publons.com/researcher/2414076/antonio-victor-c-coelho" >Researcher ID/Publons</a>
+            </li>
+        </ul>
+      </nav>
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/antoniocampos13/portfolio" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/antonio-coelho-9aa338164" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://antoniocampos13.github.io/">Home</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.rss.xml">RSS</a>
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="opening-files-of-size-larger-than-ram-with-pandas">Opening files of size larger than <span class="caps">RAM</span> with&nbsp;pandas</h1>
+    <p>
+      Posted on Mon 27 June 2022 in <a href="https://antoniocampos13.github.io/category/python.html">Python</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h2>Introduction</h2>
+<p>Dealing with big files is a routine for everyone working in genomics. <span class="caps">FASTQ</span>, <span class="caps">VCF</span>, <span class="caps">BAM</span>, and <span class="caps">GTF</span>/<span class="caps">GFF3</span> files, to name a few, can range from some hundreds of megabytes to several gigabytes in size. Usually, we can use cloud services to configure computing instances with a lot of <span class="caps">RAM</span>, but we may use some ways to read and manipulate large-than-<span class="caps">RAM</span> files in our personal/work&nbsp;machines.</p>
+<p>This post will demonstrate how to work with big tabular data using the <code>chunksize</code> option with <code>pandas</code>. You can find the code in my&nbsp;portfolio.</p>
+<h3>Chunking: divide and&nbsp;conquer</h3>
+<p><span class="dquo">&#8220;</span>Chunking&#8221; means splitting the big file into chunks (partitions) so the Python session can work with each part separately, meaning it would not need to hold the big data in memory all at once. Keep in mind that not every problem can be solved by chunking. Therefore, if your goal does <span class="caps">NOT</span> involve coordination between chunks, such as some filtering and little edition, chunking could help. However, if your task is more complicated than this, other modules such as <a href="https://www.dask.org/"><code>dask</code></a> are the better option. The panda&#8217;s documentation has an excellent <a href="https://pandas.pydata.org/docs/user_guide/scale.html#">chapter</a> explaining ways to go when scaling to large&nbsp;datasets.</p>
+<h2>The input: the human reference genome <span class="caps">GTF</span>/<span class="caps">GFF3</span>&nbsp;file</h2>
+<p>I downloaded the human reference genome <span class="caps">GTF</span>/<span class="caps">GFF3</span> file <code>GCA_000001405.15_GRCh38_full_analysis_set.refseq_annotation.gff.gz</code> file at the <a href="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/"><span class="caps">NCBI</span> <span class="caps">FTP</span> server</a> containing files preformatted for use in Bioinformatic analysis pipelines. Next, I extracted the contents of the&nbsp;file:</p>
+<div class="highlight"><pre><span></span><code>gunzip GCA_000001405.15_GRCh38_full_analysis_set.refseq_annotation.gff.gz
+</code></pre></div>
+
+<p>The extracted file has a size of about 1 <span class="caps">GB</span>. Decently big for my demonstrational&nbsp;purposes.</p>
+<p>But what is a <span class="caps">GTF</span>/<span class="caps">GFF3</span> file? The Gene Transfer Format or General Feature Format is a tab-delimited text file format. Bioinformaticians use it to describe genomic features such as genes, exons, introns, putative protein-coding sequences (<span class="caps">CDS</span>), transcription factor binding sites, etc. The first two versions (<span class="caps">GTF</span> and <span class="caps">GFF2</span>) had deficiencies, and <span class="caps">GFF3</span> was developed to address them. You can read more about <span class="caps">GFF3</span> on <a href="https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md">Lincoln Stein&#8217;s GitHub page</a>.</p>
+<p>Every <span class="caps">GTF</span>/<span class="caps">GFF3</span> file has nine fields (columns). A dot <code>.</code> represents missing or null data. The nine columns&nbsp;are:</p>
+<ol>
+<li><code>seqid</code>: the name of the sequence where the feature is located. For example, a chromosome or&nbsp;contig;</li>
+<li><code>source</code>: the program or organization, laboratory, etc. that generated the information regarding the&nbsp;feature;</li>
+<li><code>type</code>: qualifiers like &#8220;gene&#8221;, &#8220;exon&#8221;, &#8220;<span class="caps">CDS</span>&#8221;. Features can have children: for example, the exons of a gene refer to its gene (their parent). Ideally, all the children features must follow their parents after the parents&#8217; initial definition in the&nbsp;file.</li>
+<li><code>start</code>: the base position in the sequence where the feature starts. It has a 1-base offset, in contrast to the <span class="caps">BED</span> format, which is&nbsp;0-offset.</li>
+<li><code>end</code>: the base position in the sequence where the feature&nbsp;ends.</li>
+<li><code>score</code>: numeric value representing the quality of the&nbsp;sequence.</li>
+<li><code>strand</code>: indicates the strand of the feature: <code>+</code> (the sense strand is the default 5&#8217;-3&#8217; representation of the feature), <code>-</code> (the sense strand is the reverse complement strand of the sequence representation), or <code>.</code> (undetermined).</li>
+<li><code>phase</code>: used to indicate the reading frame of the features that are <span class="caps">CDS</span>. Can be <code>0</code>, <code>1</code>, <code>2</code> or <code>.</code> (undetermined).</li>
+<li><code>attributes</code>: all other information relevant for describind the&nbsp;feature.</li>
+</ol>
+<p>I will open this file using <code>pandas</code> and keep just the exons of all annotated human&nbsp;genes.</p>
+<h2>Chunking with <code>pandas</code></h2>
+<p>I create a python script and import the <code>pandas</code> module:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="err">`</span><span class="n">pandas</span><span class="err">`</span> <span class="k">as</span> <span class="n">pd</span>
+</code></pre></div>
+
+<p>Next, I define some variables to store the path of the <span class="caps">GTF</span>/<span class="caps">GFF3</span> file, the name of the output table, and the chunk&nbsp;size:</p>
+<div class="highlight"><pre><span></span><code><span class="n">TABLE</span> <span class="o">=</span> <span class="s2">&quot;GCA_000001405.15_GRCh38_full_analysis_set.refseq_annotation.gff&quot;</span>
+<span class="n">EDITED_TABLE</span> <span class="o">=</span> <span class="s2">&quot;human_gene_exons_GRCh38.gff&quot;</span>
+<span class="n">CHUNKSIZE</span><span class="o">=</span><span class="mi">20000000</span>
+</code></pre></div>
+
+<p>The chunk size must be an integer because it represents the number of lines each chunk will have. In the example above, I will tell <code>pandas</code> to partition the file into parts containing two million lines until it finishes processing the whole&nbsp;dataset.</p>
+<p>Next, I define a list with the column&nbsp;names:</p>
+<div class="highlight"><pre><span></span><code><span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;seqid&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;source&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;start&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;end&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;score&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;strand&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;phase&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;attributes&quot;</span>
+<span class="p">]</span>
+</code></pre></div>
+
+<p>Since the file is tab-delimited, I can use the <code>pd.read_table()</code> function, passing the <code>column_names</code> list as the value for the <code>names</code> argument and the <code>chunksize</code> as&nbsp;well:</p>
+<div class="highlight"><pre><span></span><code><span class="n">chunks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">TABLE</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="n">CHUNKSIZE</span><span class="p">)</span>
+
+<span class="c1"># Or:</span>
+<span class="n">chunks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">TABLE</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="n">CHUNKSIZE</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>If I had not decompressed the file, I could also use the argument <code>compression="infer"</code> so <code>pandas</code> would decompress it&nbsp;on-the-fly.</p>
+<p>The <code>chunksize</code> argument makes the <code>pd.read_table()</code> return an <strong>iterator</strong> object (<code>TextFileReader</code>). What is an iterator? In Python, an iterator is an object we can traverse through all its values. Python lists, dictionaries, and tuples are all Pythonic iterators. In our case, each element of this iterator is a <code>pd.Dataframe</code> instead.</p>
+<p>Therefore, the <code>for</code> loop I wrote will perform the same action on every <code>pd.DataFrame</code> in the&nbsp;iterator.</p>
+<h2>Filtering each&nbsp;chunk</h2>
+<p>These are the steps I will perform with each&nbsp;chunk:</p>
+<ol>
+<li>Filter for rows with &#8220;exon&#8221; values in the <code>type</code> column;</li>
+<li>Drop (remove) all columns except for <code>seqid</code>, <code>type</code>, <code>start</code>, and <code>end</code>;</li>
+<li>Save the edited chunk directly to disk by appending the chunk to a tab-delimited&nbsp;file.</li>
+</ol>
+<p>Below is the loop&nbsp;code:</p>
+<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">:</span>
+    <span class="c1"># Step 1</span>
+    <span class="n">temp_df</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[</span><span class="n">chunk</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;exon&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Step 2</span>
+    <span class="n">temp_df</span> <span class="o">=</span> <span class="n">temp_df</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="s2">&quot;strand&quot;</span><span class="p">,</span> <span class="s2">&quot;phase&quot;</span><span class="p">,</span> <span class="s2">&quot;attributes&quot;</span><span class="p">])</span>
+
+    <span class="c1"># Step 3</span>
+    <span class="n">temp_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">EDITED_TABLE</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+<p>I should explain step 3 in more detail. Since the <code>for</code> loop will dump each part immediately to disk after finishing my edits, Python&#8217;s <span class="caps">RAM</span> usage will be more or less constant during the file processing. You may see other tutorials appending the data frames to a list and concatenating them into a final <code>pd.DataFrame</code>, but in my opinion, this kind of defeats the purpose of chunking since Python will have to hold everything in memory, risking <span class="caps">RAM</span> overuse and killing the&nbsp;process.</p>
+<p>Let me explain the <code>pd.to_csv()</code> arguments:</p>
+<ul>
+<li><code>EDITED_TABLE</code>: the file output&nbsp;name/path;</li>
+<li><code>header=False</code>: do not output the column names to&nbsp;file;</li>
+<li><code>mode="a"</code>: append each chunk on the output&nbsp;file;</li>
+<li><code>sep="\t"</code>: write tab-delimited columns on the output&nbsp;file;</li>
+<li><code>index=False</code>: do not output index column. Since I did not set the index, it would print the row numbers, which would be undesirable (it would violate <span class="caps">GTF</span>/<span class="caps">GFF3</span> format&nbsp;specifications).</li>
+</ul>
+<p>Observe that I defined the column names to make filtering/editing easier. The <span class="caps">GTF</span>/<span class="caps">GFF3</span> format specifications do not require the header names to be present in the file. Therefore, I removed them during Step&nbsp;3.</p>
+<h2>Conclusion</h2>
+<p>In this post, I demonstrated one way of dealing with big files by chunking with <code>pandas</code>.</p>
+<h2>Appendix</h2>
+<p>I already have written about <code>dask</code> on my machine learning tutorials. See part 1 <a href="https://antoniocampos13.github.io/machine-learning-with-python-supervised-classification-of-tcga-prostate-cancer-data-part-1-making-features-datasets.html">here</a> and part 2 <a href="https://antoniocampos13.github.io/machine-learning-with-python-supervised-classification-of-tcga-prostate-cancer-data-part-2-making-a-model.html">here</a>. Check <a href="https://pandas.pydata.org/docs/index.html"><code>pandas</code><span class="quo">&#8216;</span> documentation</a> and <a href="https://docs.dask.org/en/stable/">dask&#8217;s</a> as well for more&nbsp;information.</p>
+<p><em>Subscribe to my <a href="https://antoniocampos13.github.io/feeds/all.rss.xml"><span class="caps">RSS</span> feed</a>, <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom feed</a> or <a href="https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg">Telegram channel</a> to keep you updated whenever I post new&nbsp;content.</em></p>
+<h2>References</h2>
+<p><a href="https://www.dask.org/">Dask | Scale the Python tools you&nbsp;love</a></p>
+<p><a href="https://pandas.pydata.org/docs/user_guide/scale.html#">Scaling to large datasets &#8212; pandas 1.4.3&nbsp;documentation</a></p>
+<p><a href="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/">Index of /genomes/all/<span class="caps">GCA</span>/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids</a></p>
+<p><a href="https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md">Specifications/gff3.md at master ·&nbsp;The-Sequence-Ontology/Specifications</a></p>
+<p><a href="https://antoniocampos13.github.io/machine-learning-with-python-supervised-classification-of-tcga-prostate-cancer-data-part-1-making-features-datasets.html">Machine Learning with Python: Supervised Classification of <span class="caps">TCGA</span> Prostate Cancer Data (Part 1 - Making Features&nbsp;Datasets)</a></p>
+<p><a href="https://antoniocampos13.github.io/machine-learning-with-python-supervised-classification-of-tcga-prostate-cancer-data-part-2-making-a-model.html">Machine Learning with Python: Supervised Classification of <span class="caps">TCGA</span> Prostate Cancer Data (Part 2 - Making a&nbsp;Model)</a></p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://antoniocampos13.github.io/tag/pandas.html">pandas</a>
+      <a href="https://antoniocampos13.github.io/tag/genomics.html">Genomics</a>
+      <a href="https://antoniocampos13.github.io/tag/bioinformatics.html">Bioinformatics</a>
+    </p>
+  </div>
+
+
+
+
+
+</article>
+
+    <footer>
+<p>
+  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike</a>
+</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+           src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Antonio's Portfolio ",
+  "url" : "https://antoniocampos13.github.io",
+  "image": "https://avatars.githubusercontent.com/antoniocampos13",
+  "description": "Data Science Portfolio by Antonio Victor Campos Coelho"
+}
+</script>
+
+</body>
+</html>

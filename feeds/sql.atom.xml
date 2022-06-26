@@ -66,13 +66,11 @@
     └── main_tcga.sh
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;The &lt;code&gt;TSV&lt;/code&gt; files are the query results and inside the folders are the files containing the genomic data (these are not their original names &amp;#8212; I renamed them to make easier to identify the contents of each one). For now, I will use just the four &lt;code&gt;TSV&lt;/code&gt; files and the &lt;code&gt;counts&lt;/code&gt; folders.&lt;/p&gt;
 &lt;p&gt;This structure is replicated in the folder corresponding to this post in my &lt;a href="https://github.com/antoniocampos13/portfolio/tree/master/SQL/2020_10_12_Working_Data_CGC_PostgreSQL/TCGA"&gt;portfolio&lt;/a&gt;. The &lt;code&gt;main_tcga.ps1&lt;/code&gt; and &lt;code&gt;main_tcga.sh&lt;/code&gt; files contain the commands I used for this demonstration. The first is for Windows and the second for Unix&amp;nbsp;systems.&lt;/p&gt;
 &lt;p&gt;Then, in the &lt;code&gt;TCGA&lt;/code&gt; folder I opened a Windows PowerShell terminal and using &lt;code&gt;psql&lt;/code&gt;, a terminal-based front-end to PostgreSQL, created a database named &lt;code&gt;tcga&lt;/code&gt; on my local&amp;nbsp;server:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;psql&lt;/span&gt; &lt;span class="n"&gt;-U&lt;/span&gt; &lt;span class="n"&gt;postgres&lt;/span&gt; &lt;span class="n"&gt;-c&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;CREATE DATABASE tcga ENCODING &amp;#39;UTF-8&amp;#39; LC_COLLATE &amp;#39;English_United States&amp;#39; LC_CTYPE &amp;#39;English_United States&amp;#39; TEMPLATE template0&amp;quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The &lt;code&gt;-U&lt;/code&gt; flag serves to indicate which user will connect to the local PostgreSQL server. &lt;code&gt;postgres&lt;/code&gt; is the default user created during PostgreSQL installation. The &lt;code&gt;-c&lt;/code&gt; flag means that we are sending a command to the server. Note that the command is inside double quotes and strings into the command are single-quoted.In summary, this command serves to connect the &lt;code&gt;postgres&lt;/code&gt; user into the server and pass a command to create the &lt;code&gt;tcga&lt;/code&gt; database with certain characteristics: use &lt;span class="caps"&gt;UTF&lt;/span&gt;-8 codification, with English locale using the &lt;code&gt;template0&lt;/code&gt; database as template, which is created by default during PostgreSQL server&amp;nbsp;installation.&lt;/p&gt;
 &lt;p&gt;If during installation you provided a password to access the server, the terminal will ask for it after you press&amp;nbsp;Enter.&lt;/p&gt;
@@ -81,18 +79,16 @@
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;psql&lt;/span&gt; &lt;span class="n"&gt;-U&lt;/span&gt; &lt;span class="n"&gt;postgres&lt;/span&gt; &lt;span class="n"&gt;-d&lt;/span&gt; &lt;span class="n"&gt;tcga&lt;/span&gt; &lt;span class="n"&gt;-a&lt;/span&gt; &lt;span class="o"&gt;-f&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;src/tcga_create_tables.sql&amp;quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;The new friends here are &lt;code&gt;-d&lt;/code&gt; and &lt;code&gt;-a -f&lt;/code&gt;. &lt;code&gt;-d&lt;/code&gt; is the flag that indicates the &lt;em&gt;database&lt;/em&gt; I wished to connect; it is the &lt;code&gt;tcga&lt;/code&gt; I created above. The &lt;code&gt;-a&lt;/code&gt; serves to echo all information from the command to the terminal output so it is possible to check if the commands worked. The &lt;code&gt;-f&lt;/code&gt; flag mean &lt;em&gt;file&lt;/em&gt;: I am indicating that I want to pass the commands within the &lt;code&gt;tcga_create_tables.sql&lt;/code&gt; file inside the &lt;code&gt;src&lt;/code&gt; directory &amp;#8212; which I created as a subfolder of the &lt;code&gt;TCGA&lt;/code&gt; folder. If you are wondering how I created this file: wrote the commands in a text file and simply saved it with the &lt;code&gt;.sql&lt;/code&gt; extension.&lt;/p&gt;
 &lt;p&gt;Below is one of the commands inside the &lt;code&gt;.sql&lt;/code&gt; file:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;CREATE&lt;/span&gt; &lt;span class="k"&gt;TABLE&lt;/span&gt; &lt;span class="n"&gt;allcases&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
-&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="n"&gt;case_id&lt;/span&gt; &lt;span class="nb"&gt;TEXT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="n"&gt;case_primarysite&lt;/span&gt; &lt;span class="nb"&gt;TEXT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="n"&gt;diagnosis&lt;/span&gt; &lt;span class="nb"&gt;TEXT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="n"&gt;diagnosis_ageatdiagnosis_1&lt;/span&gt; &lt;span class="nb"&gt;INT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="n"&gt;diagnosis_clinicalt_1&lt;/span&gt; &lt;span class="nb"&gt;TEXT&lt;/span&gt;
-&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;CREATE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;TABLE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;allcases&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="n"&gt;case_id&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;TEXT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="n"&gt;case_primarysite&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;TEXT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="n"&gt;diagnosis&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;TEXT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="n"&gt;diagnosis_ageatdiagnosis_1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;INT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="n"&gt;diagnosis_clinicalt_1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;TEXT&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The command above creates the table &lt;code&gt;allcases&lt;/code&gt; with five columns: &lt;code&gt;case_id&lt;/code&gt;, &lt;code&gt;case_primarysite&lt;/code&gt;, &lt;code&gt;diagnosis&lt;/code&gt;, &lt;code&gt;diagnosis_ageatdiagnosis_1&lt;/code&gt;, and &lt;code&gt;diagnosis_clinicalt_1&lt;/code&gt;. Notice the words beside each one: they indicate the &lt;strong&gt;data type&lt;/strong&gt; of the data that the column will hold. In this case I have four columns that will get text data (&lt;code&gt;TEXT&lt;/code&gt;) and one that will get numbers &amp;#8212; integers (&lt;code&gt;INT&lt;/code&gt;)&amp;nbsp;specifically.&lt;/p&gt;
 &lt;p&gt;Note the semicolon &lt;code&gt;;&lt;/code&gt; at the end &amp;#8212; it is a PostgreSQL requirement. It indicates the end of a command (however, if we are passing arguments through the &lt;code&gt;-c&lt;/code&gt; flag the semicolon is not needed though, it is implicit within the&amp;nbsp;flag).&lt;/p&gt;
@@ -107,7 +103,6 @@
 
 &lt;span class="n"&gt;psql&lt;/span&gt; &lt;span class="n"&gt;-U&lt;/span&gt; &lt;span class="n"&gt;postgres&lt;/span&gt; &lt;span class="n"&gt;-d&lt;/span&gt; &lt;span class="n"&gt;tcga&lt;/span&gt; &lt;span class="n"&gt;-c&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;\COPY allfiles FROM &amp;#39;data/files.tsv&amp;#39; DELIMITER E&amp;#39;\t&amp;#39; CSV HEADER&amp;quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;(It is good practice to separate table-creating commands of table-populating ones). In summary, the commands tell the PostgreSQL server to copy the information contained in the &lt;code&gt;TSV&lt;/code&gt; files inside the &lt;code&gt;data&lt;/code&gt; directory into the specified&amp;nbsp;table.&lt;/p&gt;
 &lt;p&gt;The argument &lt;code&gt;DELIMITER E'\t'&lt;/code&gt; means that the columns are tab-separated (delimited). This argument would be &lt;code&gt;DELIMITER ','&lt;/code&gt; if the file were comma-separated or omitted&amp;nbsp;altogether.  &lt;/p&gt;
@@ -150,7 +145,6 @@ ENSG00000000005.5 &lt;span class="m"&gt;25&lt;/span&gt;
 ENSG00000000419.11 &lt;span class="m"&gt;500&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;In this state, I cannot know which patients provided the samples that generate count_A and count_B. But if I add a new column with the&amp;nbsp;filename:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# count_A&lt;/span&gt;
 ENSG00000000003.13 &lt;span class="m"&gt;4000&lt;/span&gt;    count_A
@@ -163,13 +157,11 @@ ENSG00000000005.5 &lt;span class="m"&gt;25&lt;/span&gt;  count_B
 ENSG00000000419.11 &lt;span class="m"&gt;500&lt;/span&gt; count_B
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;I can now cross-reference with the &lt;code&gt;allfiles&lt;/code&gt; table, and identify which file belong to each&amp;nbsp;patient:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;case_id file_name
 case0001 count_A
 case0002 count_B
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Thus, I created a &lt;strong&gt;relation&lt;/strong&gt; between the gene expression quantification and their patients of origin. Keep in mind that the gene counts file have &lt;strong&gt;thousands&lt;/strong&gt; of rows, each corresponding to one human gene/alternate transcript. Therefore, I&amp;nbsp;must:&lt;/p&gt;
 &lt;ol&gt;
@@ -188,18 +180,15 @@ case0002 count_B
 &lt;span class="n"&gt;python&lt;/span&gt; &lt;span class="n"&gt;-m&lt;/span&gt; &lt;span class="n"&gt;venv&lt;/span&gt; &lt;span class="n"&gt;venv&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;The first command installs the program &lt;code&gt;virtualenv&lt;/code&gt; (&lt;code&gt;venv&lt;/code&gt;) via the Python package manager &lt;code&gt;pip&lt;/code&gt;. The second command uses &lt;code&gt;venv&lt;/code&gt; to create a virtual environment deposited in a folder named &lt;code&gt;venv&lt;/code&gt; in the current directory (&lt;code&gt;TCGA&lt;/code&gt; folder in this example). You can also provide a complete path like&amp;nbsp;this:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;python&lt;/span&gt; &lt;span class="n"&gt;-m&lt;/span&gt; &lt;span class="n"&gt;venv&lt;/span&gt; &lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="err"&gt;:&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;Users&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;some_path&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;TCGA&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;venv&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;python&lt;/span&gt; &lt;span class="n"&gt;-m&lt;/span&gt; &lt;span class="n"&gt;venv&lt;/span&gt; &lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="p"&gt;:\&lt;/span&gt;&lt;span class="n"&gt;Users&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;some_path&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;TCGA&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;venv&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Of course, you can call the virtual environment as you&amp;nbsp;wish.&lt;/p&gt;
 &lt;h2&gt;Activate the virtual&amp;nbsp;environment&lt;/h2&gt;
 &lt;p&gt;Still in the &lt;code&gt;TCGA&lt;/code&gt; folder, I type the&amp;nbsp;command:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;venv&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;Scripts&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;activate&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The virtual environment is ready to be used. I will install the necessary modules for the&amp;nbsp;work.&lt;/p&gt;
 &lt;h2&gt;Install Python modules into the virtual&amp;nbsp;environment&lt;/h2&gt;
@@ -211,7 +200,6 @@ case0002 count_B
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;pip&lt;/span&gt; &lt;span class="n"&gt;install&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;dask[complete]&amp;quot;&lt;/span&gt; &lt;span class="n"&gt;psycopg2-binary&lt;/span&gt; &lt;span class="n"&gt;sqlalchemy&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;The modules will be downloaded from the internet and installed at the &lt;code&gt;venv&lt;/code&gt; folder. Additional dependencies, such as &lt;a href="https://pandas.pydata.org/"&gt;&lt;code&gt;pandas&lt;/code&gt;&lt;/a&gt; (a widely-used data analysis and manipulation tool) and &lt;a href="https://numpy.org/"&gt;&lt;code&gt;NumPy&lt;/code&gt;&lt;/a&gt; (package for scientific computing), used by &lt;code&gt;dask&lt;/code&gt;, will be downloaded as&amp;nbsp;well.&lt;/p&gt;
 &lt;h2&gt;Creating Python credentials to access PostgreSQL&amp;nbsp;database&lt;/h2&gt;
 &lt;p&gt;To access the &lt;code&gt;tcga&lt;/code&gt; database through Python, we need to configure credentials for the&amp;nbsp;connection.&lt;/p&gt;
@@ -220,7 +208,6 @@ case0002 count_B
 
 &lt;span class="n"&gt;psql&lt;/span&gt; &lt;span class="n"&gt;-U&lt;/span&gt; &lt;span class="n"&gt;postgres&lt;/span&gt; &lt;span class="n"&gt;-d&lt;/span&gt; &lt;span class="n"&gt;tcga&lt;/span&gt; &lt;span class="n"&gt;-c&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;GRANT ALL PRIVILEGES ON DATABASE tcga TO &amp;lt;USER_NAME&amp;gt;&amp;quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;&lt;code&gt;&amp;lt;USER_NAME&amp;gt;&lt;/code&gt; and &lt;code&gt;&amp;lt;PASSWORD&amp;gt;&lt;/code&gt; are placeholders for my username and password, respectively, since it is good practice to &lt;strong&gt;&lt;span class="caps"&gt;NEVER&lt;/span&gt; share sensitive information&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;Then, I created a file named &lt;code&gt;settings.py&lt;/code&gt; and put it in a &lt;code&gt;src&lt;/code&gt; folder with the following&amp;nbsp;content:&lt;/p&gt;
@@ -232,7 +219,6 @@ case0002 count_B
 &lt;span class="n"&gt;PORT&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;5432&amp;quot;&lt;/span&gt;
 &lt;span class="n"&gt;DB_NAME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;tcga&amp;quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Create one yourself with the user name and password you specified on the previous step. The other parameters can be left as they are. The 5432 port is usually the default port configured during installation to connection to PostgreSQL. Change it if needed, of course. &lt;code&gt;localhost&lt;/code&gt; means that the PostgreSQL is running locally in my&amp;nbsp;computer.&lt;/p&gt;
 &lt;p&gt;Then, to keep the organization of my folder, I added my &lt;code&gt;tcga_processing_counts.py&lt;/code&gt; customized script to the &lt;code&gt;src&lt;/code&gt; folder. The folder structure is now like&amp;nbsp;this:&lt;/p&gt;
@@ -255,12 +241,10 @@ case0002 count_B
     └── main_tcga.sh
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;h2&gt;Running the&amp;nbsp;script&lt;/h2&gt;
 &lt;p&gt;Back in the &lt;code&gt;TCGA&lt;/code&gt; folder, I type in the&amp;nbsp;PowerShell:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;python&lt;/span&gt; &lt;span class="n"&gt;src&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;tcga_processing_counts&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;py&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;This will start the script, which has eight&amp;nbsp;steps:&lt;/p&gt;
 &lt;ol&gt;
@@ -281,7 +265,6 @@ case0002 count_B
 &lt;p&gt;With the gene expression counts dataset imported in the database, it is time to create the filename (gene counts)/patient relation as I explained in the beginning of the post. In the terminal again, I&amp;nbsp;type:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;psql&lt;/span&gt; &lt;span class="n"&gt;-U&lt;/span&gt; &lt;span class="n"&gt;postgres&lt;/span&gt; &lt;span class="n"&gt;-d&lt;/span&gt; &lt;span class="n"&gt;tcga&lt;/span&gt; &lt;span class="n"&gt;-c&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;CREATE TABLE gene_counts_cases AS SELECT DISTINCT case_id, gene_id, gene_count FROM gene_counts LEFT JOIN allfiles ON gene_counts.filename = allfiles.file_uuid WHERE gene_id LIKE &amp;#39;%ENSG%&amp;#39;&amp;quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The command above links the two tables by their information in common: the filename of the gene counts, which is named &lt;code&gt;filename&lt;/code&gt; in the gene_counts table and &lt;code&gt;file_uuid&lt;/code&gt; in &lt;code&gt;allfiles&lt;/code&gt; table that we created&amp;nbsp;before.&lt;/p&gt;
 &lt;p&gt;See an excerpt of the final&amp;nbsp;result:&lt;/p&gt;

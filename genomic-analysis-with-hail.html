@@ -27,6 +27,7 @@
     <link href="https://antoniocampos13.github.io/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="Antonio's Portfolio RSS">
 
 
+  
 
     <!-- Chrome, Firefox OS and Opera -->
     <meta name="theme-color" content="#333333">
@@ -38,25 +39,27 @@
     <!-- Microsoft EDGE -->
     <meta name="msapplication-TileColor" content="#333333">
 
+ 
+
 <meta name="author" content="Antonio Victor Campos Coelho" />
 <meta name="description" content="Introduction Hello, long time no see! Since I lasted posted, many things happened. Since March I have been working as Post-Doc Researcher, hired by the Hospital Israelita Albert Einstein (HIAE, São Paulo, Brazil) to work for the Projeto Genomas Raros (“Rare Genomes Project”, GRAR from here on), a public-private partnership …" />
 <meta name="keywords" content="Bioinformatics, Genomics, Hail">
 
 
-<meta property="og:site_name" content="Antonio's Portfolio"/>
-<meta property="og:title" content="Genomic Analysis With Hail"/>
-<meta property="og:description" content="Introduction Hello, long time no see! Since I lasted posted, many things happened. Since March I have been working as Post-Doc Researcher, hired by the Hospital Israelita Albert Einstein (HIAE, São Paulo, Brazil) to work for the Projeto Genomas Raros (“Rare Genomes Project”, GRAR from here on), a public-private partnership …"/>
-<meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://antoniocampos13.github.io/genomic-analysis-with-hail.html"/>
-<meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2021-07-09 16:45:00-03:00"/>
-<meta property="article:modified_time" content=""/>
-<meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
-<meta property="article:section" content="Python"/>
-<meta property="article:tag" content="Bioinformatics"/>
-<meta property="article:tag" content="Genomics"/>
-<meta property="article:tag" content="Hail"/>
-<meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
+  <meta property="og:site_name" content="Antonio's Portfolio"/>
+  <meta property="og:title" content="Genomic Analysis With Hail"/>
+  <meta property="og:description" content="Introduction Hello, long time no see! Since I lasted posted, many things happened. Since March I have been working as Post-Doc Researcher, hired by the Hospital Israelita Albert Einstein (HIAE, São Paulo, Brazil) to work for the Projeto Genomas Raros (“Rare Genomes Project”, GRAR from here on), a public-private partnership …"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="https://antoniocampos13.github.io/genomic-analysis-with-hail.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2021-07-09 16:45:00-03:00"/>
+  <meta property="article:modified_time" content=""/>
+  <meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
+  <meta property="article:section" content="Python"/>
+  <meta property="article:tag" content="Bioinformatics"/>
+  <meta property="article:tag" content="Genomics"/>
+  <meta property="article:tag" content="Hail"/>
+  <meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
 
   <title>Antonio's Portfolio &ndash; Genomic Analysis With Hail</title>
 
@@ -64,12 +67,12 @@
 <body class="light-theme">
   <aside>
     <div>
-      <a href="https://antoniocampos13.github.io">
+      <a href="https://antoniocampos13.github.io/">
         <img src="https://avatars.githubusercontent.com/antoniocampos13" alt="Antonio's Portfolio" title="Antonio's Portfolio">
       </a>
 
       <h1>
-        <a href="https://antoniocampos13.github.io">Antonio's Portfolio</a>
+        <a href="https://antoniocampos13.github.io/">Antonio's Portfolio</a>
       </h1>
 
 <p>PhD in Genetics</p>
@@ -124,7 +127,7 @@
   <main>
 
     <nav>
-      <a href="https://antoniocampos13.github.io">Home</a>
+      <a href="https://antoniocampos13.github.io/">Home</a>
 
       <a href="/archives.html">Archives</a>
       <a href="/categories.html">Categories</a>
@@ -159,7 +162,6 @@
 <div class="highlight"><pre><span></span><code>gatk GenotypeGVCFs -R <span class="nv">$REF</span> -V <span class="nv">$DBPATH</span> -G StandardAnnotation -O cohort.vcf
 </code></pre></div>
 
-
 <p>Where <code>$REF</code> and <code>$DBPATH</code> are the paths of the genome reference (the same used during the variant call process) and the GenomicsDB, respectively (which should have a <code>gendb://</code> prefix as noted in the GenomicsDBImport tutorial, something like <code>gendb://my_database</code>). The <code>-O</code> flag indicates the output name. If you wish to compress the <span class="caps">VCF</span> file, you may use <code>bcftools</code> or <code>bgzip</code>. Remember to index the compressed&nbsp;file:</p>
 <div class="highlight"><pre><span></span><code>bcftools view cohort.vcf -Oz -o cohort.vcf.gz
 bcftools index cohort.vcf.gz
@@ -168,7 +170,6 @@ bcftools index cohort.vcf.gz
 bgzip -@ <span class="m">4</span> cohort.vcf
 tabix cohort.vcf.gz
 </code></pre></div>
-
 
 <p>The next step is to perform <span class="caps">GATK</span>&#8217;s Variant Quality Score Recalibration (<span class="caps">VQSR</span>) in the output <span class="caps">VCF</span> with <span class="caps">GATK</span>&#8217;s <code>VariantRecalibrator</code>.  See their original tutorial <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360035531112--How-to-Filter-variants-either-with-VQSR-or-by-hard-filtering">here</a>. To put it simply, <span class="caps">VQSR</span> works by comparing the detected variants with high-confidence variant sites observed by several consortia (HapMap, 1000 Genomes etc.) and applies a filter deeming the variant a true positive (i.e. the observed variation is a true biological event) or a false positive (i.e. the observed variation is not real, it is in a fact sequencing artifact). To this end, I downloaded high-confidence datasets to perform the <span class="caps">VQSR</span>. The datasets can be found at the <a href="https://console.cloud.google.com/storage/browser/genomics-public-data/resources/broad/hg38/v0;tab=objects?prefix=&amp;forceOnObjectsSortingFiltering=false"><span class="caps">GATK</span> Google Cloud Storage (Resource Bundle)</a> and can be downloaded with <a href="https://cloud.google.com/storage/docs/gsutil"><code>gsutil</code> application</a>.</p>
 <p>I will post a script with slight modification in the steps of the <span class="caps">VQSR</span> tutorial in my <a href="https://github.com/antoniocampos13/portfolio/tree/master/Python/2021_07_07_Genomic_Analysis_With_Hail">portfolio</a> (I was having errors so I noticed that I had to put spaces after the <code>-resource</code> flags of the <code>VariantRecalibrator</code> command). Briefly, the steps&nbsp;are:</p>
@@ -198,7 +199,6 @@ tabix cohort.vcf.gz
 <span class="p">)</span>
 </code></pre></div>
 
-
 <p>Notice the <code>DEFAULT_REF</code> variable: it establishes that I intend to use the genomic coordinates considering the Genome Reference Consortium Human Reference 38 (GRCh38), the most recent genome version being accepted by the human genome community. Otherwise Hail would use GRCh37 as default. The <code>spark_conf</code> argument where I setup Spark so it uses four <span class="caps">CPU</span> cores and 16 <span class="caps">GB</span> of <span class="caps">RAM</span>. Change these values as&nbsp;appropriate.</p>
 <h2>Importing the <span class="caps">VCF</span>&nbsp;input</h2>
 <p>I am now ready to import <code>snp.recalibrated.vcf.gz</code> into the Hail session and convert it to Hail&#8217;s <code>MatrixTable</code> object and write it to the disk. In simple terms, a <code>MatrixTable</code> is a representation of a <span class="caps">VCF</span> file that is amenable to be manipulated by Spark. Read the <a href="https://hail.is/docs/0.2/index.html">Hail Docs</a> for more details. I initiate Hail and then import and convert the dataset with two chained steps (<code>hl.import_vcf().write()</code>):</p>
@@ -211,7 +211,6 @@ tabix cohort.vcf.gz
 <span class="n">reference_genome</span><span class="o">=</span><span class="n">DEFAULT_REF</span><span class="p">,</span>
 <span class="n">array_elements_required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;recalibrated.mt&quot;</span><span class="p">,</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>I can now proceed to prepare the dataset for sample and variant quality control (<span class="caps">QC</span>).</p>
 <h2>Preparing for Sample <span class="caps">QC</span></h2>
@@ -232,22 +231,18 @@ tabix cohort.vcf.gz
 <span class="n">MEDIAN_LENGTH</span> <span class="o">=</span> <span class="mi">250</span>  <span class="c1"># gnomAD value.</span>
 </code></pre></div>
 
-
 <p>The comment in each line contains the value used by Hail team or gnomAD team. Since this is a demonstration, I may have used different values. Change these values as you feel appropriate as&nbsp;well.</p>
 <p>I will now read the matrix table from disk and assign it to the <code>mt</code> object:</p>
 <div class="highlight"><pre><span></span><code><span class="n">mt</span> <span class="o">=</span> <span class="n">hl</span><span class="o">.</span><span class="n">read_matrix_table</span><span class="p">(</span><span class="s2">&quot;recalibrated.mt&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>To check the first few sample ids, I use the <code>show()</code> method (I explain the <code>s</code> here&nbsp;later):</p>
 <div class="highlight"><pre><span></span><code><span class="n">mt</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div>
 
-
 <p>To check the matrix table structure, I use the <code>describe()</code> method:</p>
 <div class="highlight"><pre><span></span><code><span class="n">mt</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
 </code></pre></div>
-
 
 <p>The output is as&nbsp;follows:</p>
 <div class="highlight"><pre><span></span><code>----------------------------------------
@@ -315,7 +310,6 @@ Row key: [&#39;locus&#39;, &#39;alleles&#39;]
 ----------------------------------------
 </code></pre></div>
 
-
 <p>We can see that a Hail <code>MatrixTable</code> objects has four types of information&nbsp;&#8220;compartments&#8221;:</p>
 <ul>
 <li>Global fields: information values that are identical for every&nbsp;row</li>
@@ -342,7 +336,6 @@ Row key: [&#39;locus&#39;, &#39;alleles&#39;]
 <span class="n">mt</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">annotate_rows</span><span class="p">(</span><span class="n">spanning_deletion</span><span class="o">=</span><span class="n">hl</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span> <span class="o">==</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">mt</span><span class="o">.</span><span class="n">alleles</span><span class="p">))</span>
 </code></pre></div>
 
-
 <p>To check the dimensions of the <code>MatrixTable</code>, I can use the following&nbsp;commands:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Number of Rows, Columns</span>
 <span class="n">mt</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
@@ -351,21 +344,17 @@ Row key: [&#39;locus&#39;, &#39;alleles&#39;]
 <span class="n">mt</span><span class="o">.</span><span class="n">count_cols</span><span class="p">()</span>
 </code></pre></div>
 
-
 <p>To see a variant breakdown (types, number of variants per chromosome and several other information), there is the following&nbsp;command:</p>
 <div class="highlight"><pre><span></span><code><span class="n">hl</span><span class="o">.</span><span class="n">summarize_variants</span><span class="p">(</span><span class="n">mt</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>A recommended step for further downstream analyses is to split multiallelic variants into biallelic&nbsp;configuration:</p>
 <div class="highlight"><pre><span></span><code><span class="n">mt</span> <span class="o">=</span> <span class="n">hl</span><span class="o">.</span><span class="n">split_multi_hts</span><span class="p">(</span><span class="n">mt</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>To remove any monomorphic (invariant) loci I&nbsp;use:</p>
 <div class="highlight"><pre><span></span><code><span class="n">mt</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">filter_rows</span><span class="p">(</span><span class="n">mt</span><span class="o">.</span><span class="n">n_alleles</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>Try the <code>hl.summarize_variants()</code> to check how the numbers changed after&nbsp;splitting.</p>
 <p>Up until this moment, I have only genetics-related information into the <code>MatrixTable</code>. I can instruct Hail to import <span class="caps">TSV</span>/<span class="caps">CSV</span> file with sample-level (column) annotations with the <code>hl.import_table()</code> command and then associate each observation by keying the <code>s</code> field with <code>hl.annotate_cols()</code>.</p>
@@ -373,7 +362,6 @@ Row key: [&#39;locus&#39;, &#39;alleles&#39;]
 
 <span class="n">mt</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">annotate_cols</span><span class="p">(</span><span class="n">sample_info</span><span class="o">=</span><span class="n">sa</span><span class="p">[</span><span class="n">mt</span><span class="o">.</span><span class="n">s</span><span class="p">])</span>
 </code></pre></div>
-
 
 <p>The <code>sample_info.txt</code> example file has the following&nbsp;format:</p>
 <div class="highlight"><pre><span></span><code>s sex phenotype mean_coverage chimeric_reads contamination median_length
@@ -383,12 +371,10 @@ sample3 XY control 30 0.03 0.00 265
 sample4 XX control 29 0.01 0.00 250
 </code></pre></div>
 
-
 <p>In this mock sample information file I included the sex karyotype, a fictitious phenotype and sequencing metrics to support the sample <span class="caps">QC</span> procedure. As you may have guessed, any number and type (numeric, string, float, integer, Boolean) of important sample metadata columns can be&nbsp;included.</p>
 <p>Whenever we annotate columns, rows or entries in Hail, we must provide the name of the new field. In this case is <code>sample_info</code>. So if I wanted to manipulate, say the sex karyotype field, I would refer the field name this&nbsp;way:</p>
 <div class="highlight"><pre><span></span><code><span class="n">mt</span><span class="o">.</span><span class="n">sample_info</span><span class="o">.</span><span class="n">sex</span>
 </code></pre></div>
-
 
 <p>This is because the information in the file will be assigned to a dictionary-like field named <code>sample_info</code> within the <code>MatrixTable</code>; the <code>sex</code>, <code>phenotype</code>, etc. fields are <em>inside</em> <code>sample_info</code>.</p>
 <h2>Performing Sample <span class="caps">QC</span></h2>
@@ -396,7 +382,6 @@ sample4 XX control 29 0.01 0.00 250
 <p>Hail has a very convenient function to calculate descriptive statistics of fields in a <code>MatrixTable</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="n">mt</span> <span class="o">=</span> <span class="n">hl</span><span class="o">.</span><span class="n">sample_qc</span><span class="p">(</span><span class="n">mt</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>This function will calculate overall call rate per sample, mean read depth (coverage) and other <a href="https://hail.is/docs/0.2/methods/genetics.html#hail.methods.sample_qc">things</a>. We can plot the calculated fields to assess call rate and coverage (read depth) across samples. The code below will output a <span class="caps">HTML</span> plot to disk (make sure you have the <a href="https://docs.bokeh.org/en/latest/index.html">bokeh</a> Python module&nbsp;installed).</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">bokeh.embed</span> <span class="kn">import</span> <span class="n">file_html</span>
@@ -417,14 +402,12 @@ sample4 XX control 29 0.01 0.00 250
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
 </code></pre></div>
 
-
 <h3>Filter samples by quality&nbsp;thresholds</h3>
 <p>I can finally filter out samples that do not meet the quality thresholds I established before. For example, the lines below will keep only samples that meet overall call rate and mean coverage quality&nbsp;criteria:</p>
 <div class="highlight"><pre><span></span><code><span class="n">mt</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">filter_cols</span><span class="p">(</span><span class="n">mt</span><span class="o">.</span><span class="n">sample_qc</span><span class="o">.</span><span class="n">call_rate</span> <span class="o">&gt;=</span> <span class="n">CALL_RATE</span><span class="p">)</span>
 
 <span class="n">mt</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">filter_cols</span><span class="p">(</span><span class="n">mt</span><span class="o">.</span><span class="n">sample_qc</span><span class="o">.</span><span class="n">dp_stats</span><span class="o">.</span><span class="n">mean</span> <span class="o">&gt;=</span> <span class="n">READ_DEPTH</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>If you have other quality criteria, you could filter in a similar way by correctly referring the field name (remember that dictionary-like fields contain other fields, as is the case of <code>sample_info</code> I mentioned earlier and <code>sample_qc</code> above) and a logical expression (which must follow the Python syntax for equalities and&nbsp;inequalities).</p>
 <h3>Principal component analysis (<span class="caps">PCA</span>) to filter related&nbsp;samples</h3>
@@ -433,18 +416,15 @@ sample4 XX control 29 0.01 0.00 250
 <span class="n">for_pca</span> <span class="o">=</span> <span class="n">for_pca</span><span class="o">.</span><span class="n">filter_rows</span><span class="p">(</span><span class="n">for_pca</span><span class="o">.</span><span class="n">n_alleles</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># will remove sites that were multi-allelic before splitting as well to ensure &quot;pure&quot; biallelic sites</span>
 </code></pre></div>
 
-
 <p>Then, I determine the sample number to calculate <code>k</code>, the number of principal&nbsp;components.</p>
 <div class="highlight"><pre><span></span><code><span class="n">sample_num</span> <span class="o">=</span> <span class="n">for_pca</span><span class="o">.</span><span class="n">cols</span><span class="p">()</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 </code></pre></div>
-
 
 <p>Next, using the <a href="https://hail.is/docs/0.2/methods/genetics.html#hail.methods.hwe_normalized_pca"><code>hl.hwe_normalized_pca()</code> function</a> I calculate the principal component&nbsp;scores:</p>
 <div class="highlight"><pre><span></span><code><span class="n">_</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">hl</span><span class="o">.</span><span class="n">hwe_normalized_pca</span><span class="p">(</span>
     <span class="n">for_pca</span><span class="o">.</span><span class="n">GT</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">sample_num</span> <span class="o">//</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">)),</span> <span class="n">compute_loadings</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">)</span>
 </code></pre></div>
-
 
 <p>With big sample sizes, the code above will restrict <code>k</code> to the maximum of 10 principal&nbsp;components.</p>
 <p>The scores are one of the inputs of the <a href="https://hail.is/docs/0.2/methods/relatedness.html#hail.methods.pc_relate"><code>hl.pc_relate()</code> function</a> that will estimate the relatedness between samples in a pairwise manner. To speed things up, I will estimate only the kinship statistic (<code>statistics="kin"</code>, while the default is <code>statistics="all"</code>. Check the function documentation in the previous link for more&nbsp;details).</p>
@@ -458,18 +438,15 @@ sample4 XX control 29 0.01 0.00 250
 <span class="p">)</span>
 </code></pre></div>
 
-
 <p>The <code>relatedness_ht</code> object is a Hail <code>Table</code>. It differs from a <code>MatrixTable</code> by not having column nor entries fields. We determine related samples by filtering this table to keep only the samples above the kinship threshold and then passing the object to <a href="https://hail.is/docs/0.2/methods/misc.html#hail.methods.maximal_independent_set"><code>hl.maximal_independent_set()</code> function</a>:</p>
 <div class="highlight"><pre><span></span><code><span class="n">pairs</span> <span class="o">=</span> <span class="n">relatedness_ht</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">relatedness_ht</span><span class="p">[</span><span class="s2">&quot;kin&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">RELATEDNESS</span><span class="p">)</span>
 
 <span class="n">related_samples_to_remove</span> <span class="o">=</span> <span class="n">hl</span><span class="o">.</span><span class="n">maximal_independent_set</span><span class="p">(</span><span class="n">pairs</span><span class="o">.</span><span class="n">i</span><span class="p">,</span> <span class="n">pairs</span><span class="o">.</span><span class="n">j</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>The <code>related_samples_to_remove</code> object will contain a selection of samples to be removed from the dataset because they come from related individuals in the sample. We perform this filtering with the command below. Notice the use of the keyword <code>keep=False</code> to <em>negate</em> the selection (I do <em>not</em> want to keep related&nbsp;samples).</p>
 <div class="highlight"><pre><span></span><code><span class="n">mt</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">filter_cols</span><span class="p">(</span><span class="n">hl</span><span class="o">.</span><span class="n">is_defined</span><span class="p">(</span><span class="n">related_samples_to_remove</span><span class="p">[</span><span class="n">mt</span><span class="o">.</span><span class="n">col_key</span><span class="p">]),</span> <span class="n">keep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>Use <code>mt.count_cols()</code> to assess if any sample was&nbsp;removed.</p>
 <h3>Wrapping up the sample <span class="caps">QC</span></h3>
@@ -478,7 +455,6 @@ sample4 XX control 29 0.01 0.00 250
 
 <span class="n">mt</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;sampleqc_pass.mt&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>I can now proceed to variant <span class="caps">QC</span>.</p>
 <h2>Variant <span class="caps">QC</span></h2>
@@ -503,7 +479,6 @@ sample4 XX control 29 0.01 0.00 250
 <span class="n">mt</span> <span class="o">=</span> <span class="n">hl</span><span class="o">.</span><span class="n">variant_qc</span><span class="p">(</span><span class="n">mt</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>Even though allelic frequency may be already been lift over from the original <span class="caps">VCF</span> input, I recommend using <code>hl.variant_qc()</code> since it calculates potentially useful information besides allelic frequency, such as p-values from the test of Hardy-Weinberg equilibrium. Check the function documentation at Hail to see the complete list of&nbsp;statistics.</p>
 <h3>Filter variants by genotype-related quality&nbsp;thresholds</h3>
 <p>Next, I calculate two variant-level metrics: inbreeding coefficient and the maximum p-value for sampling the observed allele balance under a binomial&nbsp;model.</p>
@@ -515,7 +490,6 @@ sample4 XX control 29 0.01 0.00 250
     <span class="p">)</span>
 <span class="p">)</span>
 </code></pre></div>
-
 
 <p>Next, I remove variants with excess of heterozygotes by inbreeding coefficient and variants for which no sample had high-quality genotypes by evaluating allele balance (the proportion of sequencing reads that support the&nbsp;variant):</p>
 <div class="highlight"><pre><span></span><code><span class="n">mt</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">filter_rows</span><span class="p">(</span><span class="n">mt</span><span class="o">.</span><span class="n">inbr_coeff</span> <span class="o">&gt;</span> <span class="n">INBR_COEFF</span><span class="p">)</span>
@@ -535,14 +509,12 @@ sample4 XX control 29 0.01 0.00 250
 <span class="p">)</span>
 </code></pre></div>
 
-
 <h3>Variant <span class="caps">QC</span> by random forest&nbsp;model</h3>
 <p>The gnomAD team adopted a <a href="https://gnomAD.broadinstitute.org/news/2018-10-gnomAD-v2-1/">random forest model</a> to filter out sequencing artifacts. Briefly, they labelled variants passing quality thresholds (such as <span class="caps">GATK</span>&#8217;s <span class="caps">VQSR</span>) as true positives and variants not passing as false positives. Next, they performed a supervised random forest training with some variant-level features. From now on, I try to replicate their method with the best of my&nbsp;understanding.</p>
 <p>I label the variants as true and false&nbsp;positives:</p>
 <div class="highlight"><pre><span></span><code><span class="n">mt</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">annotate_rows</span><span class="p">(</span><span class="n">tp</span><span class="o">=</span><span class="n">hl</span><span class="o">.</span><span class="n">if_else</span><span class="p">(</span><span class="n">hl</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="n">mt</span><span class="o">.</span><span class="n">filters</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
 <span class="n">mt</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">annotate_rows</span><span class="p">(</span><span class="n">fp</span><span class="o">=</span><span class="n">hl</span><span class="o">.</span><span class="n">if_else</span><span class="p">(</span><span class="n">hl</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="n">mt</span><span class="o">.</span><span class="n">filters</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
 </code></pre></div>
-
 
 <p>The logic is that if the <code>filters</code> field (which is carried over from the GenomicsDB-exported <span class="caps">VCF</span>) is empty, it indicates the variant passed the <span class="caps">VQSR</span> filter and is a false positive otherwise. Thus, I create two Boolean-type columns indicating it. Next, I create a Hail <code>Table</code> extracting the needed features and the <code>tp</code> and <code>fp</code> fields and assigning it to the <code>rf_ht</code> object:</p>
 <div class="highlight"><pre><span></span><code><span class="n">rf_ht</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">select_rows</span><span class="p">(</span>
@@ -561,7 +533,6 @@ sample4 XX control 29 0.01 0.00 250
 <span class="p">)</span><span class="o">.</span><span class="n">rows</span><span class="p">()</span>
 </code></pre></div>
 
-
 <p>Remember that most of these features are brought over from the <span class="caps">VCF</span> <span class="caps">INFO</span> field, while the others were generated with the help of Hail. I also generate a Python list with the features&nbsp;names:</p>
 <div class="highlight"><pre><span></span><code><span class="n">features</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;inbr_coeff&quot;</span><span class="p">,</span>
@@ -577,11 +548,9 @@ sample4 XX control 29 0.01 0.00 250
 <span class="p">]</span>
 </code></pre></div>
 
-
 <p>Since random forest models do not tolerate missing data, I use a gnomAD function to impute any missing data with the median of the&nbsp;field:</p>
 <div class="highlight"><pre><span></span><code><span class="n">rf_ht</span> <span class="o">=</span> <span class="n">median_impute_features</span><span class="p">(</span><span class="n">rf_ht</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>I will reserve all variants located in chromosome 20 to perform model evaluation with the help of the <a href="https://hail.is/docs/0.2/functions/genetics.html#hail.expr.functions.parse_locus_interval"><code>hl.parse_locus_interval()</code> function</a>:</p>
 <div class="highlight"><pre><span></span><code><span class="n">test_intervals</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;chr20&quot;</span><span class="p">]</span>
@@ -590,7 +559,6 @@ sample4 XX control 29 0.01 0.00 250
     <span class="n">hl</span><span class="o">.</span><span class="n">parse_locus_interval</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">reference_genome</span><span class="o">=</span><span class="s2">&quot;GRCh38&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">test_intervals</span>
 <span class="p">]</span>
 </code></pre></div>
-
 
 <p>I now may train the model with the help of gnomAD&#8217;s <code>train_rf_model()</code> function. Internally, the function will select a balanced dataset of true positives and false positives to train the&nbsp;model.</p>
 <div class="highlight"><pre><span></span><code><span class="n">rf_trained_ht</span><span class="p">,</span> <span class="n">rf_model</span> <span class="o">=</span> <span class="n">train_rf_model</span><span class="p">(</span>
@@ -603,7 +571,6 @@ sample4 XX control 29 0.01 0.00 250
     <span class="p">),</span>
 <span class="p">)</span>
 </code></pre></div>
-
 
 <p>The <code>rf_trained_ht</code> output is a Hail <code>Table</code> with annotations related with the random forest model training. The <code>rf_model</code> object is the model binary generated by Spark. The inputs include the <code>rf_ht Table</code>, the <code>features</code> list, the <code>rf_ht.tp</code> and <code>rf_ht.fp</code> Boolean columns and a <code>test_expr</code> argument receives a expression that will ensure that the loci contained in the interval object <code>test_intervals</code> will be used for model&nbsp;evaluation.</p>
 <p>After model training, I left join the <code>rf_ht</code> with the model-annotated <code>rf_trained_ht</code> into the <code>ht Table</code>. I use it as the input for the gnomAD&#8217;s <code>apply_rf_model()</code> function. It will apply the random forest model in all variants in the genome, including those not selected for&nbsp;training.</p>
@@ -618,7 +585,6 @@ sample4 XX control 29 0.01 0.00 250
 <span class="p">)</span>
 </code></pre></div>
 
-
 <p>I then write to disk the Hail <code>Table</code> containing a summary of the number of variants originally labeled as true or false positives and the prediction by the model. In other words - a confusion&nbsp;matrix:</p>
 <div class="highlight"><pre><span></span><code><span class="n">rf_summary_ht</span> <span class="o">=</span> <span class="n">rf_results</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span>
     <span class="s2">&quot;tp&quot;</span><span class="p">,</span> <span class="s2">&quot;fp&quot;</span><span class="p">,</span> <span class="s2">&quot;rf_train&quot;</span><span class="p">,</span> <span class="s2">&quot;rf_label&quot;</span><span class="p">,</span> <span class="s2">&quot;rf_prediction&quot;</span>
@@ -627,11 +593,9 @@ sample4 XX control 29 0.01 0.00 250
 <span class="n">rf_summary_ht</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;rf_summary.ht&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>I unpack the <code>rf_results Table</code> fields and join them in the sample <span class="caps">QC</span> <code>MatrixTable</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="n">variantqc_pass</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">annotate_rows</span><span class="p">(</span><span class="o">**</span><span class="n">rf_results</span><span class="p">[</span><span class="n">mt</span><span class="o">.</span><span class="n">locus</span><span class="p">,</span> <span class="n">mt</span><span class="o">.</span><span class="n">alleles</span><span class="p">])</span>
 </code></pre></div>
-
 
 <p>It can be easily filtered to keep only variants predicted to be true positives by the model and then written to&nbsp;disk:</p>
 <div class="highlight"><pre><span></span><code><span class="n">variantqc_pass</span> <span class="o">=</span> <span class="n">hl</span><span class="o">.</span><span class="n">filter_rows</span><span class="p">(</span><span class="n">variantqc_pass</span><span class="o">.</span><span class="n">rf_prediction</span> <span class="o">==</span> <span class="s2">&quot;TP&quot;</span><span class="p">)</span>
@@ -639,19 +603,16 @@ sample4 XX control 29 0.01 0.00 250
 <span class="n">variantqc_pass</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;variantqc_pass.mt&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 
-
 <h2>Filter loci by coordinates or allelic&nbsp;frequency</h2>
 <p>Now the dataset has passed all <span class="caps">QC</span>, I may query it to search for new variants or answer other scientific questions. To illustrate that, I will filter the dataset to contain variants in delimited regions of the genome with a certain range of allelic frequencies. To parse specific regions from a genome, I can create a Python list of strings representing exact or approximate&nbsp;coordinates:</p>
 <div class="highlight"><pre><span></span><code><span class="n">intervals</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;chr10:52765380-52772784&quot;</span><span class="p">,</span> <span class="s2">&quot;chr1:100M-200M&quot;</span><span class="p">]</span>
 </code></pre></div>
-
 
 <p>Now I will apply the filter to a <code>MatrixTable</code> with <code>hl.parse_locus_interval()</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="n">filtered_mt</span> <span class="o">=</span> <span class="n">hl</span><span class="o">.</span><span class="n">filter_intervals</span><span class="p">(</span>
     <span class="n">variantqc_pass</span><span class="p">,</span>
     <span class="p">[</span><span class="n">hl</span><span class="o">.</span><span class="n">parse_locus_interval</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">reference_genome</span><span class="o">=</span><span class="n">DEFAULT_REF</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">intervals</span><span class="p">])</span> 
 </code></pre></div>
-
 
 <p>I can also pinpoint an individual locus and create a window of nucleotides before and after it. In the code below I create a window of 100,000 nucleotides before and after a specific position in chromosome&nbsp;X.</p>
 <div class="highlight"><pre><span></span><code><span class="n">locus</span> <span class="o">=</span> <span class="n">hl</span><span class="o">.</span><span class="n">parse_locus</span><span class="p">(</span><span class="s2">&quot;chrX:23833353&quot;</span><span class="p">,</span> <span class="n">DEFAULT_REF</span><span class="p">)</span>
@@ -660,17 +621,14 @@ sample4 XX control 29 0.01 0.00 250
 <span class="n">filtered_mt</span> <span class="o">=</span> <span class="n">variantqc_pass</span><span class="o">.</span><span class="n">filter_rows</span><span class="p">(</span><span class="n">window</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">variantqc_pass</span><span class="o">.</span><span class="n">locus</span><span class="p">))</span>
 </code></pre></div>
 
-
 <p>If I wanted to check the first few genotypes of the filtered <code>MatrixTable</code> by the specified window I would use the command&nbsp;below:</p>
 <div class="highlight"><pre><span></span><code><span class="n">filtered_mt</span><span class="o">.</span><span class="n">GT</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div>
-
 
 <p>Since this coordinate is not on the pseudoautosomal region (<span class="caps">PAR</span>) of the X chromosomes, karyotypically normal male individuals will be haploid around this region, and Hail would correctly show only one allele instead of two in the <code>GT</code> call.</p>
 <p>Since I used <code>hl.variant_qc()</code> at the beginning of variant <span class="caps">QC</span>, I may filter the variants by their allelic frequency. For example, If I wanted to keep only the variants with less than 1% frequency I would&nbsp;do:</p>
 <div class="highlight"><pre><span></span><code><span class="n">filtered_mt</span> <span class="o">=</span> <span class="n">filtered_mt</span><span class="o">.</span><span class="n">filter_rows</span><span class="p">(</span><span class="n">filtered_mt</span><span class="o">.</span><span class="n">variant_qc</span><span class="o">.</span><span class="n">AF</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.01</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>Remember to <code>write()</code> the <code>MatrixTable</code> if you want to save the dataset with any applied&nbsp;filters.</p>
 <h2>Conclusion</h2>
@@ -743,7 +701,7 @@ sample4 XX control 29 0.01 0.00 250
 
     <footer>
 <p>
-  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike</a>
 </p>
 <p>
 Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
@@ -774,7 +732,6 @@ Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a 
   "description": "Data Science Portfolio by Antonio Victor Campos Coelho"
 }
 </script>
-
 
 </body>
 </html>

@@ -19,29 +19,24 @@
 &lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BSgenome.Hsapiens.UCSC.hg38&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Next, using &lt;code&gt;here()&lt;/code&gt; package, I will create the full path of a &lt;a href="http://gmod.org/wiki/GFF3"&gt;&lt;code&gt;GFF3&lt;/code&gt;&lt;/a&gt; file. The &lt;code&gt;GFF3&lt;/code&gt; format stores genomic features in a text file to help represent genomic data. This file in question contains features of the whole human genome. Since it is a big file, download it at the &lt;a href="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/"&gt;&lt;span class="caps"&gt;NCBI&lt;/span&gt;&amp;#8217;s &lt;span class="caps"&gt;FTP&lt;/span&gt; site&lt;/a&gt;.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;gffPath&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;GCA_000001405.15_GRCh38_full_analysis_set.refseq_annotation.gff&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Edit the path using &lt;a href="https://here.r-lib.org/"&gt;&lt;code&gt;here()&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s&lt;/a&gt; syntax if&amp;nbsp;necessary.&lt;/p&gt;
 &lt;p&gt;To keep things simple, I create a vector with just two&amp;nbsp;genes:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;genes&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;HTT&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;FMR1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Now I can start working with the Python script. If you use &lt;code&gt;conda&lt;/code&gt; environments to work with Python as I do, you can select the environment with &lt;code&gt;reticulate&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;use_condaenv()&lt;/code&gt; function. In this case, I will use my &lt;a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html"&gt;&lt;code&gt;bioenv&lt;/code&gt;&lt;/a&gt;&amp;nbsp;environment.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;use_condaenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;bioenv&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Using &lt;code&gt;here()&lt;/code&gt; again, I set up the path for the Python script. Then, I use &lt;code&gt;reticulate&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;source_python()&lt;/code&gt; function to run the Python&amp;nbsp;script.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;pythonScript&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;reticulate_demo_Python_side.py&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
 &lt;span class="nf"&gt;source_python&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pythonScript&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Let me show you the contents of this&amp;nbsp;script.&lt;/p&gt;
 &lt;h2&gt;Python&amp;nbsp;script&lt;/h2&gt;
@@ -50,33 +45,27 @@
 &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;pandas&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;pd&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;(Remember to install all the necessary Python modules in the environment beforehand with &lt;code&gt;conda&lt;/code&gt; or &lt;code&gt;pip&lt;/code&gt;).&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;conda install -c bioconda pyranges
 &lt;span class="c1"&gt;# or&lt;/span&gt;
 pip install pyranges
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Then, I read the &lt;code&gt;GFF3&lt;/code&gt; file into the Python session using &lt;code&gt;pyranges&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;read_gff3()&lt;/code&gt; function. Since I saved the file path into R&amp;#8217;s &lt;code&gt;gffPath&lt;/code&gt; object, I must use the &lt;code&gt;r.&lt;/code&gt; prefix to bring it into the Python session, like&amp;nbsp;this:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;grch38_gff&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read_gff3&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;gffPath&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Next, I append the &lt;code&gt;.df&lt;/code&gt; suffix into the  &lt;code&gt;grch38_gff&lt;/code&gt; Python object to convert it into a &lt;code&gt;pandas&lt;/code&gt; data frame to facilitate the search for the genes I established into the R&amp;nbsp;session:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;grch38_gff&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;I will search for the genes with &lt;code&gt;pandas&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;str.contains()&lt;/code&gt; method. To do this, I must create a regex string. I will append a &lt;code&gt;$&lt;/code&gt; to the end of each gene name to match the whole gene&amp;nbsp;string:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;suffix&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$&amp;quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Next, I will use a list comprehension and Python&amp;#8217;s &lt;code&gt;join()&lt;/code&gt; method to create the search string&amp;nbsp;:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;search_string&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;|&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="n"&gt;gene&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;suffix&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;gene&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;genes&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The &lt;code&gt;search_string&lt;/code&gt; object turns up like this (remember that the pipe &lt;code&gt;|&lt;/code&gt; character means &amp;#8220;or&amp;#8221; in&amp;nbsp;regex):&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;search_string&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -84,11 +73,9 @@ pip install pyranges
 &lt;span class="c1"&gt;# HTT$|FMR1$&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Then I can finally filter the data frame to include only those&amp;nbsp;genes:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;df&lt;/span&gt;&lt;span class="p"&gt;[(&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;gene&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;str&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;contains&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;search_string&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Feature&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;exon&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The line above concludes the Python script. Now let us return to the R script to wrap things&amp;nbsp;up.&lt;/p&gt;
 &lt;h2&gt;R script: part&amp;nbsp;2/2&lt;/h2&gt;
@@ -96,7 +83,6 @@ pip install pyranges
 &lt;p&gt;Therefore, I will retrieve the data frame &lt;code&gt;df&lt;/code&gt; object and assign it to the &lt;code&gt;exonsCoordinates&lt;/code&gt; R&amp;nbsp;object:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;exonsCoordinates&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;py&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Before working with it, let me source a function that will retrieve the exon sequences using the &lt;a href="https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html"&gt;&lt;code&gt;GenomicRanges&lt;/code&gt;&lt;/a&gt; (&lt;code&gt;pyranges&lt;/code&gt; is Python&amp;#8217;s &lt;code&gt;GenomicRanges&lt;/code&gt; analog), &lt;a href="https://bioconductor.org/packages/release/bioc/html/BSgenome.html"&gt;&lt;code&gt;BSgenome&lt;/code&gt;&lt;/a&gt; and &lt;a href="https://bioconductor.org/packages/release/data/annotation/html/BSgenome.Hsapiens.UCSC.hg38.html"&gt;&lt;code&gt;BSgenome.Hsapiens.UCSC.hg38&lt;/code&gt;&lt;/a&gt;&amp;nbsp;packages.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;source&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;src&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;getSequence.R&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
@@ -111,7 +97,6 @@ pip install pyranges
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;&lt;strong&gt;Important&lt;/strong&gt;: The first use of BSgenome/BSgenome.Hsapiens.&lt;span class="caps"&gt;UCSC&lt;/span&gt;.hg38 will prompt the download of human genomic sequence caches to be saved into a specific location on your computer. Be sure you have sufficient data allowances and&amp;nbsp;space.&lt;/p&gt;
 &lt;p&gt;Finally, using &lt;code&gt;tidyverse&lt;/code&gt; (&lt;code&gt;dplyr&lt;/code&gt;) pipe &lt;code&gt;%&amp;gt;%&lt;/code&gt; syntax, I create a new column in the data frame (&lt;code&gt;mutate()&lt;/code&gt;) using the &lt;code&gt;Chromosome&lt;/code&gt;, &lt;code&gt;Start&lt;/code&gt;, and &lt;code&gt;End&lt;/code&gt; columns as arguments to my custom &lt;code&gt;getSequence()&lt;/code&gt; function. The new column will contain the exon sequences. Observe the use of &lt;code&gt;rowwise()&lt;/code&gt; and &lt;code&gt;ungroup()&lt;/code&gt;. Since my function is not vectorized, I must use it row-wise instead of column-wise. The first function ensures this. The second function restores the data frame to its column-wise nature after &lt;code&gt;getSequence()&lt;/code&gt; finishes its job. Then, I select just some of the columns of the data frame with &lt;code&gt;dplyr&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;select()&lt;/code&gt; function:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;exonsCoordinatesClean&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;exonsCoordinates&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
@@ -120,7 +105,6 @@ pip install pyranges
   &lt;span class="nf"&gt;ungroup&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
   &lt;span class="nf"&gt;select&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Chromosome&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Feature&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Start&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;End&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Score&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Strand&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Frame&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ID&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;gene&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sequence&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;h2&gt;Conclusion&lt;/h2&gt;
 &lt;p&gt;In conclusion, I&amp;nbsp;:&lt;/p&gt;
@@ -157,7 +141,6 @@ pip install pyranges
 &lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;maps&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;I have talked about &lt;code&gt;here&lt;/code&gt; and &lt;code&gt;dplyr&lt;/code&gt; (from &lt;code&gt;tidyverse&lt;/code&gt;) packages &lt;a href="https://antoniocampos13.github.io/data-manipulation-with-r.html"&gt;before&lt;/a&gt;. In my opinion, &lt;code&gt;openxlsx&lt;/code&gt; is the best option to read Excel spreadsheets, since it does not require external dependencies, such as Java, to work (I had some problems with Java before trying to read large spreadsheets in R). The package &lt;a href="https://cran.r-project.org/web/packages/ids/index.html"&gt;&lt;code&gt;ids&lt;/code&gt;&lt;/a&gt; serves to generate random or human readable and pronounceable identifiers. Lastly, the &lt;a href="https://cran.r-project.org/web/packages/maps/maps.pdf"&gt;&lt;code&gt;maps&lt;/code&gt;&lt;/a&gt; package will provide geographic coordinates of the Brazilian states capitals to help center the information in my interactive&amp;nbsp;map.&lt;/p&gt;
 &lt;h2&gt;Creating the toy&amp;nbsp;dataset&lt;/h2&gt;
 &lt;h3&gt;Creating data&amp;nbsp;points&lt;/h3&gt;
@@ -168,19 +151,16 @@ pip install pyranges
 &lt;span class="n"&gt;DATAPOINTS&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;GENES&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;VARIANTS&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;STATES&lt;/span&gt;  
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Now I will set the random seed to make some reproducible dataset and then create two vectors with the base R &lt;code&gt;sample()&lt;/code&gt; function. The first vector will contain 162 random numbers between 25 and 80 to represent the allele counts from the variants. The second vector will contain 27 random numbers between 100 and 500 to represent sample sizes for each state. Notice how I am multiplying by two, to ensure that sample sizes will be even numbers only, since every individual usually contributes two alleles to the sample&amp;nbsp;size:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;set.seed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;123&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;alleles_count&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;sample&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;25&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;80&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;DATAPOINTS&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;replace&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;alleles_total&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="nf"&gt;sample&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;50&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;250&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;STATES&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;replace&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Then, using the &lt;code&gt;ids&lt;/code&gt; package I create two more vectors: one representing fictitious genes and the other, fictitious variants, respectively with the &lt;code&gt;random_id()&lt;/code&gt; function:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;genes&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;random_id&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;GENES&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;use_openssl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;FALSE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;var_ids&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;random_id&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;GENES&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;VARIANTS&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;use_openssl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;FALSE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Notice the first argument is the number of desired random ids, so I put the constants I defined&amp;nbsp;before.&lt;/p&gt;
 &lt;p&gt;Now I have two vectors that will generate the 162 data points (allelic frequencies). I will now prepare the geographic coordinates that will be needed when plotting the&amp;nbsp;map.&lt;/p&gt;
@@ -191,13 +171,11 @@ pip install pyranges
 &lt;span class="n"&gt;alleles_states&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;bind_cols&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;br&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;state&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;alleles_total&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;alleles_total&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;&lt;img alt="State capitals spreadsheet" src="https://antoniocampos13.github.io/images/state_capitals.PNG"&gt;&lt;/p&gt;
 &lt;p&gt;Next, I filter a special dataset named &lt;code&gt;world.cities&lt;/code&gt; with the name of the Brazilian state capitals using &lt;code&gt;dplyr&lt;/code&gt; pipes. This huge dataset contains names, countries, latitude and longitude from several cities of the world and is imported by the &lt;code&gt;maps&lt;/code&gt; package when I loaded&amp;nbsp;it.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;dim&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;world.cities&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="c1"&gt;# prints out --&amp;gt; [1] 43645     6&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Check the &lt;code&gt;dplyr&lt;/code&gt; pipes&amp;nbsp;below:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;coords&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;world.cities&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="nf"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;country.etc&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Brazil&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
@@ -206,7 +184,6 @@ pip install pyranges
   &lt;span class="nf"&gt;mutate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;br&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;state&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
   &lt;span class="nf"&gt;select&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;lat&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;long&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;state&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Now let me explain. First, I obtaining only Brazilian cities by using &lt;code&gt;filter(country.etc == "Brazil")&lt;/code&gt;. Then, I filtered the &lt;code&gt;name&lt;/code&gt; column to get only the Brazilian state capitals by using the keyword &lt;code&gt;%in%&lt;/code&gt; and using the &lt;code&gt;capital&lt;/code&gt; column of the &lt;code&gt;br&lt;/code&gt; data frame. The &lt;code&gt;filter(lat != -26.48)&lt;/code&gt; argument is to remove a city from Paraná state that has the same name of the Tocantins state capital (Palmas). The &lt;code&gt;lat&lt;/code&gt; means the latitude column. Next, I create a new column with &lt;code&gt;mutate()&lt;/code&gt; to unite latitude and longitude coordinates to their respective capital. Notice that I could only do that because &lt;code&gt;br$capital&lt;/code&gt; filter maintained the same order of the cities as it was in the input spreadsheet. Finally, I clean the data frame up by selecting only the coordinates and the state abbreviation. The result is&amp;nbsp;this:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;head&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;coords&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -219,12 +196,10 @@ pip install pyranges
 &lt;span class="m"&gt;6&lt;/span&gt; &lt;span class="m"&gt;-20.45&lt;/span&gt; &lt;span class="m"&gt;-54.63&lt;/span&gt;    &lt;span class="n"&gt;MS&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;h3&gt;Joining&amp;nbsp;everything&lt;/h3&gt;
 &lt;p&gt;Now let&amp;#8217;s combine three vectors: state abbreviations, genes and variants in a single data frame. First I create a small data frame combining the gene ids with the variants ids to ensure each gene has two unique&amp;nbsp;variants:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;gene_var_comb&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;bind_cols&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gene&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;rep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;genes&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;each&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;VARIANTS&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;variant&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;var_ids&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Then I combine the state abbreviations vector with the variants vector, making the 162 data points skeleton, and with two inner joins, I can now identify each variant by its corresponding gene and each state with its corresponding sample&amp;nbsp;size:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;combinations&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;expand.grid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;br&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;state&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;variant&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;gene_var_comb&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;variant&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
@@ -235,14 +210,12 @@ pip install pyranges
 &lt;span class="c1"&gt;# [1] 162   4&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;See that it has the correct dimensions: 162 rows (data points) and four columns (state, gene, variant and sample size). Now let&amp;#8217;s complete the data frame by merging the &lt;code&gt;alleles_count&lt;/code&gt; vector, joining the coordinates and calculating the minor allele&amp;nbsp;frequency:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;map_data&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;bind_cols&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;combinations&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; 
 &lt;span class="c1"&gt;#                  alleles_count = alleles_count) %&amp;gt;%&lt;/span&gt;
   &lt;span class="nf"&gt;inner_join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;coords&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;by&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;state&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
   &lt;span class="nf"&gt;mutate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;freq&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;alleles_count&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;alleles_total&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The result is&amp;nbsp;this:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="nf"&gt;head&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;map_data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -255,11 +228,9 @@ pip install pyranges
 &lt;span class="m"&gt;6&lt;/span&gt;    &lt;span class="n"&gt;MS&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;&lt;span class="n"&gt;cf8ac7cc786&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;&lt;span class="n"&gt;b290a87&lt;/span&gt;           &lt;span class="m"&gt;496&lt;/span&gt;            &lt;span class="m"&gt;66&lt;/span&gt; &lt;span class="m"&gt;-20.45&lt;/span&gt; &lt;span class="m"&gt;-54.63&lt;/span&gt; &lt;span class="m"&gt;0.13306452&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Now, I will save the toy dataset into a R object that will be loaded when we launch the Shiny app. I saved inside the &lt;code&gt;map/data&lt;/code&gt; folder for reasons that will be clear in a&amp;nbsp;moment.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;save&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;map_data&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;file&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;map&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;data&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;map_data.RData&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;h2&gt;Creating named list of genes and&amp;nbsp;variants&lt;/h2&gt;
 &lt;p&gt;I need a named list of genes and variants to make the dropdown menus as intended. So, again I used some &lt;code&gt;dplyr&lt;/code&gt; pipes and a &lt;code&gt;lapply&lt;/code&gt; loop to accomplish&amp;nbsp;it:&lt;/p&gt;
@@ -281,7 +252,6 @@ pip install pyranges
 &lt;span class="nf"&gt;save&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;genes_variants&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;file&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;map&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;data&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;genes_variants.RData&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;The result is a named list: each element of the list is a vector, and each of these vectors are named after a gene. Each vector, in turn, contains the corresponding&amp;nbsp;variants:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;head&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;genes_variants&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;`6b290a87`&lt;/span&gt;
@@ -294,7 +264,6 @@ pip install pyranges
 &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;adf90f0908c9&amp;quot;&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;c523d6d80697&amp;quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Notice that I also saved it into the &lt;code&gt;map/data&lt;/code&gt; folder.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;.
 ├── map
@@ -304,7 +273,6 @@ pip install pyranges
 ├── map_data.R # contains the code demonstrated here
 └── state_capitals.xlsx
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;h2&gt;Creating Shiny &lt;code&gt;ui.R&lt;/code&gt; file&lt;/h2&gt;
 &lt;p&gt;We can divide the Shiny app internals in two main functions: &lt;code&gt;ui&lt;/code&gt; and &lt;code&gt;server&lt;/code&gt;. The former will manage the user interface of the app (the front-end) and the latter will manipulate the data for interactive visualization (the back-end). I will save each function into two separate files, &lt;code&gt;server.R&lt;/code&gt; and &lt;code&gt;ui.R&lt;/code&gt;. Let&amp;#8217;s examine the &lt;code&gt;ui.R&lt;/code&gt; file:&lt;/p&gt;
@@ -326,7 +294,6 @@ pip install pyranges
   &lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The &lt;code&gt;fluidPage()&lt;/code&gt; Shiny function creates an webpage that fits browser dimensions and generate the overall layout of the app. This function receives other functions as arguments. Each function will take care of one aspect of the layout. The first function, &lt;code&gt;titlePanel()&lt;/code&gt; generates the main title of the app, the second, &lt;code&gt;sidebarLayout()&lt;/code&gt; instructs Shiny to create an app with a sidebar and a main panel. The arguments of this function will control the elements inside each&amp;nbsp;area.&lt;/p&gt;
 &lt;p&gt;The &lt;code&gt;sidebarPanel()&lt;/code&gt; function builds the sidebar. Since I wanted the dropdown menus to be placed in the sidebar, I enclose two &lt;code&gt;selectInput()&lt;/code&gt; functions, one for the genes and one for the variants. Notice that it requires three arguments: an internal name (&amp;#8220;genes&amp;#8221; or &amp;#8220;variant&amp;#8221;) so the &lt;code&gt;server&lt;/code&gt; function can access the inputs, a human-readable label (&amp;#8220;Choose a gene&amp;#8221;, &amp;#8220;Choose a variant&amp;#8221;) and the input options. Notice that I am referring to the &lt;code&gt;genes_variants&lt;/code&gt; named list I created in the previous&amp;nbsp;step.&lt;/p&gt;
@@ -362,7 +329,6 @@ pip install pyranges
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;The user options during the interaction with the app will be stored into the &lt;code&gt;input&lt;/code&gt; object. The &lt;code&gt;output&lt;/code&gt; will access the output id defined in the &lt;code&gt;ui.R&lt;/code&gt; file (&amp;#8220;map&amp;#8221;). The &lt;code&gt;session&lt;/code&gt; object will keep track of the different options of the user. For example, the user must choose a gene. Then, the variant dropdown menu must change accordingly to display the variants of said gene. This is why I included the &lt;code&gt;observe()&lt;/code&gt; function. Anytime the user chooses a different gene, the &lt;code&gt;updateSelectInput()&lt;/code&gt; will change the &amp;#8220;variant&amp;#8221; &lt;code&gt;selectInput()&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;Each user selection will display different data on the map. Therefore, the &lt;code&gt;data_subset(reactive())&lt;/code&gt; nested functions will take the user input and &lt;strong&gt;filter&lt;/strong&gt; the desired data stored in the &lt;code&gt;map_data&lt;/code&gt; object I created earlier. Notice that &lt;code&gt;input$gene&lt;/code&gt; and &lt;code&gt;input$variant&lt;/code&gt; are referring to the &lt;code&gt;selectInput()&lt;/code&gt; defined in the &lt;code&gt;ui.R&lt;/code&gt; file. They get the user option and populate the&amp;nbsp;filters.&lt;/p&gt;
 &lt;p&gt;Lastly, the &lt;code&gt;renderLeaflet()&lt;/code&gt; function output (controlled by the definitions enclosed in the &lt;code&gt;leaflet()&lt;/code&gt; function) will be assigned to the &lt;code&gt;output$map&lt;/code&gt; object. &amp;#8220;map&amp;#8221; is referring to the &lt;code&gt;outputId&lt;/code&gt; defined in the &lt;code&gt;ui.R&lt;/code&gt; file, therefore making the map appear on the main&amp;nbsp;panel.&lt;/p&gt;
@@ -385,7 +351,6 @@ pip install pyranges
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;First, I load the data stored into the &lt;code&gt;map/data&lt;/code&gt; folder. Next, the &lt;code&gt;if(!require()){}&lt;/code&gt; constructs will check if the packages exist and load them or install and then load them&amp;nbsp;otherwise.&lt;/p&gt;
 &lt;h2&gt;Executing the Shiny&amp;nbsp;app&lt;/h2&gt;
 &lt;p&gt;It is very simple to execute a Shiny app locally. Simply place the &lt;code&gt;ui.R&lt;/code&gt;, &lt;code&gt;server.R&lt;/code&gt; and &lt;code&gt;global.R&lt;/code&gt; (if it exists) inside a folder. I placed everything into the &lt;code&gt;map&lt;/code&gt; folder:&lt;/p&gt;
@@ -401,7 +366,6 @@ pip install pyranges
 └── state_capitals.xlsx
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Then, simply run the &lt;code&gt;runApp()&lt;/code&gt; Shiny function with the name of the folder (install Shiny if you have not&amp;nbsp;yet):&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="nf"&gt;require&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;shiny&lt;/span&gt;&lt;span class="p"&gt;)){&lt;/span&gt;
   &lt;span class="nf"&gt;install.packages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;shiny&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -412,7 +376,6 @@ pip install pyranges
 &lt;span class="c1"&gt;# or&lt;/span&gt;
 &lt;span class="c1"&gt;# shiny::runApp(&amp;quot;map&amp;quot;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Just make sure the R session current working directory is the parent of the Shiny app folder, otherwise it will not work. Since I am running RStudio, a window containing the interactive map opens up and I can interact with the map. Otherwise you would have to open a browser window and go to the address displayed on the R console, something like &lt;code&gt;http://127.0.0.1:&amp;lt;some_port&amp;gt;&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;The interactive map is rather barebones, but it works. Try to replicate and improve it if you&amp;nbsp;wish!&lt;/p&gt;
@@ -452,28 +415,23 @@ pip install pyranges
 &lt;span class="nf"&gt;install.packages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;here&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;tidyverse&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;openxlsx&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;BiocManager&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Now I install &lt;code&gt;edgeR&lt;/code&gt; and some more packages from Bioconductor. I will use them to annotate and convert the transcript/gene IDs to a gene symbol. Check their documentation: &lt;a href="https://www.bioconductor.org/packages/release/bioc/html/AnnotationDbi.html"&gt;&lt;code&gt;AnnotationDbi&lt;/code&gt;&lt;/a&gt;, &lt;a href="https://www.rdocumentation.org/packages/annotate/versions/1.50.0"&gt;&lt;code&gt;annotate&lt;/code&gt;&lt;/a&gt;, &lt;a href="https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html"&gt;&lt;code&gt;org.Hs.eg.db&lt;/code&gt;&lt;/a&gt;, &lt;a href="https://bioconductor.org/packages/release/data/annotation/html/EnsDb.Hsapiens.v79.html"&gt;&lt;code&gt;EnsDb.Hsapiens.v79&lt;/code&gt;&lt;/a&gt; and &lt;a href="https://www.rdocumentation.org/packages/ensembldb/versions/1.4.7"&gt;&lt;code&gt;ensembldb&lt;/code&gt;&lt;/a&gt;:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Run only once&lt;/span&gt;
 &lt;span class="n"&gt;BiocManager&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="nf"&gt;install&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;edgeR&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;AnnotationDbi&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;annotate&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;org.Hs.eg.db&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;EnsDb.Hsapiens.v79&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;ensembldb&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The &lt;code&gt;::&lt;/code&gt; is used when we wish to invoke the mentioned package directly (&lt;code&gt;BiocManager&lt;/code&gt; in this case), without loading it into the&amp;nbsp;memory.&lt;/p&gt;
 &lt;p&gt;Now, I will load just the &lt;code&gt;here&lt;/code&gt; package to handle file paths for now, the rest will be loaded into R&amp;nbsp;later.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;here&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;I will use the &lt;code&gt;counts&lt;/code&gt; data frame I produced &lt;a href="https://antoniocampos13.github.io/data-manipulation-with-r.html"&gt;last time&lt;/a&gt;. Since I have saved it to my disk, I load it into the current R session. If you already have the &lt;code&gt;counts&lt;/code&gt; data frame loaded in the session from the previous demonstration, this step is not&amp;nbsp;necessary.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;load&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;data&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;counts.RData&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Now I load the custom &lt;code&gt;edgeR_setup()&lt;/code&gt; function I use to perform &lt;span class="caps"&gt;DEA&lt;/span&gt; with &lt;code&gt;edgeR&lt;/code&gt;. I wrote the function in a R script with the same name and saved it on my &lt;code&gt;src&lt;/code&gt; folder:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;source&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;src&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;edgeR_setup.R&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Careful to not confuse the &lt;code&gt;load()&lt;/code&gt; with &lt;code&gt;source()&lt;/code&gt; functions. The &lt;a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/load"&gt;former&lt;/a&gt; is used with R objects (&lt;code&gt;*.RData&lt;/code&gt;) as input, whereas the &lt;a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/source"&gt;latter&lt;/a&gt; takes a R script (&lt;code&gt;*.R&lt;/code&gt;) as input and parses the commands contained in the&amp;nbsp;script.&lt;/p&gt;
 &lt;p&gt;Check the &lt;code&gt;edgeR_setup.R&lt;/code&gt; script. First, it loads the packages I installed&amp;nbsp;before:&lt;/p&gt;
@@ -489,14 +447,12 @@ pip install pyranges
 &lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AnnotationDbi&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Now, check the function&amp;nbsp;arguments:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;edger_setup&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;replicates&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;filter&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;gene_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;NCBI&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;ENSEMBL&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;SYMBOL&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;output_path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
 
     &lt;span class="c1"&gt;# ... the function goes here ...&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;ul&gt;
 &lt;li&gt;&lt;code&gt;name&lt;/code&gt;: A string. An identifier for the&amp;nbsp;experiment.&lt;/li&gt;
@@ -523,13 +479,11 @@ pip install pyranges
 └── main_dea_edgeR.R
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;For now, I will use default values and indicate that the transcripts in the data frame are identified by &lt;span class="caps"&gt;ENSEMBL&lt;/span&gt; ids. Before running the function, I assign the output path string to the &lt;code&gt;out_path&lt;/code&gt; object, which I include in the function call. Note that I gave the name &lt;code&gt;prostate_cancer&lt;/code&gt; to identify the experiment, and it will also be the name of the sheet in the&amp;nbsp;spreadsheet.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;out_path&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;output&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;prostate_cancer.xlsx&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
 &lt;span class="nf"&gt;edger_setup&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;prostate_cancer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;replicates&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;filter&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;gene_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;ENSEMBL&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;out_path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The function will organize the data into groups based on the sample labels I applied previously (&amp;#8220;case&amp;#8221; and &amp;#8220;control&amp;#8221;), filter out genes with negligible expression and calculate the expression metrics, such as the logarithm of the fold-change (logFC) and counts per million transcripts (logCPM), as well as fit a statistical generalized linear model (&lt;span class="caps"&gt;GLM&lt;/span&gt;), calculating &lt;span class="caps"&gt;GLM&lt;/span&gt; coefficients (&amp;beta;) for each gene. The &lt;span class="caps"&gt;DEA&lt;/span&gt; then consists in perform a hypothesis test (quasi-likelihood F-test in this case), to test the null hypothesis that the coefficients are equal (or that &amp;beta;&lt;sub&gt;&lt;em&gt;control&lt;/em&gt;&lt;/sub&gt; - &amp;beta;&lt;sub&gt;&lt;em&gt;case&lt;/em&gt;&lt;/sub&gt; = 0). From the F-test statistics is then derived a p-value, which is adjusted by false discovery rate (&lt;span class="caps"&gt;FDR&lt;/span&gt;) to account for multiple&amp;nbsp;comparisons.&lt;/p&gt;
 &lt;p&gt;After a while, the function will generate a spreadsheet with the &lt;span class="caps"&gt;DEA&lt;/span&gt; results. See below an excerpt of the spreadsheet (&lt;em&gt;with commas as decimal separators&lt;/em&gt;):&lt;/p&gt;
@@ -585,7 +539,6 @@ pip install pyranges
 &lt;span class="n"&gt;pwd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&amp;lt;PASSWORD&amp;gt;&amp;quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Replace &lt;code&gt;&amp;lt;USER_NAME&amp;gt;&lt;/code&gt; and &lt;code&gt;&amp;lt;PASSWORD&amp;gt;&lt;/code&gt; with your credentials used to access the PostgreSQL database. Usually, the default username is &lt;code&gt;postgres&lt;/code&gt; and the password is defined during PostgreSQL&amp;nbsp;installation.&lt;/p&gt;
 &lt;h2&gt;Install/Load&amp;nbsp;packages&lt;/h2&gt;
 &lt;p&gt;Then I open a RStudio session and create a project in the folder containing the &lt;code&gt;.Renviron&lt;/code&gt; file. Now, I need to load the packages I will use today. You can install them using &lt;code&gt;install.packages()&lt;/code&gt; function if you do not have them installed&amp;nbsp;yet:&lt;/p&gt;
@@ -593,14 +546,12 @@ pip install pyranges
 &lt;span class="nf"&gt;install.packages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;RPostgres&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;here&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;tidyverse&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Note that to install more than one package at once we must use the concatenate &lt;code&gt;c()&lt;/code&gt; command to pass the packages names and they must be quoted and separated by commas &amp;#8212; a R &lt;em&gt;vector&lt;/em&gt;. The package dependencies will be installed as&amp;nbsp;well.&lt;/p&gt;
 &lt;p&gt;Now I load the packages into the R&amp;nbsp;session:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;RPostgres&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;here&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tidyverse&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The &lt;code&gt;RPostgres&lt;/code&gt; is needed to connect to the PostgreSQL database I created before. The &lt;a href="https://github.com/jennybc/here_here"&gt;&lt;code&gt;here&lt;/code&gt; package&lt;/a&gt; handles file paths. &lt;code&gt;tidyverse&lt;/code&gt; is a powerful collection of packages for data manipulation. By using it, it will actually load several other packages, such as &lt;code&gt;dplyr&lt;/code&gt;, &lt;code&gt;stringr&lt;/code&gt; and &lt;code&gt;tidyr&lt;/code&gt;. It is one of the packages I use the most. Check &lt;code&gt;RPostgres&lt;/code&gt; documentation &lt;a href="https://www.rdocumentation.org/packages/RPostgres/versions/1.2.1"&gt;here&lt;/a&gt; and &lt;code&gt;tidyverse&lt;/code&gt; documentation &lt;a href="https://www.tidyverse.org/"&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;Set up connection to tcga&amp;nbsp;database&lt;/h2&gt;
@@ -615,13 +566,11 @@ pip install pyranges
 &lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;The &lt;code&gt;Sys.getenv()&lt;/code&gt; will retrieve the information in the &lt;code&gt;.Renviron&lt;/code&gt; file. Remember to not share this file so your credentials remain secret. The connection credentials are now stored in the &lt;code&gt;con&lt;/code&gt; object.&lt;/p&gt;
 &lt;h2&gt;Retrieve and pivot gene_counts_cases&amp;nbsp;table&lt;/h2&gt;
 &lt;p&gt;With the command below, I retrieve the table containing the case-identified, raw gene counts I created last&amp;nbsp;time:  &lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;cases&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;dbGetQuery&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;con&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;SELECT * FROM gene_counts_cases&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The &lt;code&gt;dbGetQuery()&lt;/code&gt; is one of the functions from &lt;code&gt;DBI&lt;/code&gt; package, a dependency of &lt;code&gt;RPostgres&lt;/code&gt;. Check &lt;code&gt;DBI&lt;/code&gt; documentation &lt;a href="https://www.rdocumentation.org/packages/DBI/versions/0.5-1"&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;The information is now stored in the &lt;code&gt;cases&lt;/code&gt; object, which has three columns: &lt;code&gt;case_id&lt;/code&gt;, &lt;code&gt;gene_id&lt;/code&gt; and &lt;code&gt;gene_counts&lt;/code&gt;. Therefore, each row is a combination of a case, a gene and a gene count &amp;#8212; it is a &amp;#8220;long&amp;#8221;&amp;nbsp;format.&lt;/p&gt;
@@ -637,13 +586,11 @@ pip install pyranges
   &lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;&lt;code&gt;cases_pivoted&lt;/code&gt; is the name of the object that will hold the pivoted table. The &lt;code&gt;%&amp;gt;%&lt;/code&gt; is &lt;code&gt;dplyr&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s syntax. It means that we are piping the contents of &lt;code&gt;cases&lt;/code&gt; object into the &lt;code&gt;pivot_wider()&lt;/code&gt; function and its&amp;nbsp;arguments.&lt;/p&gt;
 &lt;p&gt;The &lt;code&gt;names_from&lt;/code&gt; argument tells which column will be pivoted to generate new columns. The &lt;code&gt;values_from&lt;/code&gt; argument tells which column hold the values that will fill the new pivoted table. The &lt;code&gt;values_fill&lt;/code&gt; argument will substitute any missing data for a zero. The &lt;code&gt;names_repair&lt;/code&gt; argument checks that each new column has a unique name. Finally, the &lt;code&gt;values_fn&lt;/code&gt; argument indicates the function that must be applied to the values filling the new pivoted table. Note that I used the &lt;code&gt;mean&lt;/code&gt; function because during this step I noticed that some cases were associated with more than one gene expression quantification file. Therefore, I had to take the mean of these extra gene counts to correctly generate the pivoted&amp;nbsp;table.&lt;/p&gt;
 &lt;p&gt;Since I calculated means for the values, I then rounded to the next integer all numerical data in the table with the help of &lt;code&gt;dplyr&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;mutate()&lt;/code&gt;, &lt;code&gt;across()&lt;/code&gt; and &lt;code&gt;where()&lt;/code&gt; functions and &lt;code&gt;round()&lt;/code&gt;, which is one of R&amp;#8217;s standard (base)&amp;nbsp;functions:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;counts&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;cases_pivoted&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="nf"&gt;mutate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;across&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;where&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;is.numeric&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;round&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The &lt;code&gt;where(is.numeric)&lt;/code&gt; ensures that I only manipulated numeric data in the table. The &lt;code&gt;across()&lt;/code&gt; function applies the same transformation (rounding in this case) to multiple columns. Finally, &lt;code&gt;mutate()&lt;/code&gt; adds the new variables (rounded columns), replacing the existing&amp;nbsp;ones.&lt;/p&gt;
 &lt;h2&gt;Retrieve and de-duplicate follow_up&amp;nbsp;table&lt;/h2&gt;
@@ -654,7 +601,6 @@ pip install pyranges
 &lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Note how I used &lt;code&gt;DBI&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;dbExecute()&lt;/code&gt; instead of &lt;code&gt;dbGetQuery()&lt;/code&gt;, since I will not retrieve the table into the R&amp;nbsp;session.&lt;/p&gt;
 &lt;p&gt;Now I create other table to link the cases &lt;span class="caps"&gt;ID&lt;/span&gt; numbers with the de-duplicated outcomes, saving the result as the &lt;code&gt;outcomes&lt;/code&gt; table:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;dbExecute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
@@ -663,11 +609,9 @@ pip install pyranges
 &lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;I now retrieve the &lt;code&gt;outcomes&lt;/code&gt; table into the R&amp;nbsp;session:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;outcomes&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;dbGetQuery&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;con&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;SELECT * FROM outcomes&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;h2&gt;Create sample classification and new&amp;nbsp;labels&lt;/h2&gt;
 &lt;p&gt;I will now create a new column named &lt;code&gt;class&lt;/code&gt; in the outcomes table with a simplified case/control classification based on the &lt;code&gt;outcome&lt;/code&gt; column with the help of &lt;code&gt;dplyr&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;mutate()&lt;/code&gt; and &lt;code&gt;case_when()&lt;/code&gt;, which vectorizes multiple if/else statements (it is an R equivalent of the &lt;span class="caps"&gt;SQL&lt;/span&gt; &lt;code&gt;CASE WHEN&lt;/code&gt; statement):&lt;/p&gt;
@@ -678,16 +622,13 @@ pip install pyranges
 &lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Now I will create a new label for the cases for simplification. I created a column named &lt;code&gt;new_names&lt;/code&gt; in the &lt;code&gt;outcomes&lt;/code&gt; table. The new names were created by joining the classification created in the previous step with the 12 last characters of the &lt;code&gt;case_id&lt;/code&gt;:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;outcomes&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;outcomes&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="nf"&gt;mutate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;new_names&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;paste0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;str_sub&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;case_id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;-12&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;_&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;class&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Finally, let&amp;#8217;s apply the new case labels, substituting the old ones with the help of &lt;code&gt;dplyr&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;recode()&lt;/code&gt;  function:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;colnames&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;dplyr&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="nf"&gt;recode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;colnames&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="o"&gt;!!!&lt;/span&gt;&lt;span class="nf"&gt;setNames&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;as.character&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;outcomes&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;new_names&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;outcomes&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;case_id&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;h2&gt;Convert gene_ids into row names, then delete gene_id&amp;nbsp;column&lt;/h2&gt;
 &lt;p&gt;The table is almost in the state required for differential expression analysis. I just need to convert the &lt;code&gt;gene_id&lt;/code&gt; column into row names of the data&amp;nbsp;frame:&lt;/p&gt;
@@ -696,11 +637,9 @@ pip install pyranges
 &lt;span class="nf"&gt;row.names&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;gene_id&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;The &lt;code&gt;gene_id&lt;/code&gt; is not needed anymore. I can delete&amp;nbsp;it:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;counts&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;subset&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;select&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gene_id&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The data frame is now ready for differential expression analysis for sequence count data. The features (gene IDs) are embedded on the R object row names, whereas each column corresponds to a individual sample. The row/column intersection are therefore, the raw counts of gene&amp;nbsp;expression.&lt;/p&gt;
 &lt;p&gt;Check the dimensions (&lt;em&gt;G&lt;/em&gt;x&lt;em&gt;N&lt;/em&gt;) of the data frame with the &lt;code&gt;dim()&lt;/code&gt; function and see that there 60483 rows and 236 columns, meaning that 60483 transcripts where quantified in samples obtained from 236 individuals with prostate&amp;nbsp;cancer.&lt;/p&gt;
@@ -709,7 +648,6 @@ pip install pyranges
 &lt;span class="c1"&gt;# Output:&lt;/span&gt;
 &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="m"&gt;60483&lt;/span&gt;   &lt;span class="m"&gt;236&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;See below first few rows and columns of the finalized &lt;code&gt;counts&lt;/code&gt; data&amp;nbsp;frame:&lt;/p&gt;
 &lt;p&gt;&lt;img alt="Final gene counts table" src="https://antoniocampos13.github.io/images/counts_final.PNG"&gt;&lt;/p&gt;
@@ -754,13 +692,11 @@ pip install pyranges
 &lt;span class="nf"&gt;install.packages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;meta&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;here&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;openxlsx&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;The packages and their dependencies will be downloaded from the internet and installed. After install, I must load them in the R&amp;nbsp;session:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;meta&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;here&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;openxlsx&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;h4&gt;Load and inspect&amp;nbsp;data&lt;/h4&gt;
 &lt;p&gt;Now I can load the data. I prepared an Excel spreadsheet with an excerpt of the data of our paper and put inside a subfolder named &lt;code&gt;data&lt;/code&gt; on my working directory. The current script I saved on a folder named &lt;code&gt;src&lt;/code&gt; (for &amp;#8220;source&amp;#8221;). My project folder now look like&amp;nbsp;this:&lt;/p&gt;
@@ -774,11 +710,9 @@ pip install pyranges
 └── aki_demo.RProj
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;I load the spreadsheet into the R session memory with the&amp;nbsp;command:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;aki&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;read.xlsx&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;data&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;aki_demo.xlsx&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The &lt;code&gt;&amp;lt;-&lt;/code&gt;, which is simply the &amp;#8220;less than&amp;#8221; &lt;code&gt;&amp;lt;&lt;/code&gt; symbol followed by a dash symbol &lt;code&gt;-&lt;/code&gt;, means &amp;#8220;assigning&amp;#8221;. I am assigning the data to the object named &lt;code&gt;aki&lt;/code&gt;. The &lt;code&gt;read.xlsx()&lt;/code&gt; function from &lt;code&gt;openxlsx&lt;/code&gt; package reads the content of the spreadsheet and loads into a &lt;strong&gt;data frame&lt;/strong&gt;, a tabular R format that holds&amp;nbsp;data.&lt;/p&gt;
 &lt;p&gt;Note the usage of the &lt;code&gt;here()&lt;/code&gt; function. &lt;code&gt;here&lt;/code&gt; is a nice R package that helps file paths management. It ensures that my code will run smoothly on any computer, provided the directory structure is maintained. Thus, there is no need to hardcode file paths, improving code portability/reproducibility. The &lt;a href="https://github.com/jennybc/here_here"&gt;Dr. Jennifer Bryan&amp;#8217;s post&lt;/a&gt; is a nice introduction to the &lt;code&gt;here&lt;/code&gt; package.&lt;/p&gt;
@@ -810,7 +744,6 @@ pip install pyranges
 &lt;span class="m"&gt;21&lt;/span&gt;     &lt;span class="n"&gt;Chengfeng&lt;/span&gt; &lt;span class="n"&gt;Qiu&lt;/span&gt; &lt;span class="n"&gt;et&lt;/span&gt; &lt;span class="n"&gt;al.&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;2020&lt;/span&gt;    &lt;span class="n"&gt;China&lt;/span&gt;         &lt;span class="m"&gt;104&lt;/span&gt;         &lt;span class="m"&gt;102&lt;/span&gt;        &lt;span class="m"&gt;2&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Check that are 21 studies (rows) and the first five columns are: &lt;code&gt;authors&lt;/code&gt;, &lt;code&gt;location&lt;/code&gt;, &lt;code&gt;sample_size&lt;/code&gt; (the number of &lt;span class="caps"&gt;COVID&lt;/span&gt;-19 patients), &lt;code&gt;control_aki&lt;/code&gt; (the number of &lt;span class="caps"&gt;COVID&lt;/span&gt;-19 patients without &lt;span class="caps"&gt;AKI&lt;/span&gt;) and &lt;code&gt;case_aki&lt;/code&gt; (the number of &lt;span class="caps"&gt;AKI&lt;/span&gt; cases among the &lt;span class="caps"&gt;COVID&lt;/span&gt;-19&amp;nbsp;patients).&lt;/p&gt;
 &lt;p&gt;To check the name of the other columns,&amp;nbsp;type:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;names&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;aki&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -822,7 +755,6 @@ pip install pyranges
 &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;13&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;diabetes_p&amp;quot;&lt;/span&gt;     &lt;span class="s"&gt;&amp;quot;copd_p&amp;quot;&lt;/span&gt;         &lt;span class="s"&gt;&amp;quot;ckd_p&amp;quot;&lt;/span&gt;          &lt;span class="s"&gt;&amp;quot;cancer_p&amp;quot;&lt;/span&gt;   
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Then, it is possible to see that there are 16 columns in total. The bracketed number in the left side of the line is the index of the first element in the line (the count starts with &lt;code&gt;[1] authors&lt;/code&gt;; the fourth element is &lt;code&gt;[5] case_aki&lt;/code&gt; column, and so&amp;nbsp;on).&lt;/p&gt;
 &lt;p&gt;To check the shape (dimensions) of the table I&amp;nbsp;type:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;dim&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;aki&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -830,7 +762,6 @@ pip install pyranges
 &lt;span class="c1"&gt;# Output:&lt;/span&gt;
 &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="m"&gt;21&lt;/span&gt; &lt;span class="m"&gt;16&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The output tells that there are 21 rows and 16 columns&amp;nbsp;indeed.&lt;/p&gt;
 &lt;h4&gt;Calculating meta-analysis and inspecting&amp;nbsp;results&lt;/h4&gt;
@@ -850,7 +781,6 @@ pip install pyranges
                    &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;
 &lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Note that I type the command in this &amp;#8220;list&amp;#8221; format to allow easier reading of the code, it is not mandatory. The &lt;code&gt;event&lt;/code&gt; argument is the numerator (thus &lt;code&gt;aki_case&lt;/code&gt; column) and &lt;code&gt;n&lt;/code&gt; is the denominator (&lt;code&gt;sample_size&lt;/code&gt; column). I summarized above what the principal arguments do. Check &lt;code&gt;metaprop()&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s documentation page &lt;a href="https://www.rdocumentation.org/packages/meta/versions/4.9-6/topics/metaprop"&gt;here&lt;/a&gt; for more details. The &lt;code&gt;meta&lt;/code&gt; package has other functions to perform meta-analysis with other kind of data. Check the documentation &lt;a href="https://www.rdocumentation.org/packages/meta/versions/4.9-6"&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Retrieving a summary of the &lt;code&gt;aki_incidence_meta&lt;/code&gt; object produces this&amp;nbsp;output:&lt;/p&gt;
@@ -881,14 +811,12 @@ pip install pyranges
 &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;Logit&lt;/span&gt; &lt;span class="n"&gt;transformation&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Since there was high heterogeneity, I chose to interpret the results through a random-effects model, yielding the numbers I quoted above. Below the results are the heterogeneity reports, results of Cochran&amp;#8217;s Q test statistic, degrees-of-freedom and p-value confirming that the heterogeneity is not negligible and a summary of statistical methods used in the&amp;nbsp;meta-analysis.&lt;/p&gt;
 &lt;p&gt;If you want to save this output directly to file, you could use the &lt;code&gt;sink()&lt;/code&gt; method:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;sink&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;output&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;aki_incidence.txt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;span class="nf"&gt;summary&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;aki_incidence_meta&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="nf"&gt;sink&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;It will save the raw output in text format in a file named &lt;code&gt;aki_incidence.txt&lt;/code&gt; into the &lt;code&gt;output&lt;/code&gt; folder.&lt;/p&gt;
 &lt;h4&gt;Producing a Forest&amp;nbsp;plot&lt;/h4&gt;
@@ -913,13 +841,11 @@ pip install pyranges
 &lt;span class="nf"&gt;dev.off&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Check other R graphical devices commonly used to save plots as images &lt;a href="https://stat.ethz.ch/R-manual/R-devel/library/grDevices/html/png.html"&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;h4&gt;Calculating a&amp;nbsp;meta-regression&lt;/h4&gt;
 &lt;p&gt;To calculate the meta-analysis, I needed just the sample size and number of events. I can use the remaining variables in the data frame to calculate a meta-regression to assess if aggregate measures of patients characteristics would be associated with increased risk of &lt;span class="caps"&gt;AKI&lt;/span&gt; occurrence. Below is the command I&amp;nbsp;used:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;aki_incidence_metareg&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;metareg&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;aki_incidence_meta&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt; &lt;span class="n"&gt;design&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;setting&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;location&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;age&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;males_p&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;aki_criteria&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;hypertension_p&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;all_cardio_p&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;diabetes_p&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;copd_p&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;ckd_p&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;cancer_p&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;I used the &lt;code&gt;aki_incidence_meta&lt;/code&gt; meta-analysis object as input to the &lt;code&gt;metareg&lt;/code&gt; function. After a comma, I write a tilde &lt;code&gt;~&lt;/code&gt; and the list all covariates separated by plus signs &lt;code&gt;+&lt;/code&gt;. In R notation, the tilde separates the dependent covariate from the independent variables. Remember they are all columns from the spreadsheet I imported in the beginning. I check the results using the &lt;code&gt;summary()&lt;/code&gt; function:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;summary&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;aki_incidence_metareg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -966,7 +892,6 @@ pip install pyranges
 &lt;span class="o"&gt;---&lt;/span&gt;
 &lt;span class="n"&gt;Signif.&lt;/span&gt; &lt;span class="n"&gt;codes&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; ‘&lt;span class="o"&gt;***&lt;/span&gt;’ &lt;span class="m"&gt;0.001&lt;/span&gt; ‘&lt;span class="o"&gt;**&lt;/span&gt;’ &lt;span class="m"&gt;0.01&lt;/span&gt; ‘&lt;span class="o"&gt;*&lt;/span&gt;’ &lt;span class="m"&gt;0.05&lt;/span&gt; ‘&lt;span class="n"&gt;.&lt;/span&gt;’ &lt;span class="m"&gt;0.1&lt;/span&gt; ‘ ’ &lt;span class="m"&gt;1&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The &lt;code&gt;estimate&lt;/code&gt; column is the magnitude of the effect of the variable upon the dependent variable (&lt;span class="caps"&gt;AKI&lt;/span&gt; incidence among &lt;span class="caps"&gt;COVID&lt;/span&gt;-19 patients). The bigger this number, the higher is the influence. &lt;strong&gt;Positive&lt;/strong&gt; numbers mean &lt;strong&gt;higher risk&lt;/strong&gt;. &lt;strong&gt;Negative&lt;/strong&gt; numbers mean &lt;strong&gt;less risk&lt;/strong&gt;. However, we must check the &lt;code&gt;tval&lt;/code&gt; and its corresponding &lt;code&gt;pval&lt;/code&gt; (p-value) columns. The &lt;code&gt;tval&lt;/code&gt; test assumes a null hypothesis that &lt;code&gt;estimate&lt;/code&gt; = 0. Therefore if &lt;code&gt;pval&lt;/code&gt; is &lt;strong&gt;less than&lt;/strong&gt; a pre-specified level of confidence (say, 5%), we can assume the &lt;code&gt;estimate&lt;/code&gt; is significantly different than zero. Thus, we would assume that the variable would have influence over the&amp;nbsp;outcome.&lt;/p&gt;
 &lt;p&gt;However, as you can see in the output, no variables were associated with &lt;span class="caps"&gt;AKI&lt;/span&gt; incidence with statistical&amp;nbsp;significance.&lt;/p&gt;

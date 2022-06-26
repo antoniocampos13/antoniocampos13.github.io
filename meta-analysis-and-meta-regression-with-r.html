@@ -27,6 +27,7 @@
     <link href="https://antoniocampos13.github.io/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="Antonio's Portfolio RSS">
 
 
+  
 
     <!-- Chrome, Firefox OS and Opera -->
     <meta name="theme-color" content="#333333">
@@ -38,27 +39,29 @@
     <!-- Microsoft EDGE -->
     <meta name="msapplication-TileColor" content="#333333">
 
+ 
+
 <meta name="author" content="Antonio Victor Campos Coelho" />
 <meta name="description" content="Introduction On December 2019, reports from severe acute respiratory syndrome in Wuhan, China, were linked to a novel coronavirus, now known as SARS-CoV-2, and the disease it causes was termed coronavirus disease 2019 (COVID-19). The World Health Organization declared the COVID-19 outbreak a Public Health Emergency of …" />
 <meta name="keywords" content="meta-analysis, statistical analysis, COVID-19, SARS-CoV-2, acute kidney injury">
 
 
-<meta property="og:site_name" content="Antonio's Portfolio"/>
-<meta property="og:title" content="Meta-analysis and Meta-regression with R"/>
-<meta property="og:description" content="Introduction On December 2019, reports from severe acute respiratory syndrome in Wuhan, China, were linked to a novel coronavirus, now known as SARS-CoV-2, and the disease it causes was termed coronavirus disease 2019 (COVID-19). The World Health Organization declared the COVID-19 outbreak a Public Health Emergency of …"/>
-<meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://antoniocampos13.github.io/meta-analysis-and-meta-regression-with-r.html"/>
-<meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2020-10-13 14:00:00-03:00"/>
-<meta property="article:modified_time" content=""/>
-<meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
-<meta property="article:section" content="R"/>
-<meta property="article:tag" content="meta-analysis"/>
-<meta property="article:tag" content="statistical analysis"/>
-<meta property="article:tag" content="COVID-19"/>
-<meta property="article:tag" content="SARS-CoV-2"/>
-<meta property="article:tag" content="acute kidney injury"/>
-<meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
+  <meta property="og:site_name" content="Antonio's Portfolio"/>
+  <meta property="og:title" content="Meta-analysis and Meta-regression with R"/>
+  <meta property="og:description" content="Introduction On December 2019, reports from severe acute respiratory syndrome in Wuhan, China, were linked to a novel coronavirus, now known as SARS-CoV-2, and the disease it causes was termed coronavirus disease 2019 (COVID-19). The World Health Organization declared the COVID-19 outbreak a Public Health Emergency of …"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="https://antoniocampos13.github.io/meta-analysis-and-meta-regression-with-r.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2020-10-13 14:00:00-03:00"/>
+  <meta property="article:modified_time" content=""/>
+  <meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
+  <meta property="article:section" content="R"/>
+  <meta property="article:tag" content="meta-analysis"/>
+  <meta property="article:tag" content="statistical analysis"/>
+  <meta property="article:tag" content="COVID-19"/>
+  <meta property="article:tag" content="SARS-CoV-2"/>
+  <meta property="article:tag" content="acute kidney injury"/>
+  <meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
 
   <title>Antonio's Portfolio &ndash; Meta-analysis and Meta-regression with R</title>
 
@@ -66,12 +69,12 @@
 <body class="light-theme">
   <aside>
     <div>
-      <a href="https://antoniocampos13.github.io">
+      <a href="https://antoniocampos13.github.io/">
         <img src="https://avatars.githubusercontent.com/antoniocampos13" alt="Antonio's Portfolio" title="Antonio's Portfolio">
       </a>
 
       <h1>
-        <a href="https://antoniocampos13.github.io">Antonio's Portfolio</a>
+        <a href="https://antoniocampos13.github.io/">Antonio's Portfolio</a>
       </h1>
 
 <p>PhD in Genetics</p>
@@ -126,7 +129,7 @@
   <main>
 
     <nav>
-      <a href="https://antoniocampos13.github.io">Home</a>
+      <a href="https://antoniocampos13.github.io/">Home</a>
 
       <a href="/archives.html">Archives</a>
       <a href="/categories.html">Categories</a>
@@ -174,13 +177,11 @@
 <span class="nf">install.packages</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;meta&quot;</span><span class="p">,</span> <span class="s">&quot;here&quot;</span><span class="p">,</span> <span class="s">&quot;openxlsx&quot;</span><span class="p">))</span>
 </code></pre></div>
 
-
 <p>The packages and their dependencies will be downloaded from the internet and installed. After install, I must load them in the R&nbsp;session:</p>
 <div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">here</span><span class="p">)</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">openxlsx</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h4>Load and inspect&nbsp;data</h4>
 <p>Now I can load the data. I prepared an Excel spreadsheet with an excerpt of the data of our paper and put inside a subfolder named <code>data</code> on my working directory. The current script I saved on a folder named <code>src</code> (for &#8220;source&#8221;). My project folder now look like&nbsp;this:</p>
@@ -194,11 +195,9 @@
 └── aki_demo.RProj
 </code></pre></div>
 
-
 <p>I load the spreadsheet into the R session memory with the&nbsp;command:</p>
 <div class="highlight"><pre><span></span><code><span class="n">aki</span> <span class="o">&lt;-</span> <span class="nf">read.xlsx</span><span class="p">(</span><span class="nf">here</span><span class="p">(</span><span class="s">&quot;data&quot;</span><span class="p">,</span><span class="s">&quot;aki_demo.xlsx&quot;</span><span class="p">))</span>
 </code></pre></div>
-
 
 <p>The <code>&lt;-</code>, which is simply the &#8220;less than&#8221; <code>&lt;</code> symbol followed by a dash symbol <code>-</code>, means &#8220;assigning&#8221;. I am assigning the data to the object named <code>aki</code>. The <code>read.xlsx()</code> function from <code>openxlsx</code> package reads the content of the spreadsheet and loads into a <strong>data frame</strong>, a tabular R format that holds&nbsp;data.</p>
 <p>Note the usage of the <code>here()</code> function. <code>here</code> is a nice R package that helps file paths management. It ensures that my code will run smoothly on any computer, provided the directory structure is maintained. Thus, there is no need to hardcode file paths, improving code portability/reproducibility. The <a href="https://github.com/jennybc/here_here">Dr. Jennifer Bryan&#8217;s post</a> is a nice introduction to the <code>here</code> package.</p>
@@ -230,7 +229,6 @@
 <span class="m">21</span>     <span class="n">Chengfeng</span> <span class="n">Qiu</span> <span class="n">et</span> <span class="n">al.</span><span class="p">,</span> <span class="m">2020</span>    <span class="n">China</span>         <span class="m">104</span>         <span class="m">102</span>        <span class="m">2</span>
 </code></pre></div>
 
-
 <p>Check that are 21 studies (rows) and the first five columns are: <code>authors</code>, <code>location</code>, <code>sample_size</code> (the number of <span class="caps">COVID</span>-19 patients), <code>control_aki</code> (the number of <span class="caps">COVID</span>-19 patients without <span class="caps">AKI</span>) and <code>case_aki</code> (the number of <span class="caps">AKI</span> cases among the <span class="caps">COVID</span>-19&nbsp;patients).</p>
 <p>To check the name of the other columns,&nbsp;type:</p>
 <div class="highlight"><pre><span></span><code><span class="nf">names</span><span class="p">(</span><span class="n">aki</span><span class="p">)</span>
@@ -242,7 +240,6 @@
 <span class="p">[</span><span class="m">13</span><span class="p">]</span> <span class="s">&quot;diabetes_p&quot;</span>     <span class="s">&quot;copd_p&quot;</span>         <span class="s">&quot;ckd_p&quot;</span>          <span class="s">&quot;cancer_p&quot;</span>   
 </code></pre></div>
 
-
 <p>Then, it is possible to see that there are 16 columns in total. The bracketed number in the left side of the line is the index of the first element in the line (the count starts with <code>[1] authors</code>; the fourth element is <code>[5] case_aki</code> column, and so&nbsp;on).</p>
 <p>To check the shape (dimensions) of the table I&nbsp;type:</p>
 <div class="highlight"><pre><span></span><code><span class="nf">dim</span><span class="p">(</span><span class="n">aki</span><span class="p">)</span>
@@ -250,7 +247,6 @@
 <span class="c1"># Output:</span>
 <span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="m">21</span> <span class="m">16</span>
 </code></pre></div>
-
 
 <p>The output tells that there are 21 rows and 16 columns&nbsp;indeed.</p>
 <h4>Calculating meta-analysis and inspecting&nbsp;results</h4>
@@ -270,7 +266,6 @@
                    <span class="n">warn</span> <span class="o">=</span> <span class="kc">TRUE</span>
 <span class="p">)</span>
 </code></pre></div>
-
 
 <p>Note that I type the command in this &#8220;list&#8221; format to allow easier reading of the code, it is not mandatory. The <code>event</code> argument is the numerator (thus <code>aki_case</code> column) and <code>n</code> is the denominator (<code>sample_size</code> column). I summarized above what the principal arguments do. Check <code>metaprop()</code><span class="quo">&#8216;</span>s documentation page <a href="https://www.rdocumentation.org/packages/meta/versions/4.9-6/topics/metaprop">here</a> for more details. The <code>meta</code> package has other functions to perform meta-analysis with other kind of data. Check the documentation <a href="https://www.rdocumentation.org/packages/meta/versions/4.9-6">here</a>.</p>
 <p>Retrieving a summary of the <code>aki_incidence_meta</code> object produces this&nbsp;output:</p>
@@ -301,14 +296,12 @@
 <span class="o">-</span> <span class="n">Logit</span> <span class="n">transformation</span>
 </code></pre></div>
 
-
 <p>Since there was high heterogeneity, I chose to interpret the results through a random-effects model, yielding the numbers I quoted above. Below the results are the heterogeneity reports, results of Cochran&#8217;s Q test statistic, degrees-of-freedom and p-value confirming that the heterogeneity is not negligible and a summary of statistical methods used in the&nbsp;meta-analysis.</p>
 <p>If you want to save this output directly to file, you could use the <code>sink()</code> method:</p>
 <div class="highlight"><pre><span></span><code><span class="nf">sink</span><span class="p">(</span><span class="nf">here</span><span class="p">(</span><span class="s">&quot;output&quot;</span><span class="p">,</span> <span class="s">&quot;aki_incidence.txt&quot;</span><span class="p">))</span>
 <span class="nf">summary</span><span class="p">(</span><span class="n">aki_incidence_meta</span><span class="p">)</span>
 <span class="nf">sink</span><span class="p">()</span>
 </code></pre></div>
-
 
 <p>It will save the raw output in text format in a file named <code>aki_incidence.txt</code> into the <code>output</code> folder.</p>
 <h4>Producing a Forest&nbsp;plot</h4>
@@ -333,13 +326,11 @@
 <span class="nf">dev.off</span><span class="p">()</span>
 </code></pre></div>
 
-
 <p>Check other R graphical devices commonly used to save plots as images <a href="https://stat.ethz.ch/R-manual/R-devel/library/grDevices/html/png.html">here</a>.</p>
 <h4>Calculating a&nbsp;meta-regression</h4>
 <p>To calculate the meta-analysis, I needed just the sample size and number of events. I can use the remaining variables in the data frame to calculate a meta-regression to assess if aggregate measures of patients characteristics would be associated with increased risk of <span class="caps">AKI</span> occurrence. Below is the command I&nbsp;used:</p>
 <div class="highlight"><pre><span></span><code><span class="n">aki_incidence_metareg</span> <span class="o">&lt;-</span> <span class="nf">metareg</span><span class="p">(</span><span class="n">aki_incidence_meta</span><span class="p">,</span> <span class="o">~</span> <span class="n">design</span> <span class="o">+</span> <span class="n">setting</span> <span class="o">+</span> <span class="n">location</span> <span class="o">+</span> <span class="n">age</span> <span class="o">+</span> <span class="n">males_p</span> <span class="o">+</span> <span class="n">aki_criteria</span> <span class="o">+</span> <span class="n">hypertension_p</span> <span class="o">+</span> <span class="n">all_cardio_p</span> <span class="o">+</span> <span class="n">diabetes_p</span> <span class="o">+</span> <span class="n">copd_p</span> <span class="o">+</span> <span class="n">ckd_p</span> <span class="o">+</span> <span class="n">cancer_p</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>I used the <code>aki_incidence_meta</code> meta-analysis object as input to the <code>metareg</code> function. After a comma, I write a tilde <code>~</code> and the list all covariates separated by plus signs <code>+</code>. In R notation, the tilde separates the dependent covariate from the independent variables. Remember they are all columns from the spreadsheet I imported in the beginning. I check the results using the <code>summary()</code> function:</p>
 <div class="highlight"><pre><span></span><code><span class="nf">summary</span><span class="p">(</span><span class="n">aki_incidence_metareg</span><span class="p">)</span>
@@ -386,7 +377,6 @@
 <span class="o">---</span>
 <span class="n">Signif.</span> <span class="n">codes</span><span class="o">:</span>  <span class="m">0</span> ‘<span class="o">***</span>’ <span class="m">0.001</span> ‘<span class="o">**</span>’ <span class="m">0.01</span> ‘<span class="o">*</span>’ <span class="m">0.05</span> ‘<span class="n">.</span>’ <span class="m">0.1</span> ‘ ’ <span class="m">1</span>
 </code></pre></div>
-
 
 <p>The <code>estimate</code> column is the magnitude of the effect of the variable upon the dependent variable (<span class="caps">AKI</span> incidence among <span class="caps">COVID</span>-19 patients). The bigger this number, the higher is the influence. <strong>Positive</strong> numbers mean <strong>higher risk</strong>. <strong>Negative</strong> numbers mean <strong>less risk</strong>. However, we must check the <code>tval</code> and its corresponding <code>pval</code> (p-value) columns. The <code>tval</code> test assumes a null hypothesis that <code>estimate</code> = 0. Therefore if <code>pval</code> is <strong>less than</strong> a pre-specified level of confidence (say, 5%), we can assume the <code>estimate</code> is significantly different than zero. Thus, we would assume that the variable would have influence over the&nbsp;outcome.</p>
 <p>However, as you can see in the output, no variables were associated with <span class="caps">AKI</span> incidence with statistical&nbsp;significance.</p>
@@ -454,7 +444,7 @@
 
     <footer>
 <p>
-  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike</a>
 </p>
 <p>
 Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
@@ -485,7 +475,6 @@ Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a 
   "description": "Data Science Portfolio by Antonio Victor Campos Coelho"
 }
 </script>
-
 
 </body>
 </html>

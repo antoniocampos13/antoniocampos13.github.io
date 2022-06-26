@@ -27,6 +27,7 @@
     <link href="https://antoniocampos13.github.io/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="Antonio's Portfolio RSS">
 
 
+  
 
     <!-- Chrome, Firefox OS and Opera -->
     <meta name="theme-color" content="#333333">
@@ -38,26 +39,28 @@
     <!-- Microsoft EDGE -->
     <meta name="msapplication-TileColor" content="#333333">
 
+ 
+
 <meta name="author" content="Antonio Victor Campos Coelho" />
 <meta name="description" content="Introduction In a previous post, I showed how to retrieve The Cancer Genome Atlas (TCGA) data from the Cancer Genomics Cloud (CGC) platform. I downloaded gene expression quantification data, created a relational database with PostgreSQL, and created a dataset uniting the raw quantification data for 675 differentially expressed genes identified …" />
 <meta name="keywords" content="Bioinformatics, gene expression, machine learning, supervised classification">
 
 
-<meta property="og:site_name" content="Antonio's Portfolio"/>
-<meta property="og:title" content="Machine Learning with Python: Supervised Classification of TCGA Prostate Cancer Data (Part 2 - Making a Model)"/>
-<meta property="og:description" content="Introduction In a previous post, I showed how to retrieve The Cancer Genome Atlas (TCGA) data from the Cancer Genomics Cloud (CGC) platform. I downloaded gene expression quantification data, created a relational database with PostgreSQL, and created a dataset uniting the raw quantification data for 675 differentially expressed genes identified …"/>
-<meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://antoniocampos13.github.io/machine-learning-with-python-supervised-classification-of-tcga-prostate-cancer-data-part-2-making-a-model.html"/>
-<meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2020-11-05 14:50:00-03:00"/>
-<meta property="article:modified_time" content=""/>
-<meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
-<meta property="article:section" content="Python"/>
-<meta property="article:tag" content="Bioinformatics"/>
-<meta property="article:tag" content="gene expression"/>
-<meta property="article:tag" content="machine learning"/>
-<meta property="article:tag" content="supervised classification"/>
-<meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
+  <meta property="og:site_name" content="Antonio's Portfolio"/>
+  <meta property="og:title" content="Machine Learning with Python: Supervised Classification of TCGA Prostate Cancer Data (Part 2 - Making a Model)"/>
+  <meta property="og:description" content="Introduction In a previous post, I showed how to retrieve The Cancer Genome Atlas (TCGA) data from the Cancer Genomics Cloud (CGC) platform. I downloaded gene expression quantification data, created a relational database with PostgreSQL, and created a dataset uniting the raw quantification data for 675 differentially expressed genes identified …"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="https://antoniocampos13.github.io/machine-learning-with-python-supervised-classification-of-tcga-prostate-cancer-data-part-2-making-a-model.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2020-11-05 14:50:00-03:00"/>
+  <meta property="article:modified_time" content=""/>
+  <meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
+  <meta property="article:section" content="Python"/>
+  <meta property="article:tag" content="Bioinformatics"/>
+  <meta property="article:tag" content="gene expression"/>
+  <meta property="article:tag" content="machine learning"/>
+  <meta property="article:tag" content="supervised classification"/>
+  <meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
 
   <title>Antonio's Portfolio &ndash; Machine Learning with Python: Supervised Classification of TCGA Prostate Cancer Data (Part 2 - Making a Model)</title>
 
@@ -65,12 +68,12 @@
 <body class="light-theme">
   <aside>
     <div>
-      <a href="https://antoniocampos13.github.io">
+      <a href="https://antoniocampos13.github.io/">
         <img src="https://avatars.githubusercontent.com/antoniocampos13" alt="Antonio's Portfolio" title="Antonio's Portfolio">
       </a>
 
       <h1>
-        <a href="https://antoniocampos13.github.io">Antonio's Portfolio</a>
+        <a href="https://antoniocampos13.github.io/">Antonio's Portfolio</a>
       </h1>
 
 <p>PhD in Genetics</p>
@@ -125,7 +128,7 @@
   <main>
 
     <nav>
-      <a href="https://antoniocampos13.github.io">Home</a>
+      <a href="https://antoniocampos13.github.io/">Home</a>
 
       <a href="/archives.html">Archives</a>
       <a href="/categories.html">Categories</a>
@@ -173,19 +176,16 @@
 <span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
 </code></pre></div>
 
-
 <p>Install all non-standard library modules using your Python package manager, usually <code>pip</code> or through anaconda, if you are using a conda environment with&nbsp;Python.</p>
 <p>Again, I will set up some constants to use&nbsp;later:</p>
 <div class="highlight"><pre><span></span><code><span class="n">RANDOM_SEED</span> <span class="o">=</span> <span class="mi">42</span>
 <span class="n">SPLITS</span> <span class="o">=</span> <span class="mi">10</span>
 </code></pre></div>
 
-
 <p>Set up the file&nbsp;paths:</p>
 <div class="highlight"><pre><span></span><code><span class="n">project_folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
 <span class="n">features_folder</span> <span class="o">=</span> <span class="n">project_folder</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span> <span class="o">/</span> <span class="s2">&quot;processed&quot;</span>
 </code></pre></div>
-
 
 <h2>Importing&nbsp;features</h2>
 <p>If you still have the features datasets loaded on memory, the commands below are not necessary. They serve to de-serialize the pickled datasets I saved in Part 1 using <code>pandas</code><span class="quo">&#8216;</span> <code>read_pickle()</code> method:</p>
@@ -194,7 +194,6 @@
 <span class="n">y_train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">features_folder</span> <span class="o">/</span> <span class="s2">&quot;y_train&quot;</span><span class="p">)</span>
 <span class="n">y_test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">features_folder</span> <span class="o">/</span> <span class="s2">&quot;y_test&quot;</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h2>Select classification&nbsp;model</h2>
 <p>The <code>scikit-learn</code> module contains code for several classification models. If you are in doubt, you can select from a list of models using a scoring metric, and the choose the best-performing model. See below a loop command that do just that (hat tip to <a href="https://hairysun.com/">Matt Harrison</a>):</p>
@@ -219,7 +218,6 @@
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="vm">__name__</span><span class="si">:</span><span class="s2">22</span><span class="si">}</span><span class="s2">  F1 Score: &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> STD: </span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>I will now explain what the loop does. First, I create a list named <code>models</code> with the name of some <code>sklearn</code> models. Note the way their names are written: they are the names of the corresponding <code>sklearn</code> modules.</p>
 <p>I then loop this list creating a classifier <code>cls</code> object by calling each model. Then, I create a K-Folds cross-validator. In other words, I randomly split the training dataset into <code>K</code> datasets (folds). Each fold is then used once as a validation while the <code>K - 1</code> remaining folds form the training set. The <code>n_splits</code> argument indicates <code>K</code>, which I set up using the <code>SPLITS</code> constant (currently 10, so <code>K=10</code> folds). Setting a integer (<code>RANDOM_SEED</code> constant) into the <code>random_state</code> argument ensures that the splitting outputs can be&nbsp;reproduced.</p>
 <p>Next, I calculate the <a href="https://en.wikipedia.org/wiki/F-score">F1 Score</a> by comparing the predictions with their actual labels (<code>y_train</code> series). As the text in the linked page states, &#8220;it is calculated from the precision and recall of the test, where the precision is the number of correctly identified positive results divided by the number of all positive results, including those not identified correctly, and the recall is the number of correctly identified positive results divided by the number of all samples that should have been identified as positive&#8221;. Recall is also named true positive rate (<span class="caps">TPR</span>) and sensitivity. The F1 Score is the harmonic mean of the precision and recall. This calculation is performed by <code>cross_val_score()</code> method from <code>sklearn.model_selection</code> module for each comparison among the folds. Then, the final result is an average of all measurements, which is stored at the <code>s</code> object. Finally, the loop ends printing the mean F1 Score and its standard deviation (<span class="caps">STD</span>).</p>
@@ -235,13 +233,11 @@ RandomForestClassifier  F1 Score: 0.337 STD: 0.26
 XGBClassifier           F1 Score: 0.370 STD: 0.34
 </code></pre></div>
 
-
 <p>The dataset folds will be identical, but you may have different values in some of these models due to stochasticity during calculation. Nevertheless, the values should be close enough. It seems that <code>LogisticRegression</code> had the best performance among the models, with a rounded up F1 Score = 0.58. So I will continue with this model and try to improve the F1 Score by optimizing (tuning) the&nbsp;model.</p>
 <h2>Model&nbsp;optimization</h2>
 <p>I will now setup the model and produce a grid of <strong>hyperparameters</strong>. A hyperparameter is a parameter of the model whose value affects the learning/classification process. A grid is therefore a collection of some of those hyperparameters that I will give to the model so it can choose the best candidates. I now set up the&nbsp;model:</p>
 <div class="highlight"><pre><span></span><code><span class="n">estimator</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
 </code></pre></div>
-
 
 <p>And this is the&nbsp;grid:</p>
 <div class="highlight"><pre><span></span><code><span class="n">grid</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;penalty&quot;</span><span class="p">:[</span><span class="s2">&quot;l1&quot;</span><span class="p">,</span> <span class="s2">&quot;l2&quot;</span><span class="p">,</span> <span class="s2">&quot;elasticnet&quot;</span><span class="p">,</span><span class="s2">&quot;none&quot;</span><span class="p">],</span>
@@ -250,35 +246,29 @@ XGBClassifier           F1 Score: 0.370 STD: 0.34
 <span class="p">}</span>
 </code></pre></div>
 
-
 <p>Note that each model has different hyperparameters; those above are logistic regression-exclusive. Check the <a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression">sklearn.linear_model.LogisticRegression module documentation</a> to know more about these&nbsp;hyperparameters.</p>
 <p>Now, I pass the model (assigned to <code>estimator</code> object) to the <code>GridSearchCV</code> function so that it returns the optimal parameters during fitting to the train data with 10-fold&nbsp;cross-validation:</p>
 <div class="highlight"><pre><span></span><code><span class="n">logreg_cv</span><span class="o">=</span><span class="n">GridSearchCV</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span><span class="n">grid</span><span class="p">,</span><span class="n">cv</span><span class="o">=</span><span class="n">SPLITS</span><span class="p">)</span>
 <span class="n">logreg_cv</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span><span class="n">y_train</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>Let&#8217;s see a summary of the&nbsp;candidates:</p>
 <div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;tuned hyperparameters :(best parameters) &quot;</span><span class="p">,</span><span class="n">logreg_cv</span><span class="o">.</span><span class="n">best_params_</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>The output will&nbsp;be:</p>
 <div class="highlight"><pre><span></span><code>tuned hyperparameters :(best parameters)  {&#39;C&#39;: 100.0, &#39;dual&#39;: False, &#39;penalty&#39;: &#39;l2&#39;}
 </code></pre></div>
-
 
 <p>Now I pass the best parameters as keywords to the optimized model, which I will assign to <code>logreg</code> object, and then fit the training data once&nbsp;again:</p>
 <div class="highlight"><pre><span></span><code><span class="n">logreg</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="o">**</span><span class="n">logreg_cv</span><span class="o">.</span><span class="n">best_params_</span><span class="p">)</span>
 <span class="n">logreg</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>With the fitted model, I can now generate predictions with the test&nbsp;dataset:</p>
 <div class="highlight"><pre><span></span><code><span class="n">predictions</span> <span class="o">=</span> <span class="n">logreg</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
 <span class="n">predicted_proba</span> <span class="o">=</span> <span class="n">logreg</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h2>Evaluate model&nbsp;performance</h2>
 <p>Let&#8217;s compare the predict labels with actual classification using a confusion&nbsp;matrix:</p>
@@ -287,19 +277,16 @@ XGBClassifier           F1 Score: 0.370 STD: 0.34
 <span class="nb">print</span><span class="p">(</span><span class="n">conf_matrix</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>The output will&nbsp;be:</p>
 <div class="highlight"><pre><span></span><code>#                  Actual: controls  Actual: cases
 Prediction: controls                47             11
 Prediction: cases                    8              5
 </code></pre></div>
 
-
 <p>Now remember the labels summary I got in <a href="https://antoniocampos13.github.io/machine-learning-with-python-supervised-classification-of-tcga-prostate-cancer-data-part-1-making-features-datasets.html">Part 1</a>:</p>
 <div class="highlight"><pre><span></span><code>Training Set has 38 Positive Labels (cases) and 127 Negative Labels (controls)
 Test Set has 16 Positive Labels (cases) and 55 Negative Labels (controls)
 </code></pre></div>
-
 
 <p>Thus, the model erroneously classified 11 (of 16) cases as controls (false negatives) and correctly classified 5 (of 16) cases as cases (true positives). If this model were to be used in a real world scenario, this would be a problem, because the model would miss people at risk of disease&nbsp;progression.</p>
 <p>Imagine that detecting prostate cancer disease progression risk will trigger further analysis (gather second opinion, ask the patients more examinations etc.) whereas if you don&#8217;t detect this risk, the patient would be sent home with the disease actively progressing. In this situation, therefore, I would prefer false positives (type I error) over false negatives (type <span class="caps">II</span>&nbsp;error).</p>
@@ -312,14 +299,12 @@ Test Set has 16 Positive Labels (cases) and 55 Negative Labels (controls)
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;F1 Score: </span><span class="si">{</span><span class="n">f1_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>The&nbsp;output:</p>
 <div class="highlight"><pre><span></span><code>Accuracy: 0.732
 Precision: 0.385
 Recall: 0.312
 F1 Score: 0.345
 </code></pre></div>
-
 
 <p>I can also print a receiver operating characteristic (<span class="caps">ROC</span>) curve. As stated in the <a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic">Wikipedia article</a>, it &#8220;illustrates the diagnostic ability of a binary classifier system as its discrimination threshold is varied&#8221;. The area under the <span class="caps">ROC</span> curve (<span class="caps">AUC</span>) summarizes the predictive power of the&nbsp;model.</p>
 <div class="highlight"><pre><span></span><code><span class="n">false_pos_rate</span><span class="p">,</span> <span class="n">true_pos_rate</span><span class="p">,</span> <span class="n">proba</span> <span class="o">=</span> <span class="n">roc_curve</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predicted_proba</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
@@ -332,7 +317,6 @@ F1 Score: 0.345
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;lower right&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>The&nbsp;output:</p>
 <p><img alt="ROC curve from logistic regression model classifying TCGA prostate cancer dataset" src="https://antoniocampos13.github.io/images/logreg_roc.png"></p>
 <p>The <span class="caps">AUC</span> is equal to the probability that the model will rank a randomly chosen positive instance higher than a randomly chosen negative one. It ranges from 0 to 1 (perfect classifier). A random, thus useless, classifier, has a <span class="caps">AUC</span> = 0.5. Since the <span class="caps">AUC</span> of my model is about 0.65, means that it has some predictive power, although not perfect. I cannot improve the <span class="caps">AUC</span>, but I can change the classification probability threshold (as I mentioned above) to try to better utilize the potential of the&nbsp;model.</p>
@@ -344,7 +328,6 @@ F1 Score: 0.345
 <span class="n">f1_scores</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">recall</span> <span class="o">*</span> <span class="n">precision</span> <span class="o">/</span> <span class="p">(</span><span class="n">recall</span> <span class="o">+</span> <span class="n">precision</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>The <code>precision_recall_curve()</code> function will select a classification threshold (<code>thresholds</code> object), label the samples according to their predicted probabilities given by the model (<code>predicted_proba[:, -1]</code>) and compare with the actual labels (<code>y_test</code>), calculating the precision and recall (<code>precision</code> and <code>recall</code> objects).</p>
 <p>All three objects are <code>NumPy</code> arrays. Thus, I can obtain the probability cutoff value associated with maximum F1 score, and create a list of prediction labels and assign to <code>f1_predictions</code> object using a list comprehension with a <code>if else</code> statement:</p>
 <div class="highlight"><pre><span></span><code><span class="n">optimal_proba_cutoff</span> <span class="o">=</span> <span class="n">thresholds</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">f1_scores</span><span class="p">)]</span>
@@ -352,19 +335,16 @@ F1 Score: 0.345
 <span class="n">f1_predictions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">optimal_proba_cutoff</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">predicted_proba</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
 </code></pre></div>
 
-
 <p>Let&#8217;s examine the confusion matrix using this new&nbsp;cutoff:</p>
 <div class="highlight"><pre><span></span><code><span class="n">conf_matrix_th</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">f1_predictions</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Prediction: controls&quot;</span><span class="p">,</span> <span class="s2">&quot;Prediction: cases&quot;</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Actual: controls&quot;</span><span class="p">,</span> <span class="s2">&quot;Actual: cases&quot;</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">conf_matrix_th</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>The&nbsp;output:</p>
 <div class="highlight"><pre><span></span><code>#                  Actual: controls  Actual: cases
 Prediction: controls                34              4
 Prediction: cases                   21             12
 </code></pre></div>
-
 
 <p>I can see that I reduced the number of false negatives at the cost of having more false positives, as discussed above. Now the model erroneously classified just 4 cases as controls, compared to 11 before thresholding. Let&#8217;s calculate the model&#8217;s metrics&nbsp;again:</p>
 <div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accuracy Before: </span><span class="si">{</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> --&gt; Now: </span><span class="si">{</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">f1_predictions</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -373,7 +353,6 @@ Prediction: cases                   21             12
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;F1 Score Before: </span><span class="si">{</span><span class="n">f1_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> --&gt; Now: </span><span class="si">{</span><span class="n">f1_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">f1_predictions</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>The&nbsp;output:</p>
 <div class="highlight"><pre><span></span><code>Accuracy Before: 0.732 --&gt; Now: 0.648
 Precision Before: 0.385 --&gt; Now: 0.364
@@ -381,14 +360,12 @@ Recall Before: 0.312 --&gt; Now: 0.750
 F1 Score Before: 0.345 --&gt; Now: 0.490
 </code></pre></div>
 
-
 <p>I see that the sensitivity (recall) improved greatly, with a consequential F1 score improvement. With the current data, this is the maximum improvement I can achieve. If this model would to be used in a real world scenario, I would have to gather more information to try to further improve the classification power of the model, always assessing the optimal probability cutoff to account for class&nbsp;imbalance.</p>
 <h2>Save (Serialize)&nbsp;model</h2>
 <p>I can save the model to disk as a pickled object to use in the future or share with someone. Remember that the same modules must be installed and loaded in the system that will receive the pickled model so it can be unpickled and work correctly. See below the commands to save the model and the chosen probability cutoff for&nbsp;classification:</p>
 <div class="highlight"><pre><span></span><code><span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">logreg</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">project_folder</span> <span class="o">/</span> <span class="s2">&quot;models&quot;</span> <span class="o">/</span> <span class="s2">&quot;logreg&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">))</span>
 <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">optimal_proba_cutoff</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">project_folder</span> <span class="o">/</span> <span class="s2">&quot;models&quot;</span> <span class="o">/</span> <span class="s2">&quot;logreg&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">))</span>
 </code></pre></div>
-
 
 <p><strong>Note: pickled objects are Python-specific only &#8212; non-Python programs may not be able to reconstruct pickled Python objects. <span class="caps">WARNING</span>: never, <span class="caps">NEVER</span>, unpickle data you do not trust. As it says in the Python documentation: <a href="https://docs.python.org/3/library/pickle.html">&#8220;It is possible to construct malicious pickle data which will execute arbitrary code during unpickling&#8221;</a>.</strong></p>
 <p>Below is a schematics of my working directory. Check it on <a href="https://github.com/antoniocampos13/portfolio/tree/master/Python/2020_11_05_Supervised_Machine_Leaning_TCGA_Data/data/interim">my porfolio</a>:</p>
@@ -410,7 +387,6 @@ F1 Score Before: 0.345 --&gt; Now: 0.490
     └── models
         └── make_model.py
 </code></pre></div>
-
 
 <h2>Conclusion</h2>
 <p>In this part I demonstrated how&nbsp;to:</p>
@@ -453,7 +429,7 @@ F1 Score Before: 0.345 --&gt; Now: 0.490
 
     <footer>
 <p>
-  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike</a>
 </p>
 <p>
 Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
@@ -484,7 +460,6 @@ Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a 
   "description": "Data Science Portfolio by Antonio Victor Campos Coelho"
 }
 </script>
-
 
 </body>
 </html>

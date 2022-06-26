@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"><title>Antonio's Portfolio - Unix</title><link href="https://antoniocampos13.github.io/" rel="alternate"></link><link href="https://antoniocampos13.github.io/feeds/unix.atom.xml" rel="self"></link><id>https://antoniocampos13.github.io/</id><updated>2020-10-06T18:00:00-03:00</updated><subtitle>PhD in Genetics</subtitle><entry><title>FASTQ to Annotation (Part 4)</title><link href="https://antoniocampos13.github.io/fastq-to-annotation-part-4.html" rel="alternate"></link><published>2020-10-06T18:00:00-03:00</published><updated>2020-10-06T18:00:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2020-10-06:/fastq-to-annotation-part-4.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;&lt;em&gt;In a &lt;a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html"&gt;previous post&lt;/a&gt;, I showed how to configure an Ubuntu system to install Bioinformatics&amp;nbsp;programs.&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Now, using the environment I created, I will demonstrate a bash script, &lt;code&gt;FastQ_to_Annotation.sh&lt;/code&gt; that takes next generation sequencing (&lt;span class="caps"&gt;NGS&lt;/span&gt;) raw reads from human whole genome sequencing as input and produces variant annotation …&lt;/em&gt;&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;&lt;em&gt;Now, using the environment I created, I will demonstrate a bash script, &lt;code&gt;FastQ_to_Annotation.sh&lt;/code&gt; that takes next generation sequencing (&lt;span class="caps"&gt;NGS&lt;/span&gt;) raw reads from human whole genome sequencing as input and produces …&lt;/em&gt;&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;&lt;em&gt;In a &lt;a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html"&gt;previous post&lt;/a&gt;, I showed how to configure an Ubuntu system to install Bioinformatics&amp;nbsp;programs.&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Now, using the environment I created, I will demonstrate a bash script, &lt;code&gt;FastQ_to_Annotation.sh&lt;/code&gt; that takes next generation sequencing (&lt;span class="caps"&gt;NGS&lt;/span&gt;) raw reads from human whole genome sequencing as input and produces variant annotation as output. Variant annotation is the process of identifying genetic variants in some genomic &lt;span class="caps"&gt;DNA&lt;/span&gt; sample, and assess, for example, if any of the found variants have any effect on phenotype, such as increased susceptibility to certain&amp;nbsp;diseases.&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;In the &lt;a href="https://antoniocampos13.github.io/fastq-to-annotation-part-1"&gt;first part&lt;/a&gt;, I showed how to search for &lt;span class="caps"&gt;NGS&lt;/span&gt; projects deposited in &lt;a href="https://www.ncbi.nlm.nih.gov/"&gt;National Center for Biotechnology Information (&lt;span class="caps"&gt;NCBI&lt;/span&gt;) databases&lt;/a&gt; from which I can download sequencing reads later to use with the&amp;nbsp;script.&lt;/em&gt;&lt;/p&gt;
@@ -41,11 +41,9 @@
 &lt;span class="nv"&gt;BED&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;refs/GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.bed
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Then, joining everything&amp;nbsp;together:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;./FastQ_to_Annotation.sh SRR6784104 &lt;span class="nv"&gt;$REF&lt;/span&gt; &lt;span class="nv"&gt;$BED&lt;/span&gt; &lt;span class="m"&gt;20&lt;/span&gt; &lt;span class="m"&gt;20&lt;/span&gt; illumina &lt;span class="m"&gt;3&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt; normal antonio
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;h2&gt;Pipeline&amp;nbsp;steps&lt;/h2&gt;
 &lt;p&gt;The script will check if all parameters are adequate and then run the core pipeline, which proceeds in an 8-step&amp;nbsp;process:&lt;/p&gt;
@@ -144,7 +142,7 @@
 &lt;p&gt;&lt;a href="https://www.ncbi.nlm.nih.gov/snp/"&gt;Home - &lt;span class="caps"&gt;SNP&lt;/span&gt; - &lt;span class="caps"&gt;NCBI&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://www.internationalgenome.org/category/population/"&gt;Population | 1000&amp;nbsp;Genomes&lt;/a&gt;&lt;/p&gt;</content><category term="Unix"></category><category term="Bioinformatics"></category><category term="genomic variation"></category><category term="entrez-direct"></category><category term="EDirect"></category></entry><entry><title>FASTQ to Annotation (Part 3)</title><link href="https://antoniocampos13.github.io/fastq-to-annotation-part-3.html" rel="alternate"></link><published>2020-10-05T18:00:00-03:00</published><updated>2020-10-05T18:00:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2020-10-05:/fastq-to-annotation-part-3.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;&lt;em&gt;In a &lt;a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html"&gt;previous post&lt;/a&gt;, I showed how to configure an Ubuntu system to install Bioinformatics&amp;nbsp;programs.&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Now, using the environment I created, I will demonstrate a bash script, &lt;code&gt;FastQ_to_Annotation.sh&lt;/code&gt; that takes next generation sequencing (&lt;span class="caps"&gt;NGS&lt;/span&gt;) raw reads from human whole genome sequencing as input and produces variant annotation …&lt;/em&gt;&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;&lt;em&gt;Now, using the environment I created, I will demonstrate a bash script, &lt;code&gt;FastQ_to_Annotation.sh&lt;/code&gt; that takes next generation sequencing (&lt;span class="caps"&gt;NGS&lt;/span&gt;) raw reads from human whole genome sequencing as input and produces …&lt;/em&gt;&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;&lt;em&gt;In a &lt;a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html"&gt;previous post&lt;/a&gt;, I showed how to configure an Ubuntu system to install Bioinformatics&amp;nbsp;programs.&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Now, using the environment I created, I will demonstrate a bash script, &lt;code&gt;FastQ_to_Annotation.sh&lt;/code&gt; that takes next generation sequencing (&lt;span class="caps"&gt;NGS&lt;/span&gt;) raw reads from human whole genome sequencing as input and produces variant annotation as output. Variant annotation is the process of identifying genetic variants in some genomic &lt;span class="caps"&gt;DNA&lt;/span&gt; sample, and assess, for example, if any of the found variants have any effect on phenotype, such as increased susceptibility to certain&amp;nbsp;diseases.&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;In the &lt;a href="https://antoniocampos13.github.io/fastq-to-annotation-part-1"&gt;first part&lt;/a&gt;, I showed how to search for &lt;span class="caps"&gt;NGS&lt;/span&gt; projects deposited in &lt;a href="https://www.ncbi.nlm.nih.gov/"&gt;National Center for Biotechnology Information (&lt;span class="caps"&gt;NCBI&lt;/span&gt;) databases&lt;/a&gt; from which I can download sequencing reads later to use with the&amp;nbsp;script.&lt;/em&gt;&lt;/p&gt;
@@ -157,7 +155,6 @@
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;vep_install -a cf -s homo_sapiens_refseq -y GRCh38 -c . –CONVERT
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Unfortunately, the command above is prone to network and other esoteric errors. If you have any problem, you can try an alternative manner. See&amp;nbsp;below:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Alternative: manually download the compressed cache&lt;/span&gt;
 wget ftp://ftp.ensembl.org/pub/release-101/variation/indexed_vep_cache/homo_sapiens_refseq_vep_101_GRCh38.tar.gz -P &lt;span class="nv"&gt;$HOME&lt;/span&gt;/.vep
@@ -165,7 +162,6 @@ wget ftp://ftp.ensembl.org/pub/release-101/variation/indexed_vep_cache/homo_sapi
 &lt;span class="c1"&gt;# Uncompress the cache&lt;/span&gt;
 tar -zxf &lt;span class="nv"&gt;$HOME&lt;/span&gt;/.vep/homo_sapiens_refseq_vep_101_GRCh38.tar.gz -C &lt;span class="nv"&gt;$HOME&lt;/span&gt;/.vep
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;After some time (several minutes to some hours depending on the network and the capabilities of your computer) the &lt;span class="caps"&gt;VEP&lt;/span&gt; cache will be downloaded and installed into a hidden folder in your home folder (&lt;code&gt;$HOME/.vep&lt;/code&gt;). Therefore, notice that it is independent of miniconda environments. Thus, it is expected that once installed, this cache will work with any miniconda environment on your computer. You may backup the &lt;code&gt;.vep/&lt;/code&gt; folder to avoid downloading the whole thing again (but consider to download newer versions of the cache as they become available&amp;nbsp;though).&lt;/p&gt;
 &lt;h3&gt;Obtaining human genome reference&amp;nbsp;files&lt;/h3&gt;
@@ -191,29 +187,24 @@ mkdir refs
 curl -O ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.28_GRCh38.p13/GRCh38_major_release_seqs_for_alignment_pipelines/GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.gz
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;h4&gt;2. Human genome &lt;span class="caps"&gt;FASTA&lt;/span&gt;&amp;nbsp;index&lt;/h4&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Download from NCBI&amp;#39;s FTP server&lt;/span&gt;
 curl -O ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.28_GRCh38.p13/GRCh38_major_release_seqs_for_alignment_pipelines/GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.fai
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;h4&gt;3. Human genome &lt;span class="caps"&gt;BED&lt;/span&gt;&amp;nbsp;file&lt;/h4&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Produce sorted BED file from reference genome index file obtained above&lt;/span&gt;
 awk &lt;span class="s1"&gt;&amp;#39;{print $1 &amp;quot;\t0\t&amp;quot; $2}&amp;#39;&lt;/span&gt; GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.fai &lt;span class="p"&gt;|&lt;/span&gt; sort -k1,1V -k2,2n &amp;gt; GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.bed
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;h4&gt;4. Human genome &lt;span class="caps"&gt;GFF&lt;/span&gt; file (optional alternative to &lt;span class="caps"&gt;BED&lt;/span&gt;&amp;nbsp;file)&lt;/h4&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Download from NCBI&amp;#39;s FTP server&lt;/span&gt;
 curl -O ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.28_GRCh38.p13/GRCh38_major_release_seqs_for_alignment_pipelines/GCA_000001405.15_GRCh38_full_analysis_set.refseq_annotation.gff.gz
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;h4&gt;5. bwa index&amp;nbsp;files&lt;/h4&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;bwa index GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.gz
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;When you complete all of the steps in Part 1, Part 2 and in this part, your &lt;code&gt;demo&lt;/code&gt; folder should have the files showed&amp;nbsp;below&lt;/p&gt;
 &lt;p&gt;&lt;img alt="demo folder contents until now" src="https://antoniocampos13.github.io/images/demo_folder.PNG"&gt;&lt;/p&gt;
@@ -246,7 +237,7 @@ curl -O ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.28_
 &lt;p&gt;&lt;a href="http://ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.28_GRCh38.p13/GRCh38_major_release_seqs_for_alignment_pipelines/"&gt;&lt;span class="caps"&gt;NCBI&lt;/span&gt;&amp;#8217;s &lt;span class="caps"&gt;FTP&lt;/span&gt; Server | GRCh38 Major release sequences for alignment&amp;nbsp;pipelines&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;a href="http://ftp://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/dna/"&gt;Ensembl&amp;#8217;s &lt;span class="caps"&gt;FTP&lt;/span&gt; Server | Homo sapiens &lt;span class="caps"&gt;DNA&lt;/span&gt; sequences release&amp;nbsp;101&lt;/a&gt;&lt;/p&gt;</content><category term="Unix"></category><category term="Bioinformatics"></category><category term="genomic variation"></category><category term="entrez-direct"></category><category term="EDirect"></category></entry><entry><title>FASTQ to Annotation (Part 2)</title><link href="https://antoniocampos13.github.io/fastq-to-annotation-part-2.html" rel="alternate"></link><published>2020-10-02T18:00:00-03:00</published><updated>2020-10-02T18:00:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2020-10-02:/fastq-to-annotation-part-2.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;&lt;em&gt;In a &lt;a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis"&gt;previous post&lt;/a&gt;, I showed how to configure an Ubuntu system to install Bioinformatics&amp;nbsp;programs.&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Now, using the environment I created, I will demonstrate a bash script, &lt;code&gt;FastQ_to_Annotation.sh&lt;/code&gt; that takes next generation sequencing (&lt;span class="caps"&gt;NGS&lt;/span&gt;) raw reads from human whole genome sequencing as input and produces variant annotation …&lt;/em&gt;&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;&lt;em&gt;Now, using the environment I created, I will demonstrate a bash script, &lt;code&gt;FastQ_to_Annotation.sh&lt;/code&gt; that takes next generation sequencing (&lt;span class="caps"&gt;NGS&lt;/span&gt;) raw reads from human whole genome sequencing as input and produces …&lt;/em&gt;&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;&lt;em&gt;In a &lt;a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis"&gt;previous post&lt;/a&gt;, I showed how to configure an Ubuntu system to install Bioinformatics&amp;nbsp;programs.&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Now, using the environment I created, I will demonstrate a bash script, &lt;code&gt;FastQ_to_Annotation.sh&lt;/code&gt; that takes next generation sequencing (&lt;span class="caps"&gt;NGS&lt;/span&gt;) raw reads from human whole genome sequencing as input and produces variant annotation as output. Variant annotation is the process of identifying genetic variants in some genomic &lt;span class="caps"&gt;DNA&lt;/span&gt; sample, and assess, for example, if any of the found variants have any effect on phenotype, such as increased susceptibility to certain&amp;nbsp;diseases.&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;In the &lt;a href="https://antoniocampos13.github.io/fastq-to-annotation-part-1"&gt;first part&lt;/a&gt;, I showed how to search for &lt;span class="caps"&gt;NGS&lt;/span&gt; projects deposited in &lt;a href="https://www.ncbi.nlm.nih.gov/"&gt;National Center for Biotechnology Information (&lt;span class="caps"&gt;NCBI&lt;/span&gt;) databases&lt;/a&gt; from which I can download sequencing reads later to use with the&amp;nbsp;script.&lt;/em&gt;&lt;/p&gt;
@@ -270,7 +261,6 @@ conda activate bioenv
 esearch -db sra -query &lt;span class="s1"&gt;&amp;#39;PRJNA436005&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; efetch -format runinfo &amp;gt; PRJNA436005_runinfo.csv
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;The &lt;code&gt;runinfo&lt;/code&gt; format displays metadata of read sets. Reads are inferred sequences of base pairs corresponding to &lt;span class="caps"&gt;DNA&lt;/span&gt; fragments produced during procedures for &lt;span class="caps"&gt;NGS&lt;/span&gt;. The collection of &lt;span class="caps"&gt;DNA&lt;/span&gt; fragments from a given sample is called a &lt;strong&gt;library&lt;/strong&gt;, which are sequenced to produce the set of &lt;strong&gt;reads&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;Checking the &lt;code&gt;CSV&lt;/code&gt; file, I see that there are seven read sets generated by the project, each displayed on a row, and are identified by the &lt;code&gt;SRR&lt;/code&gt; prefix followed by some numbers. With this &lt;span class="caps"&gt;ID&lt;/span&gt; is possible to retrieve &lt;code&gt;FASTQ&lt;/code&gt; files for each read set. Now I check the &lt;code&gt;LibraryLayout&lt;/code&gt; column to confirm they are all &lt;strong&gt;&lt;span class="caps"&gt;PAIRED&lt;/span&gt;&lt;/strong&gt; reads, meaning that the researchers sequenced both ends of a fragment. Thus, each read set will produce two &lt;code&gt;FASTQ&lt;/code&gt; files, containing the sequences and qualities from all reads obtained from the library of the original sample. This is important to check because the script requires paired&amp;nbsp;reads.&lt;/p&gt;
 &lt;p&gt;Other interesting columns that I like to check&amp;nbsp;are:&lt;/p&gt;
@@ -286,7 +276,6 @@ esearch -db sra -query &lt;span class="s1"&gt;&amp;#39;PRJNA436005&amp;#39;&lt;/
 &lt;p&gt;For now, I will use only the first read, which has the &lt;code&gt;SRR6784104&lt;/code&gt; &lt;span class="caps"&gt;ID&lt;/span&gt;, since I will just demonstrate the script use. Finally, let&amp;#8217;s download the read set with the &lt;code&gt;EDirect fastq-dump&lt;/code&gt; command and split it into two files (&lt;code&gt;--split-files&lt;/code&gt; flag), one with reads from each end of &lt;span class="caps"&gt;DNA&lt;/span&gt; fragments in the original library, and compress them with &lt;code&gt;--gzip&lt;/code&gt;:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;fastq-dump --split-files SRR6784104 --gzip
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;After a moment, two &lt;code&gt;fastq.gz&lt;/code&gt; files will be downloaded to the current working directory and are ready to be used as the input for the &lt;code&gt;FastQ_to_VariantCall.sh&lt;/code&gt;.&lt;/p&gt;
 &lt;h2&gt;Conclusion (Part&amp;nbsp;2)&lt;/h2&gt;
@@ -307,7 +296,7 @@ esearch -db sra -query &lt;span class="s1"&gt;&amp;#39;PRJNA436005&amp;#39;&lt;/
 &lt;p&gt;&lt;a href="https://www.illumina.com"&gt;Illumina | Sequencing and array-based solutions for genetic&amp;nbsp;research&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://www.illumina.com/science/technology/next-generation-sequencing/beginners.html"&gt;Next-Generation Sequencing for Beginners | &lt;span class="caps"&gt;NGS&lt;/span&gt; basics for&amp;nbsp;researchers&lt;/a&gt;&lt;/p&gt;</content><category term="Unix"></category><category term="Bioinformatics"></category><category term="genomic variation"></category><category term="entrez-direct"></category><category term="EDirect"></category></entry><entry><title>FASTQ to Annotation (Part 1)</title><link href="https://antoniocampos13.github.io/fastq-to-annotation-part-1.html" rel="alternate"></link><published>2020-10-01T18:00:00-03:00</published><updated>2020-10-01T18:00:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2020-10-01:/fastq-to-annotation-part-1.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;In my &lt;a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html"&gt;previous post&lt;/a&gt;, I showed how to configure an Ubuntu system to install Bioinformatics&amp;nbsp;programs.&lt;/p&gt;
-&lt;p&gt;Now, using the environment I created, I will demonstrate a bash script, &lt;code&gt;FastQ_to_Annotation.sh&lt;/code&gt; that takes next generation sequencing (&lt;span class="caps"&gt;NGS&lt;/span&gt;) raw reads from human whole genome sequencing as input and produces variant annotation …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;Now, using the environment I created, I will demonstrate a bash script, &lt;code&gt;FastQ_to_Annotation.sh&lt;/code&gt; that takes next generation sequencing (&lt;span class="caps"&gt;NGS&lt;/span&gt;) raw reads from human whole genome sequencing as input and produces …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;In my &lt;a href="https://antoniocampos13.github.io/setting-up-your-unix-computer-for-bioinformatics-analysis.html"&gt;previous post&lt;/a&gt;, I showed how to configure an Ubuntu system to install Bioinformatics&amp;nbsp;programs.&lt;/p&gt;
 &lt;p&gt;Now, using the environment I created, I will demonstrate a bash script, &lt;code&gt;FastQ_to_Annotation.sh&lt;/code&gt; that takes next generation sequencing (&lt;span class="caps"&gt;NGS&lt;/span&gt;) raw reads from human whole genome sequencing as input and produces variant annotation as output. Variant annotation is the process of identifying genetic variants in some genomic &lt;span class="caps"&gt;DNA&lt;/span&gt; sample, and assess, for example, if any of the found variants have any effect on phenotype, such as increased susceptibility to certain&amp;nbsp;diseases.&lt;/p&gt;
 &lt;p&gt;This demonstration will be separated in four parts. Here in the first part, I will show how to search for &lt;span class="caps"&gt;NGS&lt;/span&gt; projects deposited in &lt;a href="https://www.ncbi.nlm.nih.gov/"&gt;National Center for Biotechnology Information (&lt;span class="caps"&gt;NCBI&lt;/span&gt;) databases&lt;/a&gt; from which I can download sequencing reads later to use with the&amp;nbsp;script.&lt;/p&gt;
@@ -315,7 +304,6 @@ esearch -db sra -query &lt;span class="s1"&gt;&amp;#39;PRJNA436005&amp;#39;&lt;/
 &lt;p&gt;I open my Unix terminal and activate the &lt;code&gt;bioenv&lt;/code&gt; environment:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;conda activate bioenv
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Now I use the &lt;code&gt;EDirect&lt;/code&gt; &lt;code&gt;esearch&lt;/code&gt; command to search &lt;span class="caps"&gt;NCBI&lt;/span&gt;&amp;#8217;s databases. I must provide a database using the flag &lt;code&gt;-db&lt;/code&gt;. Check the available databases &lt;a href="https://www.ncbi.nlm.nih.gov/books/NBK25497/table/chapter2.T._entrez_unique_identifiers_ui/?report=objectonly"&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;I will search the &lt;code&gt;biproject&lt;/code&gt; database because it contains metadata from projects dealing with high-throughput genome sequencing, transcriptome expression analysis and so on. I must use the &lt;code&gt;-query&lt;/code&gt; flag to provide keywords for search. In this example, I will search for studies dealing with &lt;strong&gt;vorinostat&lt;/strong&gt;, a medicine that is have been used in experimental &lt;span class="caps"&gt;HIV&lt;/span&gt;-1 latency reversal, or &amp;#8220;shock-and-kill&amp;#8221;&amp;nbsp;treatments.&lt;/p&gt;
@@ -329,7 +317,6 @@ mkdir demo
 esearch -db bioproject -query &lt;span class="s1"&gt;&amp;#39;vorinostat&amp;#39;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;The output is just a &lt;code&gt;XML&lt;/code&gt; summary including, among other things, the number of results&amp;nbsp;retrieved:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;&amp;lt;ENTREZ_DIRECT&amp;gt;&lt;/span&gt;
   &lt;span class="nt"&gt;&amp;lt;Db&amp;gt;&lt;/span&gt;bioproject&lt;span class="nt"&gt;&amp;lt;/Db&amp;gt;&lt;/span&gt;
@@ -340,12 +327,10 @@ esearch -db bioproject -query &lt;span class="s1"&gt;&amp;#39;vorinostat&amp;#39
 &lt;span class="nt"&gt;&amp;lt;/ENTREZ_DIRECT&amp;gt;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;In this case, the query resulted in 61 results (check the &lt;code&gt;&amp;lt;count&amp;gt;&lt;/code&gt; tag). Thus, I will add more commands to retrieve the actual query results. I will pipe, i.e. transfer, the results of the query to the another command &amp;#8212; &lt;code&gt;efetch&lt;/code&gt; &amp;#8212; that will do this work for me. This is the pipe symbol: &lt;code&gt;|&lt;/code&gt;.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# ... not there yet ... (2/4)&lt;/span&gt;
 esearch -db bioproject -query &lt;span class="s1"&gt;&amp;#39;vorinostat&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; efetch -format native -mode xml
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The output is in &lt;code&gt;XML&lt;/code&gt; format, and it is unfortunately not very much human-readable. Here is a print screen showing the first result. Notice how the record is contained within a &lt;code&gt;&amp;lt;/DocumentSummary&amp;gt;&lt;/code&gt; node:&lt;/p&gt;
 &lt;p&gt;&lt;img alt="esearch vorinostat XML result" src="https://antoniocampos13.github.io/images/esearch_vorinostat_xml_results.PNG"&gt;&lt;/p&gt;
@@ -354,14 +339,12 @@ esearch -db bioproject -query &lt;span class="s1"&gt;&amp;#39;vorinostat&amp;#39
 esearch -db bioproject -query &lt;span class="s1"&gt;&amp;#39;vorinostat&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; efetch -format native -mode xml &lt;span class="p"&gt;|&lt;/span&gt; xtract -pattern DocumentSummary -element ArchiveID@accession ID Title Description Reference
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Here is the tab-separated output of the same record displayed on my&amp;nbsp;terminal:&lt;/p&gt;
 &lt;p&gt;&lt;img alt="esearch vorinostat xtract result" src="https://antoniocampos13.github.io/images/esearch_vorinostat_xtract_results.PNG"&gt;&lt;/p&gt;
 &lt;p&gt;Lastly, I will add a final command to transfer to a local text file &lt;code&gt;vorinostat_projects.txt&lt;/code&gt; that will be saved in the current working directory. Note that if you have a identically-named file in the working directory, it will be overwritten, so be&amp;nbsp;careful.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Finally there! (4/4)&lt;/span&gt;
 esearch -db bioproject -query &lt;span class="s1"&gt;&amp;#39;vorinostat&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; efetch -format native -mode xml &lt;span class="p"&gt;|&lt;/span&gt; xtract -pattern DocumentSummary -element ArchiveID@accession ID Reference Title Description &amp;gt; vorinostat_projects.txt
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The &lt;code&gt;vorinostat_projects.txt&lt;/code&gt; file can then be imported into spreadsheets to make easier to organize and read the&amp;nbsp;results.&lt;/p&gt;
 &lt;h2&gt;Refining the&amp;nbsp;search&lt;/h2&gt;
@@ -375,7 +358,6 @@ esearch -db bioproject -query &lt;span class="s1"&gt;&amp;#39;vorinostat&amp;#39
 &lt;p&gt;You could continue the search on the website, of course, but let&amp;#8217;s go back to the terminal and continue from&amp;nbsp;there:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;esearch -db bioproject -query &lt;span class="s1"&gt;&amp;#39;(((vorinostat) AND &amp;quot;bioproject sra&amp;quot;[Filter]) AND Homo sapiens[Organism]) AND &amp;quot;variation&amp;quot;[Filter]&amp;#39;&lt;/span&gt;  &lt;span class="p"&gt;|&lt;/span&gt; efetch -format native -mode xml &lt;span class="p"&gt;|&lt;/span&gt; xtract -pattern DocumentSummary -element ArchiveID@accession ID Reference Title Description  &amp;gt; vorinostat_refined.txt
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Remember: single quotes enclosing the query. Turns out that this refined search was rather restrictive: it resulted in a single record. Checking the &lt;code&gt;vorinostat_refined.txt&lt;/code&gt; I see in the abstract that the project dealt with samples from patients with melanoma. One of the last sentences says: &amp;#8220;&lt;span class="caps"&gt;DNA&lt;/span&gt; Seq data: biopsy samples from patients pre- and post- treated with Vorinostat; check mutations related to MAPKi-resistance&amp;#8221; (MAPKi: Mitogen Activated Protein Kinase inhibitors). Although I had &lt;span class="caps"&gt;HIV&lt;/span&gt;-1-related projects in mind, that&amp;#8217;s fine for now, since it is suitable to &lt;code&gt;FastQ_to_Annotation.sh&lt;/code&gt; script: identify and annotate genetic&amp;nbsp;variation.&lt;/p&gt;
 &lt;p&gt;Then, I take note of the project &lt;span class="caps"&gt;ID&lt;/span&gt;: &lt;code&gt;PRJNA436005&lt;/code&gt;. I will use it to retrieve reads from this project by searching the &lt;span class="caps"&gt;SRA&lt;/span&gt; with&amp;nbsp;it.&lt;/p&gt;
@@ -404,13 +386,11 @@ esearch -db bioproject -query &lt;span class="s1"&gt;&amp;#39;vorinostat&amp;#39
 sudo apt-get upgrade
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Then I must install some useful libraries, especially to be sure that all future libraries I need will be installed and work properly. Some of these (e.g. default-jdk, the Java libraries), may already be installed in your system, but just to&amp;nbsp;ensure:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo apt-get install -y curl unzip build-essential ncurses-dev
 sudo apt-get install -y byacc zlib1g-dev python-dev git cmake
 sudo apt-get install -y default-jdk ant
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;h2&gt;Installing&amp;nbsp;(mini)conda&lt;/h2&gt;
 &lt;p&gt;Now I will install &lt;a href="https://conda.io/miniconda.html"&gt;miniconda&lt;/a&gt;. What is miniconda? Miniconda is a simplified version of Conda, an environment management system. Every program we install on our computers depend on other programs to work. So if a program X needs a program Y to work, it may stop working if Y gets an update that for some reason is incompatible with the original X&amp;nbsp;program.&lt;/p&gt;
@@ -420,23 +400,19 @@ sudo apt-get install -y default-jdk ant
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh &amp;gt; Miniconda3-latest-Linux-x86_64.sh
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Then, go to the folder where the installer was downloaded and run the&amp;nbsp;script:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;bash Miniconda3-latest-Linux-x86_64.sh
 
 ./Miniconda3-latest-Linux-x86_64.sh &lt;span class="c1"&gt;# same effect&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;When the installation finishes, I must initialize&amp;nbsp;conda:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;miniconda3/condabin/conda init
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Close the terminal and open it again. Now miniconda must be ready to use. Check by typing and pressing&amp;nbsp;Enter:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;conda
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Then, I added two &lt;strong&gt;channels&lt;/strong&gt;. Channels are &lt;a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html"&gt;&amp;#8220;the locations where packages are stored&amp;#8221;&lt;/a&gt;. Miniconda has the &lt;code&gt;defaults&lt;/code&gt; channel pre-configured. The two channels in question are dedicated to Bioinformatics and Data analysis programs, which may not be present in the default channels, so I must add&amp;nbsp;them.&lt;/p&gt;
 &lt;h2&gt;Configuring miniconda&amp;nbsp;channels&lt;/h2&gt;
@@ -445,24 +421,20 @@ sudo apt-get install -y default-jdk ant
 conda config --add channels conda-forge
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;Miniconda sets up priorities in the list of channels it receives. When we need to install some program, miniconda will search in the higher-priority channels first, then in the channels with lower-priority. &amp;#8220;Different channels can have the same package&amp;#8221; and you can &amp;#8220;safely put channels at the bottom of your channel list to provide additional packages that are not in the default channels&amp;#8221; as stated in the &lt;a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html"&gt;official website&lt;/a&gt;. The flag &lt;code&gt;--add&lt;/code&gt; adds the respective channels (&lt;code&gt;bioconda&lt;/code&gt; and &lt;code&gt;conda-forge&lt;/code&gt;) to the &lt;strong&gt;top&lt;/strong&gt; of the priorities list. If you want to give lower priority, putting them in the &lt;strong&gt;bottom&lt;/strong&gt; of the list, use the &lt;code&gt;--append&lt;/code&gt; command instead. Thus, according to the command above, the order of channel priorities in our new miniconda installation will be: &lt;code&gt;conda-forge&lt;/code&gt;, &lt;code&gt;bioconda&lt;/code&gt; and lastly, &lt;code&gt;defaults&lt;/code&gt;.&lt;/p&gt;
 &lt;h2&gt;Create an environment for Bioinformatics&amp;nbsp;programs&lt;/h2&gt;
 &lt;p&gt;Now that miniconda is configured, I will create the environment that will receive them. I will name it &lt;code&gt;bioenv&lt;/code&gt;. You can choose whatever name you&amp;nbsp;like! &lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;conda create -y --name bioenv &lt;span class="nv"&gt;python&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;.6
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;h2&gt;Activating and deactivating an&amp;nbsp;environment&lt;/h2&gt;
 &lt;p&gt;With the &lt;code&gt;bioenv&lt;/code&gt; created, I must &lt;strong&gt;activate&lt;/strong&gt;&amp;nbsp;it:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;conda activate bioenv
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;I need to perform this step every time I want to use the programs that I will install in this environment. If you do not need to use the environment for the moment, simply &lt;strong&gt;deactivate&lt;/strong&gt;&amp;nbsp;it:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;conda deactivate
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;Simply &lt;strong&gt;activate&lt;/strong&gt; it again when&amp;nbsp;needed.&lt;/p&gt;
 &lt;h2&gt;Installing&amp;nbsp;programs&lt;/h2&gt;
@@ -470,18 +442,15 @@ conda config --add channels conda-forge
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;cat bioenv.txt &lt;span class="p"&gt;|&lt;/span&gt; xargs conda install -y
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;h2&gt;Backing up and restoring your environment&amp;nbsp;configuration&lt;/h2&gt;
 &lt;p&gt;Miniconda has a special command to backup your environment configuration. &lt;strong&gt;Activate&lt;/strong&gt; (if needed) the environment you want to backup and enter the&amp;nbsp;command:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;conda env &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; grep -v &lt;span class="s2"&gt;&amp;quot;prefix&amp;quot;&lt;/span&gt; &amp;gt; bioenv.yml
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
 &lt;p&gt;It will result in a &lt;code&gt;YAML&lt;/code&gt; file in the current working folder containing all configurations in your environment. Again, I named the file &lt;code&gt;bioenv.yml&lt;/code&gt; but you can choose whatever you like. Note that if you already have a &lt;code&gt;bioenv.yml&lt;/code&gt; in your directory, it will be overwritten, so be&amp;nbsp;careful.&lt;/p&gt;
 &lt;p&gt;To restore this environment in your computer, or on other computer, first install miniconda again, and then use the&amp;nbsp;command:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;conda env create -f bioenv.yml
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 
 &lt;p&gt;The &lt;code&gt;-f&lt;/code&gt; flag means you are creating an environment using the configurations in the &lt;code&gt;bioenv.yml&lt;/code&gt; file. The first line of the yml file sets the new environment&amp;#8217;s name, so you can change it in the file if you like. It will also restore the channels configured in the previous installation of&amp;nbsp;miniconda.&lt;/p&gt;
 &lt;h2&gt;Conclusion&lt;/h2&gt;
