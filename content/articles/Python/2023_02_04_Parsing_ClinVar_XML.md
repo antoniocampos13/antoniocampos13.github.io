@@ -1,6 +1,6 @@
 ---
 Title: Parsing the ClinVar XML file with pandas
-Status: draft
+Status: published
 Date: 2023-02-04 16:25
 Author: Antonio Victor Campos Coelho
 Categories: Python
