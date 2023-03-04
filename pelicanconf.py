@@ -46,7 +46,7 @@ LINKS = (
 ('Brazilian Lattes CV', 'http://lattes.cnpq.br/2986394950644755'),
 ('Google Scholar', 'https://scholar.google.com.br/citations?user=d2ij4wUAAAAJ&hl'),
 ('ORCID', 'https://orcid.org/0000-0003-2143-9701'),
-('Researcher ID/Publons', 'https://publons.com/researcher/2414076/antonio-victor-c-coelho'),
+('ResearcherID Profile', 'http://www.webofscience.com/wos/author/record/E-6795-2015'),
 )
 
 # Social widget
