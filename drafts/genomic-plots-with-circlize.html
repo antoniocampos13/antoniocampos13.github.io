@@ -1,0 +1,396 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/stylesheet/style.min.css">
+
+
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+          href="https://antoniocampos13.github.io/theme/pygments/vs.min.css">
+
+
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/solid.css">
+
+
+    <link href="https://antoniocampos13.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Antonio's Portfolio Atom">
+
+    <link href="https://antoniocampos13.github.io/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="Antonio's Portfolio RSS">
+
+
+  
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Microsoft EDGE -->
+    <meta name="msapplication-TileColor" content="#333333">
+
+ 
+
+<meta name="author" content="Antonio Victor Campos Coelho" />
+<meta name="description" content="Introduction Genomics is undoubtedly a complex science. The human genome is huge, with more than 3 billion base pairs, about 20,000 protein-coding genes, several millions of variants, and many more interesting characteristics. The visualization of genomic/omics data is challenging due to the sheer volume of information. Circular plots …" />
+<meta name="keywords" content="circlize, genomics, data visualization">
+
+
+  <meta property="og:site_name" content="Antonio's Portfolio"/>
+  <meta property="og:title" content="Genomic plots with circlize"/>
+  <meta property="og:description" content="Introduction Genomics is undoubtedly a complex science. The human genome is huge, with more than 3 billion base pairs, about 20,000 protein-coding genes, several millions of variants, and many more interesting characteristics. The visualization of genomic/omics data is challenging due to the sheer volume of information. Circular plots …"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="https://antoniocampos13.github.io/drafts/genomic-plots-with-circlize.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2023-04-29 10:00:00-03:00"/>
+  <meta property="article:modified_time" content=""/>
+  <meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
+  <meta property="article:section" content="R"/>
+  <meta property="article:tag" content="circlize"/>
+  <meta property="article:tag" content="genomics"/>
+  <meta property="article:tag" content="data visualization"/>
+  <meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
+
+  <title>Antonio's Portfolio &ndash; Genomic plots with circlize</title>
+
+</head>
+<body class="light-theme">
+  <aside>
+    <div>
+      <a href="https://antoniocampos13.github.io/">
+        <img src="https://avatars.githubusercontent.com/antoniocampos13" alt="Antonio's Portfolio" title="Antonio's Portfolio">
+      </a>
+
+      <h1>
+        <a href="https://antoniocampos13.github.io/">Antonio's Portfolio</a>
+      </h1>
+
+<p>PhD in Genetics</p>
+
+      <nav>
+        <ul class="list">
+
+
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/about.html#about">
+                  About
+                </a>
+              </li>
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/contact.html#contact">
+                  Contact
+                </a>
+              </li>
+
+            <li>
+              <a target="_self" href="http://lattes.cnpq.br/2986394950644755" >Brazilian Lattes CV</a>
+            </li>
+            <li>
+              <a target="_self" href="https://scholar.google.com.br/citations?user=d2ij4wUAAAAJ&hl" >Google Scholar</a>
+            </li>
+            <li>
+              <a target="_self" href="https://orcid.org/0000-0003-2143-9701" >ORCID</a>
+            </li>
+            <li>
+              <a target="_self" href="http://www.webofscience.com/wos/author/record/E-6795-2015" >ResearcherID Profile</a>
+            </li>
+        </ul>
+      </nav>
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/antoniocampos13/portfolio" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/antonio-coelho-9aa338164" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://antoniocampos13.github.io/">Home</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.rss.xml">RSS</a>
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="genomic-plots-with-circlize">Genomic plots with&nbsp;circlize</h1>
+    <p>
+      Posted on Sat 29 April 2023 in <a href="https://antoniocampos13.github.io/category/r.html">R</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h2>Introduction</h2>
+<p>Genomics is undoubtedly a complex science. The human genome is huge, with more than 3 billion base pairs, about 20,000 protein-coding genes, several millions of variants, and many more interesting characteristics. The visualization of genomic/omics data is challenging due to the sheer volume of information. Circular plots are a popular way to extract information at a glance from omics-level&nbsp;information.</p>
+<p>In this post, I will demonstrate the <a href="https://jokergoo.github.io/circlize_book/book/"><code>circlize</code> package</a> from R software, a versatile tool with applications in&nbsp;Genomics.</p>
+<p>As always, I will post the code of this demo in my <a href="https://github.com/antoniocampos13/portfolio/tree/master/R/2023_04_21_Genomic_plots_with_circlize">portfolio</a>.</p>
+<h2>Necessary&nbsp;packages</h2>
+<p>I will use the following R&nbsp;packages:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">glue</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">circlize</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Install any of them with the function <code>install.packages()</code>, for&nbsp;example:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;tidyverse&quot;</span><span class="p">,</span> <span class="n">version</span> <span class="o">=</span> <span class="s">&quot;&gt;= 1.5.0&quot;</span><span class="p">)</span> <span class="c1"># we need this version or later</span>
+<span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;glue&quot;</span><span class="p">)</span>
+<span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;circlize&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<h2>Preparing the&nbsp;data</h2>
+<p>In this demo, I will create a simple circular plot showing the mean number of pathogenic variants per 100,000 base pairs windows (intervals) in the human genome, as well as showing regions involved with segmental&nbsp;duplication.</p>
+<p>Thus, I create a variable named <code>intervalWidth</code> representing the 100,000 bp intervals to use later in the&nbsp;script:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Magic numbers ----</span>
+<span class="n">intervalWidth</span> <span class="o">&lt;-</span> <span class="m">1e5</span>
+</code></pre></div>
+
+<p>This is a fancy way to write the number 100,000. Then, I create two variables to hold the web links containing the data. The first one is the ClinVar variant summary. I will extract the pathogenic variants&#8217; coordinates from it and calculate the mean number of them in each interval of the human&nbsp;genome.</p>
+<p>The second one is a dataset from <span class="caps">UCSC</span> storing the coordinates of segmental duplication regions in the human&nbsp;genome.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Dataset links ----</span>
+<span class="n">variantSummaryPath</span> <span class="o">&lt;-</span> <span class="s">&quot;https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz&quot;</span>
+
+<span class="n">genomicSuperDupsPath</span> <span class="o">&lt;-</span> <span class="s">&quot;https://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/genomicSuperDups.txt.gz&quot;</span>
+</code></pre></div>
+
+<h2>Preparing the ClinVar&nbsp;data</h2>
+<p>Let&#8217;s import the ClinVar dataset and keep only germline, pathogenic, single nucleotide variants mapped in the GRCh38 assembly, excluding those in the mitochondrial&nbsp;chromosome:</p>
+<div class="highlight"><pre><span></span><code><span class="n">pathogenicSNVs</span> <span class="o">&lt;-</span> <span class="n">variantSummary</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="n">OriginSimple</span> <span class="o">==</span> <span class="s">&quot;germline&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="n">Assembly</span> <span class="o">==</span> <span class="s">&quot;GRCh38&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="n">ClinicalSignificance</span> <span class="o">==</span> <span class="s">&quot;Pathogenic&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="n">Type</span> <span class="o">==</span> <span class="s">&quot;single nucleotide variant&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="n">Chromosome</span> <span class="o">!=</span> <span class="s">&quot;MT&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="c1"># continues in the next codeblock</span>
+</code></pre></div>
+
+<p>Then I create new columns to help me link with the segmental duplication dataset. I create a new column named <code>chr</code> appending the string &#8220;chr&#8221; to each chromosome name, and another column, <code>posInterval</code> to put each variant inside a 100,000 base pair window as I explained earlier. To this end, I group the data by chromosome, so each chromosome has their&nbsp;windows:</p>
+<div class="highlight"><pre><span></span><code>  <span class="nf">mutate</span><span class="p">(</span><span class="n">chr</span> <span class="o">=</span> <span class="nf">glue</span><span class="p">(</span><span class="s">&quot;chr{Chromosome}&quot;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_by</span><span class="p">(</span><span class="n">chr</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">posInterval</span> <span class="o">=</span> <span class="nf">cut_width</span><span class="p">(</span><span class="n">Start</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">intervalWidth</span><span class="p">,</span> <span class="n">boundary</span> <span class="o">=</span> <span class="m">0</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">ungroup</span><span class="p">()</span> <span class="o">%&gt;%</span> <span class="c1"># continues in the next codeblock</span>
+</code></pre></div>
+
+<p>Next, I count how many variants there are per&nbsp;interval:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">group_by</span><span class="p">(</span><span class="n">chr</span><span class="p">,</span> <span class="n">posInterval</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">summarise</span><span class="p">(</span><span class="n">nVariants</span> <span class="o">=</span> <span class="nf">n</span><span class="p">())</span> <span class="o">%&gt;%</span>
+  <span class="nf">ungroup</span><span class="p">()</span> <span class="o">%&gt;%</span> <span class="c1"># continues in the next codeblock</span>
+</code></pre></div>
+
+<p>I create one more column (<code>newStart</code>) to mark the starting coordinate of each interval, to help me plot in the circular layout&nbsp;later:</p>
+<div class="highlight"><pre><span></span><code>  <span class="nf">rowwise</span><span class="p">()</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">newStart</span> <span class="o">=</span> <span class="nf">as.integer</span><span class="p">(</span><span class="nf">str_remove</span><span class="p">(</span>
+    <span class="nf">str_split_1</span><span class="p">(</span><span class="nf">as.character</span><span class="p">(</span><span class="n">posInterval</span><span class="p">),</span> <span class="s">&quot;,&quot;</span><span class="p">)[</span><span class="m">1</span><span class="p">],</span> <span class="s">&quot;\\[|\\(&quot;</span>
+  <span class="p">)))</span> <span class="o">%&gt;%</span>
+  <span class="nf">ungroup</span><span class="p">()</span>
+</code></pre></div>
+
+<p>This last step involves a bit of string manipulation. The <code>posInterval</code> is created with <code>factor</code> type. I must convert it to <code>character</code> (string) so I can extract the first coordinate of the interval by splitting it at the comma delimiter with the help of the <code>str_split_1()</code> function. Then, I remove <code>[</code> or <code>(</code> characters from the string with the <code>str_remove()</code> function. Finally, I convert the string into <code>integer</code> type with the <code>as.integer()</code> function.</p>
+<h2>Preparing the segmental duplication&nbsp;data</h2>
+<p>I import the segmental duplication dataset into the object <code>genomicSuperDups</code> and explicitly name the columns with the <a href="http://genome.ucsc.edu/cgi-bin/hgTables?db=hg38&amp;hgta_group=rep&amp;hgta_track=genomicSuperDups&amp;hgta_table=genomicSuperDups&amp;hgta_doSchema=describe+table+schema">original names from <span class="caps">UCSC</span></a> since the <span class="caps">BED</span> format does not have header&nbsp;names:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Import segmental duplication dataset ----</span>
+<span class="n">genomicSuperDups</span> <span class="o">&lt;-</span> <span class="nf">read_tsv</span><span class="p">(</span>
+  <span class="n">genomicSuperDupsPath</span><span class="p">,</span>
+  <span class="n">col_names</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span>
+    <span class="s">&quot;bin&quot;</span><span class="p">,</span>
+    <span class="s">&quot;chrom&quot;</span><span class="p">,</span>
+    <span class="s">&quot;chromStart&quot;</span><span class="p">,</span>
+    <span class="s">&quot;chromEnd&quot;</span><span class="p">,</span>
+    <span class="s">&quot;name&quot;</span><span class="p">,</span>
+    <span class="s">&quot;score&quot;</span><span class="p">,</span>
+    <span class="s">&quot;strand&quot;</span><span class="p">,</span>
+    <span class="s">&quot;otherChr&quot;</span><span class="p">,</span>
+    <span class="s">&quot;otherStart&quot;</span><span class="p">,</span>
+    <span class="s">&quot;otherEnd&quot;</span><span class="p">,</span>
+    <span class="s">&quot;otherSize&quot;</span><span class="p">,</span>
+    <span class="s">&quot;uid&quot;</span><span class="p">,</span>
+    <span class="s">&quot;posBasesHit&quot;</span><span class="p">,</span>
+    <span class="s">&quot;testResult&quot;</span><span class="p">,</span>
+    <span class="s">&quot;verdict&quot;</span><span class="p">,</span>
+    <span class="s">&quot;chits&quot;</span><span class="p">,</span>
+    <span class="s">&quot;ccov&quot;</span><span class="p">,</span>
+    <span class="s">&quot;alignfile&quot;</span><span class="p">,</span>
+    <span class="s">&quot;alignL&quot;</span><span class="p">,</span>
+    <span class="s">&quot;indelN&quot;</span><span class="p">,</span>
+    <span class="s">&quot;indelS&quot;</span><span class="p">,</span>
+    <span class="s">&quot;alignB&quot;</span><span class="p">,</span>
+    <span class="s">&quot;matchB&quot;</span><span class="p">,</span>
+    <span class="s">&quot;mismatchB&quot;</span><span class="p">,</span>
+    <span class="s">&quot;transitionsB&quot;</span><span class="p">,</span>
+    <span class="s">&quot;transversionsB&quot;</span><span class="p">,</span>
+    <span class="s">&quot;fracMatch&quot;</span><span class="p">,</span>
+    <span class="s">&quot;fracMatchIndel&quot;</span><span class="p">,</span>
+    <span class="s">&quot;jcK&quot;</span><span class="p">,</span>
+    <span class="s">&quot;k2K&quot;</span>
+  <span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Now, some filtering. I remove any duplication involving alternative/decoys&nbsp;chromosomes:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">## Extract coordinates ----</span>
+<span class="n">genomicSuperDupsFiltered</span> <span class="o">&lt;-</span> <span class="n">genomicSuperDups</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="o">!</span><span class="nf">str_detect</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="s">&quot;random|chrUn&quot;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="o">!</span><span class="nf">str_detect</span><span class="p">(</span><span class="n">otherChr</span><span class="p">,</span> <span class="s">&quot;random|chrUn&quot;</span><span class="p">))</span>
+</code></pre></div>
+
+<p>Then, I create two data frames representing the pairs of coordinates (origin/target) involved in the&nbsp;duplications:</p>
+<div class="highlight"><pre><span></span><code><span class="n">bed1</span> <span class="o">&lt;-</span> <span class="n">genomicSuperDups</span> <span class="o">%&gt;%</span>
+  <span class="nf">select</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">chromStart</span><span class="p">,</span> <span class="n">chromEnd</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">setNames</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;chr&quot;</span><span class="p">,</span> <span class="s">&quot;start&quot;</span><span class="p">,</span> <span class="s">&quot;end&quot;</span><span class="p">))</span>
+
+<span class="n">bed2</span> <span class="o">&lt;-</span> <span class="n">genomicSuperDups</span> <span class="o">%&gt;%</span>
+  <span class="nf">select</span><span class="p">(</span><span class="n">otherChr</span><span class="p">,</span> <span class="n">otherStart</span><span class="p">,</span> <span class="n">otherEnd</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">setNames</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;chr&quot;</span><span class="p">,</span> <span class="s">&quot;start&quot;</span><span class="p">,</span> <span class="s">&quot;end&quot;</span><span class="p">))</span>
+</code></pre></div>
+
+<p>I rename the column names so <code>circlize</code> can recognize them&nbsp;later.</p>
+<h2>Preparing color helper&nbsp;function</h2>
+<p>I will now create a helper function to color the plot according to the number of pathogenic variants in each interval. Thus, each interval will be colored according to the mean number of pathogenic variants in the whole genome. The mean number will be colored white, and regions with fewer variants than the mean will be colored with shades of blue, whereas regions with more variants will be colored with shades of&nbsp;red.</p>
+<p>To this end, I will scale the limits of the number of variants with their&nbsp;logarithm:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create color function ----</span>
+<span class="n">minVariants</span> <span class="o">&lt;-</span> <span class="nf">log10</span><span class="p">(</span><span class="nf">floor</span><span class="p">(</span><span class="nf">min</span><span class="p">(</span><span class="n">pathogenicSNVs</span><span class="o">$</span><span class="n">nVariants</span><span class="p">)))</span>
+
+<span class="n">meanVariants</span> <span class="o">&lt;-</span> <span class="nf">log10</span><span class="p">(</span><span class="nf">floor</span><span class="p">(</span><span class="nf">mean</span><span class="p">(</span><span class="n">pathogenicSNVs</span><span class="o">$</span><span class="n">nVariants</span><span class="p">)))</span>
+
+<span class="n">maxVariants</span> <span class="o">&lt;-</span> <span class="nf">log10</span><span class="p">(</span><span class="nf">ceiling</span><span class="p">(</span><span class="nf">max</span><span class="p">(</span><span class="n">pathogenicSNVs</span><span class="o">$</span><span class="n">nVariants</span><span class="p">)))</span>
+
+<span class="n">colorFunction</span> <span class="o">&lt;-</span>
+  <span class="nf">colorRamp2</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="n">minVariants</span><span class="p">,</span> <span class="n">meanVariants</span><span class="p">,</span> <span class="n">maxVariants</span><span class="p">),</span>
+             <span class="nf">c</span><span class="p">(</span><span class="s">&quot;blue&quot;</span><span class="p">,</span> <span class="s">&quot;white&quot;</span><span class="p">,</span> <span class="s">&quot;red&quot;</span><span class="p">))</span>
+</code></pre></div>
+
+<h2>Making the <code>circlize</code> plot</h2>
+<p>Everything is ready for making the <code>circlize</code> plot. I will save the output to disk in a <span class="caps">TIFF</span> format with the specified dimensions in centimeters and with a resolution of 300&nbsp;dpi:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">tiff</span><span class="p">(</span>
+  <span class="s">&quot;circlize_demo.tiff&quot;</span><span class="p">,</span>
+  <span class="n">units</span> <span class="o">=</span> <span class="s">&quot;cm&quot;</span><span class="p">,</span>
+  <span class="n">width</span> <span class="o">=</span> <span class="m">17.35</span><span class="p">,</span>
+  <span class="n">height</span> <span class="o">=</span> <span class="m">23.35</span><span class="p">,</span>
+  <span class="n">pointsize</span> <span class="o">=</span> <span class="m">18</span><span class="p">,</span>
+  <span class="n">res</span> <span class="o">=</span> <span class="m">300</span><span class="p">,</span>
+  <span class="n">compression</span> <span class="o">=</span> <span class="s">&quot;lzw&quot;</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>After declaring the output format, I can run the commands that will construct the circular&nbsp;plot:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">circos.par</span><span class="p">(</span><span class="s">&quot;start.degree&quot;</span> <span class="o">=</span> <span class="m">90</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The first command is purely cosmetic: it tells <code>circlize</code> to rotate the layout 90 degrees, so chromosome 1 will appear approximately at the top of the plot, with the remaining chromosomes following in a clockwise&nbsp;manner.</p>
+<p>The next command creates the first track of the plot, with ideograms representing the cytobands of each chromosome. Observe the <code>species</code> argument value - the <code>circlize</code> default is the GRCh37 assembly, therefore we must configure it to use the&nbsp;GRCh38:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">circos.initializeWithIdeogram</span><span class="p">(</span><span class="n">species</span> <span class="o">=</span> <span class="s">&quot;hg38&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The third command creates the second track of the plot. This track will be a simple color plot. The <code>ylim</code> represents a Y-axis with limits going from 0 to 100. The X-axis will correspond to chromosome coordinates. Each chromosome is a sector in this&nbsp;track.</p>
+<div class="highlight"><pre><span></span><code><span class="nf">circos.track</span><span class="p">(</span><span class="n">ylim</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">100</span><span class="p">))</span>
+</code></pre></div>
+
+<p>Then, I draw the plot with colored lines. Each line will represent one 100,00 bp interval and the color represent the density of pathogenic variants within the interval. Regions with fewer variants than the mean will have blue shades, whereas variant-rich regions will have red&nbsp;shades.</p>
+<div class="highlight"><pre><span></span><code><span class="nf">circos.trackLines</span><span class="p">(</span>
+  <span class="n">pathogenicSNVs</span><span class="o">$</span><span class="n">chr</span><span class="p">,</span>
+  <span class="n">x</span> <span class="o">=</span> <span class="n">pathogenicSNVs</span><span class="o">$</span><span class="n">newStart</span><span class="p">,</span>
+  <span class="n">y</span> <span class="o">=</span> <span class="nf">rep</span><span class="p">(</span><span class="m">100</span><span class="p">,</span> <span class="nf">nrow</span><span class="p">(</span><span class="n">pathogenicSNVs</span><span class="p">)),</span>
+  <span class="n">type</span> <span class="o">=</span> <span class="s">&quot;h&quot;</span><span class="p">,</span>
+  <span class="n">col</span> <span class="o">=</span> <span class="nf">colorFunction</span><span class="p">(</span><span class="nf">log10</span><span class="p">(</span><span class="n">pathogenicSNVs</span><span class="o">$</span><span class="n">nVariants</span><span class="p">))</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>The first argument represents the chromosomes (sectors), <code>x</code> and <code>y</code> the line coordinates. Since I wanted each line spanning the complete Y-axis length, I simply repeat the number 100 <em>N</em> times (with the function <code>rep()</code>), in which <em>N</em> represents the number of rows in the <code>pathogenicSNVs</code> dataset, obtained by using the <code>nrow()</code> function.</p>
+<p>Finally, I invoke the final command for the plot: it will create links in the center of the plot, connecting the regions involved with segmental&nbsp;duplications:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">circos.genomicLink</span><span class="p">(</span><span class="n">bed1</span><span class="p">,</span> <span class="n">bed2</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="s">&quot;coral&quot;</span><span class="p">,</span> <span class="n">border</span> <span class="o">=</span> <span class="kc">NA</span><span class="p">)</span>
+</code></pre></div>
+
+<p>As soon as I execute the command above, I execute the following two commands so that R can save the <span class="caps">TIFF</span> image to disk and reset <code>circlize</code>, readying it for generating other&nbsp;plots.</p>
+<div class="highlight"><pre><span></span><code><span class="nf">dev.off</span><span class="p">()</span>
+<span class="nf">circos.clear</span><span class="p">()</span>
+</code></pre></div>
+
+<p>The plotting process may take a while since we are dealing with quite a number of datapoints. This is the&nbsp;result:</p>
+<p><img alt="circlize plot: pathogenic variants and segmental duplications" src="https://antoniocampos13.github.io/images/circlize_demo.PNG"></p>
+<h2>Conclusion</h2>
+<ul>
+<li>I demonstrated the <code>circlize</code> package for producing interesting circular plots, which are specially used for visualizing complex genomic&nbsp;information.</li>
+</ul>
+<p><em>Subscribe to my <a href="https://antoniocampos13.github.io/feeds/all.rss.xml"><span class="caps">RSS</span> feed</a>, <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom feed</a> or <a href="https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg">Telegram channel</a> to keep you updated whenever I post new&nbsp;content.</em></p>
+<h2>References</h2>
+<p><a href="https://jokergoo.github.io/circlize_book/book/">Circular Visualization in&nbsp;R</a></p>
+<p><a href="http://genome.ucsc.edu/cgi-bin/hgTables?db=hg38&amp;hgta_group=rep&amp;hgta_track=genomicSuperDups&amp;hgta_table=genomicSuperDups&amp;hgta_doSchema=describe+table+schema"><span class="caps">UCSC</span> Genome Browser | Schema for Segmental&nbsp;Dups</a></p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://antoniocampos13.github.io/tag/circlize.html">circlize</a>
+      <a href="https://antoniocampos13.github.io/tag/genomics.html">genomics</a>
+      <a href="https://antoniocampos13.github.io/tag/data-visualization.html">data visualization</a>
+    </p>
+  </div>
+
+
+
+
+
+</article>
+
+    <footer>
+<p>
+  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike</a>
+</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+           src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Antonio's Portfolio ",
+  "url" : "https://antoniocampos13.github.io",
+  "image": "https://avatars.githubusercontent.com/antoniocampos13",
+  "description": "Data Science Portfolio by Antonio Victor Campos Coelho"
+}
+</script>
+
+</body>
+</html>
