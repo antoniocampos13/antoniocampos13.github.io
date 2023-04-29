@@ -1,5 +1,198 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Antonio's Portfolio</title><link href="https://antoniocampos13.github.io/" rel="alternate"></link><link href="https://antoniocampos13.github.io/feeds/all.atom.xml" rel="self"></link><id>https://antoniocampos13.github.io/</id><updated>2023-02-04T16:25:00-03:00</updated><subtitle>PhD in Genetics</subtitle><entry><title>Parsing the ClinVar XML file with pandas</title><link href="https://antoniocampos13.github.io/parsing-the-clinvar-xml-file-with-pandas.html" rel="alternate"></link><published>2023-02-04T16:25:00-03:00</published><updated>2023-02-04T16:25:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2023-02-04:/parsing-the-clinvar-xml-file-with-pandas.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Antonio's Portfolio</title><link href="https://antoniocampos13.github.io/" rel="alternate"></link><link href="https://antoniocampos13.github.io/feeds/all.atom.xml" rel="self"></link><id>https://antoniocampos13.github.io/</id><updated>2023-04-29T10:00:00-03:00</updated><subtitle>PhD in Genetics</subtitle><entry><title>Genomic plots with circlize</title><link href="https://antoniocampos13.github.io/genomic-plots-with-circlize.html" rel="alternate"></link><published>2023-04-29T10:00:00-03:00</published><updated>2023-04-29T10:00:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2023-04-29:/genomic-plots-with-circlize.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;Genomics is undoubtedly a complex science. The human genome is huge, with more than 3 billion base pairs, about 20,000 protein-coding genes, several millions of variants, and many more interesting characteristics. The visualization of genomic/omics data is challenging due to the sheer volume of information. Circular plots …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;Genomics is undoubtedly a complex science. The human genome is huge, with more than 3 billion base pairs, about 20,000 protein-coding genes, several millions of variants, and many more interesting characteristics. The visualization of genomic/omics data is challenging due to the sheer volume of information. Circular plots are a popular way to extract information at a glance from omics-level&amp;nbsp;information.&lt;/p&gt;
+&lt;p&gt;In this post, I will demonstrate the &lt;a href="https://jokergoo.github.io/circlize_book/book/"&gt;&lt;code&gt;circlize&lt;/code&gt; package&lt;/a&gt; from R software, a versatile tool with applications in&amp;nbsp;Genomics.&lt;/p&gt;
+&lt;p&gt;As always, I will post the code of this demo in my &lt;a href="https://github.com/antoniocampos13/portfolio/tree/master/R/2023_04_21_Genomic_plots_with_circlize"&gt;portfolio&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Necessary&amp;nbsp;packages&lt;/h2&gt;
+&lt;p&gt;I will use the following R&amp;nbsp;packages:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tidyverse&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;glue&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;circlize&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Install any of them with the function &lt;code&gt;install.packages()&lt;/code&gt;, for&amp;nbsp;example:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;install.packages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;tidyverse&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;version&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&amp;gt;= 1.5.0&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# we need this version or later&lt;/span&gt;
+&lt;span class="nf"&gt;install.packages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;glue&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;install.packages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;circlize&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Preparing the&amp;nbsp;data&lt;/h2&gt;
+&lt;p&gt;In this demo, I will create a simple circular plot showing the mean number of pathogenic variants per 100,000 base pairs windows (intervals) in the human genome, as well as showing regions involved with segmental&amp;nbsp;duplication.&lt;/p&gt;
+&lt;p&gt;Thus, I create a variable named &lt;code&gt;intervalWidth&lt;/code&gt; representing the 100,000 bp intervals to use later in the&amp;nbsp;script:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Magic numbers ----&lt;/span&gt;
+&lt;span class="n"&gt;intervalWidth&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="m"&gt;1e5&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This is a fancy way to write the number 100,000. Then, I create two variables to hold the web links containing the data. The first one is the ClinVar variant summary. I will extract the pathogenic variants&amp;#8217; coordinates from it and calculate the mean number of them in each interval of the human&amp;nbsp;genome.&lt;/p&gt;
+&lt;p&gt;The second one is a dataset from &lt;span class="caps"&gt;UCSC&lt;/span&gt; storing the coordinates of segmental duplication regions in the human&amp;nbsp;genome.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Dataset links ----&lt;/span&gt;
+&lt;span class="n"&gt;variantSummaryPath&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;genomicSuperDupsPath&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;https://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/genomicSuperDups.txt.gz&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Preparing the ClinVar&amp;nbsp;data&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s import the ClinVar dataset and keep only germline, pathogenic, single nucleotide variants mapped in the GRCh38 assembly, excluding those in the mitochondrial&amp;nbsp;chromosome:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;pathogenicSNVs&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;variantSummary&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;OriginSimple&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;germline&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Assembly&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;GRCh38&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ClinicalSignificance&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Pathogenic&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Type&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;single nucleotide variant&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Chromosome&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;MT&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="c1"&gt;# continues in the next codeblock&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Then I create new columns to help me link with the segmental duplication dataset. I create a new column named &lt;code&gt;chr&lt;/code&gt; appending the string &amp;#8220;chr&amp;#8221; to each chromosome name, and another column, &lt;code&gt;posInterval&lt;/code&gt; to put each variant inside a 100,000 base pair window as I explained earlier. To this end, I group the data by chromosome, so each chromosome has their&amp;nbsp;windows:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;  &lt;span class="nf"&gt;mutate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;chr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;glue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;chr{Chromosome}&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;group_by&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;chr&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;mutate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;posInterval&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;cut_width&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Start&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;width&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;intervalWidth&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;boundary&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;ungroup&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="c1"&gt;# continues in the next codeblock&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Next, I count how many variants there are per&amp;nbsp;interval:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;group_by&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;chr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;posInterval&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;summarise&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nVariants&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;n&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;ungroup&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="c1"&gt;# continues in the next codeblock&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I create one more column (&lt;code&gt;newStart&lt;/code&gt;) to mark the starting coordinate of each interval, to help me plot in the circular layout&amp;nbsp;later:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;  &lt;span class="nf"&gt;rowwise&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;mutate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;newStart&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;as.integer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;str_remove&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="nf"&gt;str_split_1&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;as.character&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;posInterval&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;,&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)[&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;\\[|\\(&amp;quot;&lt;/span&gt;
+  &lt;span class="p"&gt;)))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;ungroup&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This last step involves a bit of string manipulation. The &lt;code&gt;posInterval&lt;/code&gt; is created with &lt;code&gt;factor&lt;/code&gt; type. I must convert it to &lt;code&gt;character&lt;/code&gt; (string) so I can extract the first coordinate of the interval by splitting it at the comma delimiter with the help of the &lt;code&gt;str_split_1()&lt;/code&gt; function. Then, I remove &lt;code&gt;[&lt;/code&gt; or &lt;code&gt;(&lt;/code&gt; characters from the string with the &lt;code&gt;str_remove()&lt;/code&gt; function. Finally, I convert the string into &lt;code&gt;integer&lt;/code&gt; type with the &lt;code&gt;as.integer()&lt;/code&gt; function.&lt;/p&gt;
+&lt;h2&gt;Preparing the segmental duplication&amp;nbsp;data&lt;/h2&gt;
+&lt;p&gt;I import the segmental duplication dataset into the object &lt;code&gt;genomicSuperDups&lt;/code&gt; and explicitly name the columns with the &lt;a href="http://genome.ucsc.edu/cgi-bin/hgTables?db=hg38&amp;amp;hgta_group=rep&amp;amp;hgta_track=genomicSuperDups&amp;amp;hgta_table=genomicSuperDups&amp;amp;hgta_doSchema=describe+table+schema"&gt;original names from &lt;span class="caps"&gt;UCSC&lt;/span&gt;&lt;/a&gt; since the &lt;span class="caps"&gt;BED&lt;/span&gt; format does not have header&amp;nbsp;names:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Import segmental duplication dataset ----&lt;/span&gt;
+&lt;span class="n"&gt;genomicSuperDups&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;read_tsv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+  &lt;span class="n"&gt;genomicSuperDupsPath&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;col_names&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;bin&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;chrom&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;chromStart&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;chromEnd&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;name&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;score&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;strand&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;otherChr&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;otherStart&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;otherEnd&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;otherSize&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;uid&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;posBasesHit&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;testResult&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;verdict&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;chits&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;ccov&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;alignfile&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;alignL&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;indelN&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;indelS&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;alignB&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;matchB&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;mismatchB&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;transitionsB&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;transversionsB&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;fracMatch&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;fracMatchIndel&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;jcK&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;k2K&amp;quot;&lt;/span&gt;
+  &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Now, some filtering. I remove any duplication involving alternative/decoys&amp;nbsp;chromosomes:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;## Extract coordinates ----&lt;/span&gt;
+&lt;span class="n"&gt;genomicSuperDupsFiltered&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;genomicSuperDups&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="nf"&gt;str_detect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;chrom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;random|chrUn&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="nf"&gt;str_detect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;otherChr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;random|chrUn&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Then, I create two data frames representing the pairs of coordinates (origin/target) involved in the&amp;nbsp;duplications:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;bed1&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;genomicSuperDups&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;select&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;chrom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;chromStart&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;chromEnd&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;setNames&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;chr&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;start&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;end&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="n"&gt;bed2&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;genomicSuperDups&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;select&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;otherChr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;otherStart&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;otherEnd&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;setNames&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;chr&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;start&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;end&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I rename the column names so &lt;code&gt;circlize&lt;/code&gt; can recognize them&amp;nbsp;later.&lt;/p&gt;
+&lt;h2&gt;Preparing color helper&amp;nbsp;function&lt;/h2&gt;
+&lt;p&gt;I will now create a helper function to color the plot according to the number of pathogenic variants in each interval. Thus, each interval will be colored according to the mean number of pathogenic variants in the whole genome. The mean number will be colored white, and regions with fewer variants than the mean will be colored with shades of blue, whereas regions with more variants will be colored with shades of&amp;nbsp;red.&lt;/p&gt;
+&lt;p&gt;To this end, I will scale the limits of the number of variants with their&amp;nbsp;logarithm:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Create color function ----&lt;/span&gt;
+&lt;span class="n"&gt;minVariants&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;log10&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;floor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;min&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pathogenicSNVs&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;nVariants&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+
+&lt;span class="n"&gt;meanVariants&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;log10&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;floor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;mean&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pathogenicSNVs&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;nVariants&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+
+&lt;span class="n"&gt;maxVariants&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;log10&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;ceiling&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;max&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pathogenicSNVs&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;nVariants&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+
+&lt;span class="n"&gt;colorFunction&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
+  &lt;span class="nf"&gt;colorRamp2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;minVariants&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;meanVariants&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;maxVariants&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+             &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;blue&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;white&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;red&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Making the &lt;code&gt;circlize&lt;/code&gt; plot&lt;/h2&gt;
+&lt;p&gt;Everything is ready for making the &lt;code&gt;circlize&lt;/code&gt; plot. I will save the output to disk in a &lt;span class="caps"&gt;TIFF&lt;/span&gt; format with the specified dimensions in centimeters and with a resolution of 300&amp;nbsp;dpi:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;tiff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+  &lt;span class="s"&gt;&amp;quot;circlize_demo.tiff&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;units&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;cm&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;width&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;17.35&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;height&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;23.35&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;pointsize&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;18&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;res&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;300&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;compression&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;lzw&amp;quot;&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;After declaring the output format, I can run the commands that will construct the circular&amp;nbsp;plot:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;circos.par&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;start.degree&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;90&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The first command is purely cosmetic: it tells &lt;code&gt;circlize&lt;/code&gt; to rotate the layout 90 degrees, so chromosome 1 will appear approximately at the top of the plot, with the remaining chromosomes following in a clockwise&amp;nbsp;manner.&lt;/p&gt;
+&lt;p&gt;The next command creates the first track of the plot, with ideograms representing the cytobands of each chromosome. Observe the &lt;code&gt;species&lt;/code&gt; argument value - the &lt;code&gt;circlize&lt;/code&gt; default is the GRCh37 assembly, therefore we must configure it to use the&amp;nbsp;GRCh38:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;circos.initializeWithIdeogram&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;species&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;hg38&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The third command creates the second track of the plot. This track will be a simple color plot. The &lt;code&gt;ylim&lt;/code&gt; represents a Y-axis with limits going from 0 to 100. The X-axis will correspond to chromosome coordinates. Each chromosome is a sector in this&amp;nbsp;track.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;circos.track&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ylim&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;100&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Then, I draw the plot with colored lines. Each line will represent one 100,00 bp interval and the color represent the density of pathogenic variants within the interval. Regions with fewer variants than the mean will have blue shades, whereas variant-rich regions will have red&amp;nbsp;shades.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;circos.trackLines&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+  &lt;span class="n"&gt;pathogenicSNVs&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;chr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pathogenicSNVs&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;newStart&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;rep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;100&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;nrow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pathogenicSNVs&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+  &lt;span class="n"&gt;type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;h&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;col&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;colorFunction&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;log10&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pathogenicSNVs&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;nVariants&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The first argument represents the chromosomes (sectors), &lt;code&gt;x&lt;/code&gt; and &lt;code&gt;y&lt;/code&gt; the line coordinates. Since I wanted each line spanning the complete Y-axis length, I simply repeat the number 100 &lt;em&gt;N&lt;/em&gt; times (with the function &lt;code&gt;rep()&lt;/code&gt;), in which &lt;em&gt;N&lt;/em&gt; represents the number of rows in the &lt;code&gt;pathogenicSNVs&lt;/code&gt; dataset, obtained by using the &lt;code&gt;nrow()&lt;/code&gt; function.&lt;/p&gt;
+&lt;p&gt;Finally, I invoke the final command for the plot: it will create links in the center of the plot, connecting the regions involved with segmental&amp;nbsp;duplications:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;circos.genomicLink&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bed1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;bed2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;col&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;coral&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;border&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;NA&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;As soon as I execute the command above, I execute the following two commands so that R can save the &lt;span class="caps"&gt;TIFF&lt;/span&gt; image to disk and reset &lt;code&gt;circlize&lt;/code&gt;, readying it for generating other&amp;nbsp;plots.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;dev.off&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="nf"&gt;circos.clear&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The plotting process may take a while since we are dealing with quite a number of datapoints. This is the&amp;nbsp;result:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="circlize plot: pathogenic variants and segmental duplications" src="https://antoniocampos13.github.io/images/circlize_demo.png"&gt;&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;I demonstrated the &lt;code&gt;circlize&lt;/code&gt; package for producing interesting circular plots, which are specially used for visualizing complex genomic&amp;nbsp;information.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Subscribe to my &lt;a href="https://antoniocampos13.github.io/feeds/all.rss.xml"&gt;&lt;span class="caps"&gt;RSS&lt;/span&gt; feed&lt;/a&gt;, &lt;a href="https://antoniocampos13.github.io/feeds/all.atom.xml"&gt;Atom feed&lt;/a&gt; or &lt;a href="https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg"&gt;Telegram channel&lt;/a&gt; to keep you updated whenever I post new&amp;nbsp;content.&lt;/em&gt;&lt;/p&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://jokergoo.github.io/circlize_book/book/"&gt;Circular Visualization in&amp;nbsp;R&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://genome.ucsc.edu/cgi-bin/hgTables?db=hg38&amp;amp;hgta_group=rep&amp;amp;hgta_track=genomicSuperDups&amp;amp;hgta_table=genomicSuperDups&amp;amp;hgta_doSchema=describe+table+schema"&gt;&lt;span class="caps"&gt;UCSC&lt;/span&gt; Genome Browser | Schema for Segmental&amp;nbsp;Dups&lt;/a&gt;&lt;/p&gt;</content><category term="R"></category><category term="circlize"></category><category term="genomics"></category><category term="data visualization"></category></entry><entry><title>Parsing the ClinVar XML file with pandas</title><link href="https://antoniocampos13.github.io/parsing-the-clinvar-xml-file-with-pandas.html" rel="alternate"></link><published>2023-02-04T16:25:00-03:00</published><updated>2023-02-04T16:25:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2023-02-04:/parsing-the-clinvar-xml-file-with-pandas.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;&lt;a href="https://www.ncbi.nlm.nih.gov/clinvar/intro/"&gt;ClinVar&lt;/a&gt; is one of the &lt;span class="caps"&gt;USA&lt;/span&gt;&amp;#8217;s National Center for Biotechnology Information (&lt;span class="caps"&gt;NCBI&lt;/span&gt;) databases. ClinVar archives reports of relationships among human genetic variants and phenotypes (usually genetic disorders). Any organization, such as a laboratory, hospital, clinic etc can submit data to ClinVar. The core idea of ClinVar is aggregate …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;&lt;a href="https://www.ncbi.nlm.nih.gov/clinvar/intro/"&gt;ClinVar&lt;/a&gt; is one of the &lt;span class="caps"&gt;USA&lt;/span&gt;&amp;#8217;s National Center for Biotechnology Information (&lt;span class="caps"&gt;NCBI&lt;/span&gt;) databases. ClinVar archives reports of relationships among human genetic variants and phenotypes (usually genetic disorders). Any organization, such as a laboratory, hospital, clinic etc can submit data to ClinVar. The core idea of ClinVar is aggregate evidence for the clinical significance of any genetic variant concerning any disorder. Over 2,400 organizations contributed more than 2 million 600 thousand &lt;a href="https://www.ncbi.nlm.nih.gov/clinvar/submitters/"&gt;records to ClinVar&lt;/a&gt;, representing more than 1 million 600 thousand unique&amp;nbsp;variants.&lt;/p&gt;
 &lt;p&gt;Anyone can freely search ClinVar through their &lt;a href="https://www.ncbi.nlm.nih.gov/clinvar/"&gt;website&lt;/a&gt;, using gene symbols, genomic coordinates, &lt;a href="https://varnomen.hgvs.org/"&gt;&lt;span class="caps"&gt;HGVS&lt;/span&gt; expressions&lt;/a&gt;, phenotypes, and more. If you want to perform a few queries, the online search tool does a good job. However, if you are pursuing more complex scientific questions, or are intending to download batches of data, the search tool will not suffice. Other &lt;span class="caps"&gt;NCBI&lt;/span&gt; databases can be queried via the command line with the &lt;a href="https://www.ncbi.nlm.nih.gov/books/NBK179288/"&gt;Entrez Direct (EDirect) utilities&lt;/a&gt; (in a &lt;a href="https://antoniocampos13.github.io/fastq-to-annotation-part-2.html"&gt;previous post&lt;/a&gt; I mention how to work with the EDirect utilities). Unfortunately, ClinVar does not currently support a batch query interface via EDirect&amp;nbsp;utilities.&lt;/p&gt;
