@@ -1,6 +1,6 @@
 ---
 Title: Genomic plots with circlize
-Status: draft
+Status: published
 Date: 2023-04-29 10:00
 Author: Antonio Victor Campos Coelho
 Categories: R
