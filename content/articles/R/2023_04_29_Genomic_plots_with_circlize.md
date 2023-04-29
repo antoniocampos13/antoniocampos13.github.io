@@ -247,7 +247,7 @@ circos.clear()
 
 The plotting process may take a while since we are dealing with quite a number of datapoints. This is the result:
 
-![`circlize` plot: pathogenic variants and segmental duplications]({static}/images/circlize_demo.PNG)
+![`circlize` plot: pathogenic variants and segmental duplications]({static}/images/circlize_demo.png)
 
 ## Conclusion
 
