@@ -106,7 +106,7 @@ countData <- countDataOriginal %>%
 
 This data frame has 60656 rows (genes/transcripts) and 117 columns. The first three columns are gene information: `gene_ID`, `gene_name`, and `gene_type`, leaving 114 columns to represent the samples (column indexes between 4 and 117).
 
-![countData data frame view]({static}/images/count_data_C9orf72.png)
+![countData data frame view]({static}/images/count_data_C9orf72.PNG)
 
 Thankfully, the project authors gave very descriptive names to the columns, so I could identify right away their study design. I created a data frame named `sampleInfo` using the column names to extract information from each sample:
 
@@ -118,7 +118,7 @@ sampleInfo <- tibble(Names = names(countData)[4:length(names(countData))]) %>%
   mutate(columnIndex = row_number() + 3)
 ```
 
-![sampleInfo data frame view]({static}/images/sampleInfo_C9orf72.png)
+![sampleInfo data frame view]({static}/images/sampleInfo_C9orf72.PNG)
 
 With the `columnIndex` column I created on the `sampleInfo`, I can extract the necessary cases/control combinations to generate 12 distinct data frames, by splitting the `countData` data frame.
 
