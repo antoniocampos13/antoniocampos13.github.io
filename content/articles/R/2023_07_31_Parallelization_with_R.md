@@ -1,7 +1,7 @@
 ---
 Title: Parallelization with R
-Status: draft
-Date: 2023-07-31 10:00
+Status: published
+Date: 2023-07-29 17:43
 Author: Antonio Victor Campos Coelho
 Categories: R
 Tags: Bioinformatics, gene expression, edgeR, furrr
