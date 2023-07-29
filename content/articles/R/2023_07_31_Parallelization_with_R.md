@@ -118,7 +118,7 @@ sampleInfo <- tibble(Names = names(countData)[4:length(names(countData))]) %>%
   mutate(columnIndex = row_number() + 3)
 ```
 
-![sampleInfo data frame view]({static}/images/sampleInfo_C9orf72.png)
+![sampleInfo data frame view]({static}/images/sampleInfo_C9orf72.png?raw=true)
 
 With the `columnIndex` column I created on the `sampleInfo`, I can extract the necessary cases/control combinations to generate 12 distinct data frames, by splitting the `countData` data frame.
 
