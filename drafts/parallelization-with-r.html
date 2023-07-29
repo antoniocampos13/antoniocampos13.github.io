@@ -229,7 +229,7 @@
 </code></pre></div>
 
 <p>This data frame has 60656 rows (genes/transcripts) and 117 columns. The first three columns are gene information: <code>gene_ID</code>, <code>gene_name</code>, and <code>gene_type</code>, leaving 114 columns to represent the samples (column indexes between 4 and&nbsp;117).</p>
-<p><img alt="countData data frame view" src="https://antoniocampos13.github.io/images/count_data_C9orf72.png"></p>
+<p><img alt="countData data frame view" src="https://antoniocampos13.github.io/images/count_data_C9orf72.PNG"></p>
 <p>Thankfully, the project authors gave very descriptive names to the columns, so I could identify right away their study design. I created a data frame named <code>sampleInfo</code> using the column names to extract information from each&nbsp;sample:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">### src/prepareData.R ###</span>
 <span class="c1"># Identify samples and outcomes ----</span>
@@ -238,7 +238,7 @@
   <span class="nf">mutate</span><span class="p">(</span><span class="n">columnIndex</span> <span class="o">=</span> <span class="nf">row_number</span><span class="p">()</span> <span class="o">+</span> <span class="m">3</span><span class="p">)</span>
 </code></pre></div>
 
-<p><img alt="sampleInfo data frame view" src="https://antoniocampos13.github.io/images/sampleInfo_C9orf72.png"></p>
+<p><img alt="sampleInfo data frame view" src="https://antoniocampos13.github.io/images/sampleInfo_C9orf72.PNG"></p>
 <p>With the <code>columnIndex</code> column I created on the <code>sampleInfo</code>, I can extract the necessary cases/control combinations to generate 12 distinct data frames, by splitting the <code>countData</code> data&nbsp;frame.</p>
 <p>By observing this table, I surmised they recruited three outcome groups: &#8220;<span class="caps">C9ALS</span>&#8221;, &#8220;<span class="caps">C9FTD</span>&#8221; and &#8220;Control&#8221;, with six, seven, and six individuals in each group, respectively. Since they collect three cell types from two cerebral cortices, we have six cortex/cell type combinations. Coupling with two distinct diseases, we can perform two <strong>case vs. control comparisons</strong> per combination. Therefore, we can perform $3 \times 2 \times 2 = 12$ <strong>distinct DEAs</strong>.</p>
 <p>To keep track of the samples in each of the 12 analyses, I created two lists of data frames, containing cases and controls, stratified by cortex and cell&nbsp;type:</p>
