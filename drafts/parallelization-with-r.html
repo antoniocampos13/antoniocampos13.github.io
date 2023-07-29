@@ -238,7 +238,7 @@
   <span class="nf">mutate</span><span class="p">(</span><span class="n">columnIndex</span> <span class="o">=</span> <span class="nf">row_number</span><span class="p">()</span> <span class="o">+</span> <span class="m">3</span><span class="p">)</span>
 </code></pre></div>
 
-<p><img alt="sampleInfo data frame view" src="https://antoniocampos13.github.io/images/sampleInfo_C9orf72.png"></p>
+<p><img alt="sampleInfo data frame view" src="https://antoniocampos13.github.io/images/sampleInfo_C9orf72.png?raw=true"></p>
 <p>With the <code>columnIndex</code> column I created on the <code>sampleInfo</code>, I can extract the necessary cases/control combinations to generate 12 distinct data frames, by splitting the <code>countData</code> data&nbsp;frame.</p>
 <p>By observing this table, I surmised they recruited three outcome groups: &#8220;<span class="caps">C9ALS</span>&#8221;, &#8220;<span class="caps">C9FTD</span>&#8221; and &#8220;Control&#8221;, with six, seven, and six individuals in each group, respectively. Since they collect three cell types from two cerebral cortices, we have six cortex/cell type combinations. Coupling with two distinct diseases, we can perform two <strong>case vs. control comparisons</strong> per combination. Therefore, we can perform $3 \times 2 \times 2 = 12$ <strong>distinct DEAs</strong>.</p>
 <p>To keep track of the samples in each of the 12 analyses, I created two lists of data frames, containing cases and controls, stratified by cortex and cell&nbsp;type:</p>
