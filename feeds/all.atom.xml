@@ -1,5 +1,241 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Antonio's Portfolio</title><link href="https://antoniocampos13.github.io/" rel="alternate"></link><link href="https://antoniocampos13.github.io/feeds/all.atom.xml" rel="self"></link><id>https://antoniocampos13.github.io/</id><updated>2023-04-29T10:00:00-03:00</updated><subtitle>PhD in Genetics</subtitle><entry><title>Genomic plots with circlize</title><link href="https://antoniocampos13.github.io/genomic-plots-with-circlize.html" rel="alternate"></link><published>2023-04-29T10:00:00-03:00</published><updated>2023-04-29T10:00:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2023-04-29:/genomic-plots-with-circlize.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Antonio's Portfolio</title><link href="https://antoniocampos13.github.io/" rel="alternate"></link><link href="https://antoniocampos13.github.io/feeds/all.atom.xml" rel="self"></link><id>https://antoniocampos13.github.io/</id><updated>2023-07-29T17:43:00-03:00</updated><subtitle>PhD in Genetics</subtitle><entry><title>Parallelization with R</title><link href="https://antoniocampos13.github.io/parallelization-with-r.html" rel="alternate"></link><published>2023-07-29T17:43:00-03:00</published><updated>2023-07-29T17:43:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2023-07-29:/parallelization-with-r.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;Sometimes, some computations can be carried out in parallel. Certain large tasks can be divided into independent ones, allowing them to be solved at the same time, rather than waiting for each task to be solved&amp;nbsp;sequentially.&lt;/p&gt;
+&lt;p&gt;I find the native R parallel functions such as &lt;code&gt;mclapply()&lt;/code&gt;, or those …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;Sometimes, some computations can be carried out in parallel. Certain large tasks can be divided into independent ones, allowing them to be solved at the same time, rather than waiting for each task to be solved&amp;nbsp;sequentially.&lt;/p&gt;
+&lt;p&gt;I find the native R parallel functions such as &lt;code&gt;mclapply()&lt;/code&gt;, or those from highly used packages such as &lt;code&gt;snow&lt;/code&gt; to be cumbersome. Frankly, I assume I may never get those approaches to&amp;nbsp;work.&lt;/p&gt;
+&lt;p&gt;This is why I got very happy when I recently discovered the &lt;code&gt;furrr&lt;/code&gt; package. This package is from the &lt;code&gt;tidyverse&lt;/code&gt; family, and as such, it is easy to use. With &lt;code&gt;furrr&lt;/code&gt;, all the mental gymnastics I used to have when I tried parallelization in R is&amp;nbsp;over.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;furrr&lt;/code&gt; package is the &amp;#8220;marriage&amp;#8221; between &lt;code&gt;purrr&lt;/code&gt; and &lt;code&gt;future&lt;/code&gt; packages. It has versions of the main mapping functions from &lt;code&gt;purrr&lt;/code&gt;, but using &lt;code&gt;future&lt;/code&gt; backend to execute computations in parallel and&amp;nbsp;asynchronously.&lt;/p&gt;
+&lt;p&gt;In this post, I will demonstrate a simple way to achieve parallelization with R and &lt;code&gt;furrr&lt;/code&gt;. The code of this demo is in my &lt;a href="https://github.com/antoniocampos13/portfolio/tree/master/R/2023_07_31_Parallelization_with_R"&gt;portfolio&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I will parallelize a series of differential expression analyses (&lt;span class="caps"&gt;DEA&lt;/span&gt;) of a dataset by Li et al. (2022). Check the Gene Expression Omnibus (&lt;span class="caps"&gt;GEO&lt;/span&gt;) summary page &lt;a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE219278"&gt;here&lt;/a&gt;. Briefly, they investigated the cellular alterations associated with the &lt;em&gt;C9orf72&lt;/em&gt; gene pathogenic repeat expansions. They performed single nucleus transcriptomics (snRNA-seq) in postmortem samples of motor and frontal cortices from amyotrophic lateral sclerosis (&lt;span class="caps"&gt;ALS&lt;/span&gt;) and frontotemporal dementia (&lt;span class="caps"&gt;FTD&lt;/span&gt;) donors as well as unaffected controls. They sampled three major brain cell populations (neurons, oligodendrocytes, and other glia) from both of the&amp;nbsp;cortices.&lt;/p&gt;
+&lt;h2&gt;Installing&amp;nbsp;packages&lt;/h2&gt;
+&lt;p&gt;Install the following packages into your R library with the &lt;code&gt;src/installPackages.R&lt;/code&gt; file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;### src/installPackages.R ###&lt;/span&gt;
+&lt;span class="n"&gt;packages&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
+  &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;here&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;tidyverse&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;glue&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;openxlsx&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;future&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;future.callr&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;devtools&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;tictoc&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;BiocManager&amp;quot;&lt;/span&gt;
+  &lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;lapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;packages&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pkg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nf"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;pkg&lt;/span&gt; &lt;span class="o"&gt;%in%&lt;/span&gt; &lt;span class="nf"&gt;rownames&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;installed.packages&lt;/span&gt;&lt;span class="p"&gt;()))&lt;/span&gt;
+
+    &lt;span class="nf"&gt;install.packages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pkg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="p"&gt;})&lt;/span&gt;
+
+&lt;span class="n"&gt;biocPackages&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
+  &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;edgeR&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;AnnotationDbi&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;annotate&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;org.Hs.eg.db&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;EnsDb.Hsapiens.v79&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;ensembldb&amp;quot;&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;lapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;biocPackages&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pkg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nf"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;pkg&lt;/span&gt; &lt;span class="o"&gt;%in%&lt;/span&gt; &lt;span class="nf"&gt;rownames&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;installed.packages&lt;/span&gt;&lt;span class="p"&gt;()))&lt;/span&gt;
+
+    &lt;span class="n"&gt;BiocManager&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="nf"&gt;install&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pkg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="p"&gt;})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Now I create an &lt;code&gt;outputs&lt;/code&gt; folder to hold the &lt;span class="caps"&gt;DEA&lt;/span&gt;&amp;nbsp;results:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;### main.R ###&lt;/span&gt;
+&lt;span class="c1"&gt;# Paths ----&lt;/span&gt;
+&lt;span class="nf"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="nf"&gt;dir.exists&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;outputs&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nf"&gt;dir.create&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;outputs&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Next, I load all the functions I created for this&amp;nbsp;demo:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;### main.R ###&lt;/span&gt;
+&lt;span class="c1"&gt;# Scripts ----&lt;/span&gt;
+&lt;span class="nf"&gt;source&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;src&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;functions.R&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This script will load the following scripts in the &lt;code&gt;functions&lt;/code&gt; folder: &lt;code&gt;makeCountsDf.R&lt;/code&gt;, &lt;code&gt;sourceFromGitHub.R&lt;/code&gt;, and &lt;code&gt;runParallelDEA.R&lt;/code&gt;. I will explain each one at the appropriate&amp;nbsp;moment.&lt;/p&gt;
+&lt;h2&gt;Obtaining and preparing the&amp;nbsp;data&lt;/h2&gt;
+&lt;p&gt;The next step is executing the &lt;code&gt;prepareData.R&lt;/code&gt; script:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;### main.R ###&lt;/span&gt;
+&lt;span class="nf"&gt;source&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;src&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;prepareData.R&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The script will start by loading the gene expression count data directly from the &lt;span class="caps"&gt;GEO&lt;/span&gt; &lt;span class="caps"&gt;FTP&lt;/span&gt; server into a data frame, and rounding up any number to the nearest integer just to be safe, since &lt;code&gt;edgeR&lt;/code&gt; requires raw, integer&amp;nbsp;counts:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;### src/prepareData.R ###&lt;/span&gt;
+&lt;span class="c1"&gt;# Load data ----&lt;/span&gt;
+&lt;span class="n"&gt;countDataOriginal&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;read_tsv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;https://ftp.ncbi.nlm.nih.gov/geo/series/GSE219nnn/GSE219278/suppl/GSE219278_allSamples_rsem_genes_results_counts_annotated.tsv.gz&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Round up gene counts ----&lt;/span&gt;
+&lt;span class="n"&gt;countData&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;countDataOriginal&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;mutate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;across&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;where&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;is.numeric&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;ceiling&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This data frame has 60656 rows (genes/transcripts) and 117 columns. The first three columns are gene information: &lt;code&gt;gene_ID&lt;/code&gt;, &lt;code&gt;gene_name&lt;/code&gt;, and &lt;code&gt;gene_type&lt;/code&gt;, leaving 114 columns to represent the samples (column indexes between 4 and&amp;nbsp;117).&lt;/p&gt;
+&lt;p&gt;&lt;img alt="countData data frame view" src="https://antoniocampos13.github.io/images/count_data_C9orf72.png"&gt;&lt;/p&gt;
+&lt;p&gt;Thankfully, the project authors gave very descriptive names to the columns, so I could identify right away their study design. I created a data frame named &lt;code&gt;sampleInfo&lt;/code&gt; using the column names to extract information from each&amp;nbsp;sample:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;### src/prepareData.R ###&lt;/span&gt;
+&lt;span class="c1"&gt;# Identify samples and outcomes ----&lt;/span&gt;
+&lt;span class="n"&gt;sampleInfo&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;tibble&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Names&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;names&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;countData&lt;/span&gt;&lt;span class="p"&gt;)[&lt;/span&gt;&lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="nf"&gt;length&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;names&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;countData&lt;/span&gt;&lt;span class="p"&gt;))])&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;separate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Names&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;into&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;outcome&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;patientId&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;location&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;cellType&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;mutate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;columnIndex&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;row_number&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img alt="sampleInfo data frame view" src="https://antoniocampos13.github.io/images/sampleInfo_C9orf72.png?raw=true"&gt;&lt;/p&gt;
+&lt;p&gt;With the &lt;code&gt;columnIndex&lt;/code&gt; column I created on the &lt;code&gt;sampleInfo&lt;/code&gt;, I can extract the necessary cases/control combinations to generate 12 distinct data frames, by splitting the &lt;code&gt;countData&lt;/code&gt; data&amp;nbsp;frame.&lt;/p&gt;
+&lt;p&gt;By observing this table, I surmised they recruited three outcome groups: &amp;#8220;&lt;span class="caps"&gt;C9ALS&lt;/span&gt;&amp;#8221;, &amp;#8220;&lt;span class="caps"&gt;C9FTD&lt;/span&gt;&amp;#8221; and &amp;#8220;Control&amp;#8221;, with six, seven, and six individuals in each group, respectively. Since they collect three cell types from two cerebral cortices, we have six cortex/cell type combinations. Coupling with two distinct diseases, we can perform two &lt;strong&gt;case vs. control comparisons&lt;/strong&gt; per combination. Therefore, we can perform $3 \times 2 \times 2 = 12$ &lt;strong&gt;distinct DEAs&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;To keep track of the samples in each of the 12 analyses, I created two lists of data frames, containing cases and controls, stratified by cortex and cell&amp;nbsp;type:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;### src/prepareData.R ###&lt;/span&gt;
+&lt;span class="n"&gt;alsDfsList&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;sampleInfo&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span class="n"&gt;dplyr&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="nf"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;outcome&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;C9ALS&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;outcome&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Control&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;group_by&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;location&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cellType&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;group_split&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="n"&gt;ftdDfsList&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;sampleInfo&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span class="n"&gt;dplyr&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="nf"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;outcome&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;C9FTD&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;outcome&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Control&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;group_by&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;location&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cellType&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;group_split&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Next, I concatenate the two lists&amp;nbsp;together:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;### src/prepareData.R ###&lt;/span&gt;
+&lt;span class="n"&gt;allAnalysesList&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;alsDfsList&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ftdDfsList&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Finally, I can use the &lt;code&gt;makeCountsDf()&lt;/code&gt; function to generate the 12 distinct gene count data frames. The function inputs are a data frame and a vector of column indexes, so it can convert the &lt;code&gt;gene_ID&lt;/code&gt; into row names of the data frame and select the desired sample&amp;nbsp;columns:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;### src/functions/makeCountsDf.R ###&lt;/span&gt;
+&lt;span class="n"&gt;makeCountsDf&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dataFrame&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;columnIndexes&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+
+  &lt;span class="n"&gt;counts&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;dataFrame&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="n"&gt;dplyr&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="nf"&gt;select&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;all_of&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;columnIndexes&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="nf"&gt;rename_with&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;~&lt;/span&gt; &lt;span class="nf"&gt;str_replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;.x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;C9ALS|C9FTD&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;case&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="nf"&gt;rename_with&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;~&lt;/span&gt; &lt;span class="nf"&gt;str_replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;.x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Control&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;control&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="nf"&gt;as.data.frame&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; 
+
+  &lt;span class="nf"&gt;row.names&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;gene_ID&lt;/span&gt;
+
+  &lt;span class="n"&gt;counts&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;subset&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;select&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gene_ID&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+  &lt;span class="nf"&gt;return&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;counts&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I use a simple &lt;code&gt;lapply&lt;/code&gt; loop to finally generate the &lt;code&gt;countsDfsList&lt;/code&gt; object, which is a list of 12 data frames, each with the necessary samples for each distinct &lt;span class="caps"&gt;DEA&lt;/span&gt; as mentioned&amp;nbsp;above.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;### src/prepareData.R ###&lt;/span&gt;
+&lt;span class="c1"&gt;# Split count data into 12 dataframes for differential expression analysis with edgeR ----&lt;/span&gt;
+&lt;span class="n"&gt;countsDfsList&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;lapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;seq_along&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;allAnalysesList&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="nf"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+
+  &lt;span class="n"&gt;df&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;allAnalysesList&lt;/span&gt;&lt;span class="p"&gt;[[&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;]]&lt;/span&gt;
+
+  &lt;span class="n"&gt;cIdx&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;df&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;columnIndex&lt;/span&gt;
+
+  &lt;span class="nf"&gt;makeCountsDf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dataFrame&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;countData&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;columnIndexes&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cIdx&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="p"&gt;})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;To keep track of each analysis, I named each element with a string contaning the disease, cortex and cell type by creating a string column combining the corresponding &lt;code&gt;sampleInfo&lt;/code&gt; columns and &lt;code&gt;pull&lt;/code&gt;ing it to create a simple vector. With the vector, I set the &lt;code&gt;countsDfsList&lt;/code&gt; element&amp;nbsp;names:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;### src/prepareData.R ###&lt;/span&gt;
+&lt;span class="n"&gt;allAnalysesNames&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;sampleInfo&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="n"&gt;dplyr&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="nf"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;outcome&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Control&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="n"&gt;dplyr&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="nf"&gt;select&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;outcome&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;location&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cellType&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;distinct&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;mutate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;names&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;glue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;{outcome}_{location}_{cellType}&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;pull&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;names&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;names&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;countsDfsList&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;allAnalysesNames&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;em&gt;In summary&lt;/em&gt;: I got the gene counts &lt;code&gt;countData&lt;/code&gt;, and split it into 12 distinct data frames, stratifying by disease, cortex and cell type. Each one will allow a &lt;span class="caps"&gt;DEA&lt;/span&gt; with the &lt;code&gt;edgeR&lt;/code&gt; package.&lt;/p&gt;
+&lt;h2&gt;The &lt;code&gt;runParallelDEA()&lt;/code&gt; function&lt;/h2&gt;
+&lt;p&gt;By executing the &lt;code&gt;sourceFromGitHub.R&lt;/code&gt; script, I sourced my &lt;code&gt;edgeR_setup&lt;/code&gt; function directly from my GitHub&amp;nbsp;portfolio:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;### src/functions/sourceFromGitHub.R ###&lt;/span&gt;
+&lt;span class="n"&gt;URLs&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;https://raw.githubusercontent.com/antoniocampos13/portfolio/master/R/2020_10_22_DEA_with_edgeR/src/edgeR_setup.R&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;lapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;URLs&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;devtools&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;source_url&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;In a &lt;a href="https://antoniocampos13.github.io/differential-expression-analysis-with-edger-in-r.html"&gt;previous post&lt;/a&gt; I demonstrated the &lt;code&gt;edger_setup&lt;/code&gt; custom function that uses &lt;code&gt;edgeR&lt;/code&gt; package to perform differential expression&amp;nbsp;analysis.&lt;/p&gt;
+&lt;p&gt;Since I have 12 &lt;strong&gt;independent&lt;/strong&gt; DEAs to perform, I surmised I could parallelize the computation, so I created the &lt;code&gt;run&lt;/code&gt; function to demonstrate that sometimes parallel computation allows us to complete some tasks faster than if we executed them sequentially. Check the function&amp;nbsp;code:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;### src/functions/runParallelDEA.R ###&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;glue&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;furrr&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;future.callr&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tictoc&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;runParallelDEA&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nWorkers&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+
+  &lt;span class="nf"&gt;plan&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;callr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;gc&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;workers&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;nWorkers&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+  &lt;span class="n"&gt;opts&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;furrr_options&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;scheduling&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;seed&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+  &lt;span class="n"&gt;parallelFileNames&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;glue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;{names(countsDfsList)}_parallel_{nWorkers}_workers.xlsx&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+  &lt;span class="n"&gt;logMessage&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;ifelse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nWorkers&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Sequential execution&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;glue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Parallel execution with {nWorkers} workers&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+  &lt;span class="nf"&gt;tic&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;logMessage&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="nf"&gt;future_walk2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="n"&gt;.x&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;parallelFileNames&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;.y&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;countsDfsList&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="o"&gt;~&lt;/span&gt; &lt;span class="nf"&gt;edger_setup&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+      &lt;span class="n"&gt;name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;as.character&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;which&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;parallelFileNames&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;.x&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+      &lt;span class="n"&gt;counts&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;.y&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="n"&gt;gene_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;ENSEMBL&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="n"&gt;output_path&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;outputs&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;.x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="n"&gt;.options&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;opts&lt;/span&gt;
+  &lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="nf"&gt;toc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;log&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="n"&gt;parallelTime&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;unlist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;tic.log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+  &lt;span class="nf"&gt;tic.clearlog&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+  &lt;span class="n"&gt;parallelTime&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="nf"&gt;write_lines&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;outputs&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;tictoc_log.txt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;append&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;file.exists&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;outputs&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;tictoc_log.txt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;It is a convenient function around the execution of &lt;code&gt;furrr&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;code&gt;future_walk2&lt;/code&gt; function based on the number of parallel workers (&lt;span class="caps"&gt;CPU&lt;/span&gt; cores). First, let me explain &lt;code&gt;future_walk2&lt;/code&gt;: it applies a function (in this case, &lt;code&gt;edger_setup&lt;/code&gt;) to each element of two vectors of the same length in parallel using the &lt;code&gt;futures&lt;/code&gt; package backend. The number of &lt;strong&gt;simultaneous, parallel executions&lt;/strong&gt; of &lt;code&gt;edger_setup&lt;/code&gt; is controlled by the &lt;code&gt;nWorkers&lt;/code&gt; parameter, which is passed over to the &lt;code&gt;plan()&lt;/code&gt; function, which will use the &lt;code&gt;future.callr&lt;/code&gt; &lt;span class="caps"&gt;API&lt;/span&gt; to finetune the &lt;code&gt;futures&lt;/code&gt; package&amp;nbsp;backend.&lt;/p&gt;
+&lt;p&gt;I chose &lt;code&gt;future_walk2&lt;/code&gt; because &lt;code&gt;edger_setup&lt;/code&gt; does not return any value to the console; it just writes a spreadsheet with results directly to disk. Thus, I am interested in the &amp;#8220;side-effect&amp;#8221; of the function, which is exactly the purpose of &lt;code&gt;walk&lt;/code&gt;-like&amp;nbsp;functions.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;edger_setup&lt;/code&gt; has three required inputs: &lt;code&gt;name&lt;/code&gt;, &lt;code&gt;counts&lt;/code&gt; and &lt;code&gt;output_path&lt;/code&gt;. The &lt;code&gt;counts&lt;/code&gt; parameter will receive each data frame stored in the &lt;code&gt;countsDfsList&lt;/code&gt; list. With the &lt;code&gt;parallelFileNames&lt;/code&gt; vector inside the function, I could satisfy both the &lt;code&gt;name&lt;/code&gt; and &lt;code&gt;output_path&lt;/code&gt; parameters.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;In summary:&lt;/em&gt; the &lt;code&gt;future_walk2&lt;/code&gt; will map over two vectors (&lt;code&gt;countsDfsList&lt;/code&gt; and &lt;code&gt;parallelFileNames&lt;/code&gt;) and pass each element of both vectors simultaneously over to &lt;code&gt;edger_setup&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;Performing differential expression analysis (&lt;span class="caps"&gt;DEA&lt;/span&gt;) sequentially and in&amp;nbsp;parallel&lt;/h2&gt;
+&lt;p&gt;Now that I explained the logic behind the &lt;code&gt;runParallelDEA()&lt;/code&gt; function, I can finally demonstrate how parallelization may accelerate the completion time of certain tasks. To this end, I created a numerical&amp;nbsp;vector:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;### main.R ###&lt;/span&gt;
+&lt;span class="c1"&gt;# Run DEA  ----&lt;/span&gt;
+&lt;span class="n"&gt;nWorkers&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;6&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;lapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nWorkers&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;runParallelDEA&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Each number represents the number of workers (&lt;span class="caps"&gt;CPU&lt;/span&gt; cores) that I will loop over with &lt;code&gt;lapply&lt;/code&gt; to pass over to &lt;code&gt;runParallelDEA()&lt;/code&gt;. Six is the maximum number in the vector because my &lt;span class="caps"&gt;PC&lt;/span&gt; has this many&amp;nbsp;cores.&lt;/p&gt;
+&lt;p&gt;Observe that the first element is &lt;code&gt;1&lt;/code&gt;: it will boil over to a sequential execution, since &lt;code&gt;future_walk2&lt;/code&gt; will use a single worker to process all 12 DEAs with &lt;code&gt;edger_setup&lt;/code&gt;. The &lt;code&gt;runParallelDEA()&lt;/code&gt; will count the number of seconds elapsed to complete all 12 DEAs and save it to the &lt;code&gt;outputs/tictoc_log.txt&lt;/code&gt; file, displayed&amp;nbsp;below:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;### outputs/tictoc_log.txt ###
+Sequential execution: 52.57 sec elapsed
+Parallel execution with 2 workers: 35.78 sec elapsed
+Parallel execution with 4 workers: 28.98 sec elapsed
+Parallel execution with 6 workers: 26.89 sec elapsed
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Notice how with six cores, the elapsed time to produce all 12 result spreadsheets is cut short by half! Now imagine the time gained in the calculation of more complex tasks, provided plenty of &lt;span class="caps"&gt;CPU&lt;/span&gt; cores and &lt;span class="caps"&gt;RAM&lt;/span&gt; size. Tasks that would run for several days or weeks if done sequentially can be performed in much shorter times if they are amenable to&amp;nbsp;parallelization.&lt;/p&gt;
+&lt;p&gt;You can check the 12 spreadsheets and the &lt;code&gt;tictoc&lt;/code&gt; log at the &lt;code&gt;outputs&lt;/code&gt; folder (I included just only the set of spreadsheets produced by the 6 workers to avoid duplicate files on my GitHub&amp;nbsp;portfolio).&lt;/p&gt;
+&lt;p&gt;Now that you know about the &lt;code&gt;furrr&lt;/code&gt; package through my post, you can use it as a inspiration to try parallel computing with your use&amp;nbsp;cases.&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;I demonstrated the &lt;code&gt;furrr&lt;/code&gt; package for easy parallelization of tasks within&amp;nbsp;R.&lt;/li&gt;
+&lt;li&gt;The &lt;code&gt;future.callr&lt;/code&gt; package finetunes the &lt;code&gt;future&lt;/code&gt; backend used by &lt;code&gt;furrr&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Some tasks are completed quicker if they are amenable to&amp;nbsp;parallelization&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Subscribe to my &lt;a href="https://antoniocampos13.github.io/feeds/all.rss.xml"&gt;&lt;span class="caps"&gt;RSS&lt;/span&gt; feed&lt;/a&gt;, &lt;a href="https://antoniocampos13.github.io/feeds/all.atom.xml"&gt;Atom feed&lt;/a&gt; or &lt;a href="https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg"&gt;Telegram channel&lt;/a&gt; to keep you updated whenever I post new&amp;nbsp;content.&lt;/em&gt;&lt;/p&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE219278"&gt;&lt;span class="caps"&gt;GEO&lt;/span&gt; Accession viewer | &lt;span class="caps"&gt;GSE219278&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://antoniocampos13.github.io/differential-expression-analysis-with-edger-in-r.html"&gt;Differential Expression Analysis with edgeR in&amp;nbsp;R&lt;/a&gt;&lt;/p&gt;</content><category term="R"></category><category term="Bioinformatics"></category><category term="gene expression"></category><category term="edgeR"></category><category term="furrr"></category></entry><entry><title>Genomic plots with circlize</title><link href="https://antoniocampos13.github.io/genomic-plots-with-circlize.html" rel="alternate"></link><published>2023-04-29T10:00:00-03:00</published><updated>2023-04-29T10:00:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2023-04-29:/genomic-plots-with-circlize.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;Genomics is undoubtedly a complex science. The human genome is huge, with more than 3 billion base pairs, about 20,000 protein-coding genes, several millions of variants, and many more interesting characteristics. The visualization of genomic/omics data is challenging due to the sheer volume of information. Circular plots …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;Genomics is undoubtedly a complex science. The human genome is huge, with more than 3 billion base pairs, about 20,000 protein-coding genes, several millions of variants, and many more interesting characteristics. The visualization of genomic/omics data is challenging due to the sheer volume of information. Circular plots are a popular way to extract information at a glance from omics-level&amp;nbsp;information.&lt;/p&gt;
 &lt;p&gt;In this post, I will demonstrate the &lt;a href="https://jokergoo.github.io/circlize_book/book/"&gt;&lt;code&gt;circlize&lt;/code&gt; package&lt;/a&gt; from R software, a versatile tool with applications in&amp;nbsp;Genomics.&lt;/p&gt;
