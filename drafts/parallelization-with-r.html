@@ -1,0 +1,440 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/stylesheet/style.min.css">
+
+
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+          href="https://antoniocampos13.github.io/theme/pygments/vs.min.css">
+
+
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/solid.css">
+
+
+    <link href="https://antoniocampos13.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Antonio's Portfolio Atom">
+
+    <link href="https://antoniocampos13.github.io/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="Antonio's Portfolio RSS">
+
+
+  
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Microsoft EDGE -->
+    <meta name="msapplication-TileColor" content="#333333">
+
+ 
+
+<meta name="author" content="Antonio Victor Campos Coelho" />
+<meta name="description" content="Introduction Sometimes, some computations can be carried out in parallel. Certain large tasks can be divided into independent ones, allowing them to be solved at the same time, rather than waiting for each task to be solved sequentially. I find the native R parallel functions such as mclapply(), or those …" />
+<meta name="keywords" content="Bioinformatics, gene expression, edgeR, furrr">
+
+
+  <meta property="og:site_name" content="Antonio's Portfolio"/>
+  <meta property="og:title" content="Parallelization with R"/>
+  <meta property="og:description" content="Introduction Sometimes, some computations can be carried out in parallel. Certain large tasks can be divided into independent ones, allowing them to be solved at the same time, rather than waiting for each task to be solved sequentially. I find the native R parallel functions such as mclapply(), or those …"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="https://antoniocampos13.github.io/drafts/parallelization-with-r.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2023-07-31 10:00:00-03:00"/>
+  <meta property="article:modified_time" content=""/>
+  <meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
+  <meta property="article:section" content="R"/>
+  <meta property="article:tag" content="Bioinformatics"/>
+  <meta property="article:tag" content="gene expression"/>
+  <meta property="article:tag" content="edgeR"/>
+  <meta property="article:tag" content="furrr"/>
+  <meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
+
+  <title>Antonio's Portfolio &ndash; Parallelization with R</title>
+
+</head>
+<body class="light-theme">
+  <aside>
+    <div>
+      <a href="https://antoniocampos13.github.io/">
+        <img src="https://avatars.githubusercontent.com/antoniocampos13" alt="Antonio's Portfolio" title="Antonio's Portfolio">
+      </a>
+
+      <h1>
+        <a href="https://antoniocampos13.github.io/">Antonio's Portfolio</a>
+      </h1>
+
+<p>PhD in Genetics</p>
+
+      <nav>
+        <ul class="list">
+
+
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/about.html#about">
+                  About
+                </a>
+              </li>
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/contact.html#contact">
+                  Contact
+                </a>
+              </li>
+
+            <li>
+              <a target="_self" href="http://lattes.cnpq.br/2986394950644755" >Brazilian Lattes CV</a>
+            </li>
+            <li>
+              <a target="_self" href="https://scholar.google.com.br/citations?user=d2ij4wUAAAAJ&hl" >Google Scholar</a>
+            </li>
+            <li>
+              <a target="_self" href="https://orcid.org/0000-0003-2143-9701" >ORCID</a>
+            </li>
+            <li>
+              <a target="_self" href="http://www.webofscience.com/wos/author/record/E-6795-2015" >ResearcherID Profile</a>
+            </li>
+        </ul>
+      </nav>
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/antoniocampos13/portfolio" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/antonio-coelho-9aa338164" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://antoniocampos13.github.io/">Home</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.rss.xml">RSS</a>
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="parallelization-with-r">Parallelization with&nbsp;R</h1>
+    <p>
+      Posted on Mon 31 July 2023 in <a href="https://antoniocampos13.github.io/category/r.html">R</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h2>Introduction</h2>
+<p>Sometimes, some computations can be carried out in parallel. Certain large tasks can be divided into independent ones, allowing them to be solved at the same time, rather than waiting for each task to be solved&nbsp;sequentially.</p>
+<p>I find the native R parallel functions such as <code>mclapply()</code>, or those from highly used packages such as <code>snow</code> to be cumbersome. Frankly, I assume I may never get those approaches to&nbsp;work.</p>
+<p>This is why I got very happy when I recently discovered the <code>furrr</code> package. This package is from the <code>tidyverse</code> family, and as such, it is easy to use. With <code>furrr</code>, all the mental gymnastics I used to have when I tried parallelization in R is&nbsp;over.</p>
+<p>The <code>furrr</code> package is the &#8220;marriage&#8221; between <code>purrr</code> and <code>future</code> packages. It has versions of the main mapping functions from <code>purrr</code>, but using <code>future</code> backend to execute computations in parallel and&nbsp;asynchronously.</p>
+<p>In this post, I will demonstrate a simple way to achieve parallelization with R and <code>furrr</code>. The code of this demo is in my <a href="https://github.com/antoniocampos13/portfolio/tree/master/R/2023_07_31_Parallelization_with_R">portfolio</a>.</p>
+<p>I will parallelize a series of differential expression analyses (<span class="caps">DEA</span>) of a dataset by Li et al. (2022). Check the Gene Expression Omnibus (<span class="caps">GEO</span>) summary page <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE219278">here</a>. Briefly, they investigated the cellular alterations associated with the <em>C9orf72</em> gene pathogenic repeat expansions. They performed single nucleus transcriptomics (snRNA-seq) in postmortem samples of motor and frontal cortices from amyotrophic lateral sclerosis (<span class="caps">ALS</span>) and frontotemporal dementia (<span class="caps">FTD</span>) donors as well as unaffected controls. They sampled three major brain cell populations (neurons, oligodendrocytes, and other glia) from both of the&nbsp;cortices.</p>
+<h2>Installing&nbsp;packages</h2>
+<p>Install the following packages into your R library with the <code>src/installPackages.R</code> file:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">### src/installPackages.R ###</span>
+<span class="n">packages</span> <span class="o">&lt;-</span>
+  <span class="nf">c</span><span class="p">(</span>
+    <span class="s">&quot;here&quot;</span><span class="p">,</span>
+    <span class="s">&quot;tidyverse&quot;</span><span class="p">,</span>
+    <span class="s">&quot;glue&quot;</span><span class="p">,</span>
+    <span class="s">&quot;openxlsx&quot;</span><span class="p">,</span>
+    <span class="s">&quot;future&quot;</span><span class="p">,</span>
+    <span class="s">&quot;future.callr&quot;</span><span class="p">,</span>
+    <span class="s">&quot;devtools&quot;</span><span class="p">,</span>
+    <span class="s">&quot;tictoc&quot;</span><span class="p">,</span>
+    <span class="s">&quot;BiocManager&quot;</span>
+  <span class="p">)</span>
+
+<span class="nf">lapply</span><span class="p">(</span><span class="n">packages</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">pkg</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="n">pkg</span> <span class="o">%in%</span> <span class="nf">rownames</span><span class="p">(</span><span class="nf">installed.packages</span><span class="p">()))</span>
+
+    <span class="nf">install.packages</span><span class="p">(</span><span class="n">pkg</span><span class="p">)</span>
+
+<span class="p">})</span>
+
+<span class="n">biocPackages</span> <span class="o">&lt;-</span>
+  <span class="nf">c</span><span class="p">(</span>
+    <span class="s">&quot;edgeR&quot;</span><span class="p">,</span>
+    <span class="s">&quot;AnnotationDbi&quot;</span><span class="p">,</span>
+    <span class="s">&quot;annotate&quot;</span><span class="p">,</span>
+    <span class="s">&quot;org.Hs.eg.db&quot;</span><span class="p">,</span>
+    <span class="s">&quot;EnsDb.Hsapiens.v79&quot;</span><span class="p">,</span>
+    <span class="s">&quot;ensembldb&quot;</span>
+    <span class="p">)</span>
+
+<span class="nf">lapply</span><span class="p">(</span><span class="n">biocPackages</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">pkg</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="n">pkg</span> <span class="o">%in%</span> <span class="nf">rownames</span><span class="p">(</span><span class="nf">installed.packages</span><span class="p">()))</span>
+
+    <span class="n">BiocManager</span><span class="o">::</span><span class="nf">install</span><span class="p">(</span><span class="n">pkg</span><span class="p">)</span>
+
+<span class="p">})</span>
+</code></pre></div>
+
+<p>Now I create an <code>outputs</code> folder to hold the <span class="caps">DEA</span>&nbsp;results:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">### main.R ###</span>
+<span class="c1"># Paths ----</span>
+<span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">dir.exists</span><span class="p">(</span><span class="nf">here</span><span class="p">(</span><span class="s">&quot;outputs&quot;</span><span class="p">)))</span> <span class="p">{</span> <span class="nf">dir.create</span><span class="p">(</span><span class="nf">here</span><span class="p">(</span><span class="s">&quot;outputs&quot;</span><span class="p">))</span> <span class="p">}</span>
+</code></pre></div>
+
+<p>Next, I load all the functions I created for this&nbsp;demo:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">### main.R ###</span>
+<span class="c1"># Scripts ----</span>
+<span class="nf">source</span><span class="p">(</span><span class="nf">here</span><span class="p">(</span><span class="s">&quot;src&quot;</span><span class="p">,</span> <span class="s">&quot;functions.R&quot;</span><span class="p">))</span>
+</code></pre></div>
+
+<p>This script will load the following scripts in the <code>functions</code> folder: <code>makeCountsDf.R</code>, <code>sourceFromGitHub.R</code>, and <code>runParallelDEA.R</code>. I will explain each one at the appropriate&nbsp;moment.</p>
+<h2>Obtaining and preparing the&nbsp;data</h2>
+<p>The next step is executing the <code>prepareData.R</code> script:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">### main.R ###</span>
+<span class="nf">source</span><span class="p">(</span><span class="nf">here</span><span class="p">(</span><span class="s">&quot;src&quot;</span><span class="p">,</span> <span class="s">&quot;prepareData.R&quot;</span><span class="p">))</span>
+</code></pre></div>
+
+<p>The script will start by loading the gene expression count data directly from the <span class="caps">GEO</span> <span class="caps">FTP</span> server into a data frame, and rounding up any number to the nearest integer just to be safe, since <code>edgeR</code> requires raw, integer&nbsp;counts:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">### src/prepareData.R ###</span>
+<span class="c1"># Load data ----</span>
+<span class="n">countDataOriginal</span> <span class="o">&lt;-</span> <span class="nf">read_tsv</span><span class="p">(</span><span class="s">&quot;https://ftp.ncbi.nlm.nih.gov/geo/series/GSE219nnn/GSE219278/suppl/GSE219278_allSamples_rsem_genes_results_counts_annotated.tsv.gz&quot;</span><span class="p">)</span>
+
+<span class="c1"># Round up gene counts ----</span>
+<span class="n">countData</span> <span class="o">&lt;-</span> <span class="n">countDataOriginal</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="nf">across</span><span class="p">(</span><span class="nf">where</span><span class="p">(</span><span class="n">is.numeric</span><span class="p">),</span> <span class="n">ceiling</span><span class="p">))</span>
+</code></pre></div>
+
+<p>This data frame has 60656 rows (genes/transcripts) and 117 columns. The first three columns are gene information: <code>gene_ID</code>, <code>gene_name</code>, and <code>gene_type</code>, leaving 114 columns to represent the samples (column indexes between 4 and&nbsp;117).</p>
+<p><img alt="countData data frame view" src="https://antoniocampos13.github.io/images/count_data_C9orf72.png"></p>
+<p>Thankfully, the project authors gave very descriptive names to the columns, so I could identify right away their study design. I created a data frame named <code>sampleInfo</code> using the column names to extract information from each&nbsp;sample:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">### src/prepareData.R ###</span>
+<span class="c1"># Identify samples and outcomes ----</span>
+<span class="n">sampleInfo</span> <span class="o">&lt;-</span> <span class="nf">tibble</span><span class="p">(</span><span class="n">Names</span> <span class="o">=</span> <span class="nf">names</span><span class="p">(</span><span class="n">countData</span><span class="p">)[</span><span class="m">4</span><span class="o">:</span><span class="nf">length</span><span class="p">(</span><span class="nf">names</span><span class="p">(</span><span class="n">countData</span><span class="p">))])</span> <span class="o">%&gt;%</span>
+  <span class="nf">separate</span><span class="p">(</span><span class="n">Names</span><span class="p">,</span> <span class="n">into</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&quot;outcome&quot;</span><span class="p">,</span> <span class="s">&quot;patientId&quot;</span><span class="p">,</span> <span class="s">&quot;location&quot;</span><span class="p">,</span> <span class="s">&quot;cellType&quot;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">columnIndex</span> <span class="o">=</span> <span class="nf">row_number</span><span class="p">()</span> <span class="o">+</span> <span class="m">3</span><span class="p">)</span>
+</code></pre></div>
+
+<p><img alt="sampleInfo data frame view" src="https://antoniocampos13.github.io/images/sampleInfo_C9orf72.png"></p>
+<p>With the <code>columnIndex</code> column I created on the <code>sampleInfo</code>, I can extract the necessary cases/control combinations to generate 12 distinct data frames, by splitting the <code>countData</code> data&nbsp;frame.</p>
+<p>By observing this table, I surmised they recruited three outcome groups: &#8220;<span class="caps">C9ALS</span>&#8221;, &#8220;<span class="caps">C9FTD</span>&#8221; and &#8220;Control&#8221;, with six, seven, and six individuals in each group, respectively. Since they collect three cell types from two cerebral cortices, we have six cortex/cell type combinations. Coupling with two distinct diseases, we can perform two <strong>case vs. control comparisons</strong> per combination. Therefore, we can perform $3 \times 2 \times 2 = 12$ <strong>distinct DEAs</strong>.</p>
+<p>To keep track of the samples in each of the 12 analyses, I created two lists of data frames, containing cases and controls, stratified by cortex and cell&nbsp;type:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">### src/prepareData.R ###</span>
+<span class="n">alsDfsList</span> <span class="o">&lt;-</span> <span class="n">sampleInfo</span> <span class="o">%&gt;%</span> 
+  <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">outcome</span> <span class="o">==</span> <span class="s">&quot;C9ALS&quot;</span> <span class="o">|</span> <span class="n">outcome</span> <span class="o">==</span> <span class="s">&quot;Control&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_by</span><span class="p">(</span><span class="n">location</span><span class="p">,</span> <span class="n">cellType</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_split</span><span class="p">()</span>
+
+<span class="n">ftdDfsList</span> <span class="o">&lt;-</span> <span class="n">sampleInfo</span> <span class="o">%&gt;%</span> 
+  <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">outcome</span> <span class="o">==</span> <span class="s">&quot;C9FTD&quot;</span> <span class="o">|</span> <span class="n">outcome</span> <span class="o">==</span> <span class="s">&quot;Control&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_by</span><span class="p">(</span><span class="n">location</span><span class="p">,</span> <span class="n">cellType</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_split</span><span class="p">()</span>
+</code></pre></div>
+
+<p>Next, I concatenate the two lists&nbsp;together:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">### src/prepareData.R ###</span>
+<span class="n">allAnalysesList</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="n">alsDfsList</span><span class="p">,</span> <span class="n">ftdDfsList</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Finally, I can use the <code>makeCountsDf()</code> function to generate the 12 distinct gene count data frames. The function inputs are a data frame and a vector of column indexes, so it can convert the <code>gene_ID</code> into row names of the data frame and select the desired sample&nbsp;columns:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">### src/functions/makeCountsDf.R ###</span>
+<span class="n">makeCountsDf</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">dataFrame</span><span class="p">,</span> <span class="n">columnIndexes</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="n">counts</span> <span class="o">&lt;-</span> <span class="n">dataFrame</span> <span class="o">%&gt;%</span>
+    <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="nf">all_of</span><span class="p">(</span><span class="n">columnIndexes</span><span class="p">))</span> <span class="o">%&gt;%</span>
+    <span class="nf">rename_with</span><span class="p">(</span><span class="o">~</span> <span class="nf">str_replace</span><span class="p">(</span><span class="n">.x</span><span class="p">,</span> <span class="s">&quot;C9ALS|C9FTD&quot;</span><span class="p">,</span> <span class="s">&quot;case&quot;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+    <span class="nf">rename_with</span><span class="p">(</span><span class="o">~</span> <span class="nf">str_replace</span><span class="p">(</span><span class="n">.x</span><span class="p">,</span> <span class="s">&quot;Control&quot;</span><span class="p">,</span> <span class="s">&quot;control&quot;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+    <span class="nf">as.data.frame</span><span class="p">()</span> 
+
+  <span class="nf">row.names</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">counts</span><span class="o">$</span><span class="n">gene_ID</span>
+
+  <span class="n">counts</span> <span class="o">&lt;-</span> <span class="nf">subset</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">select</span> <span class="o">=</span> <span class="o">-</span><span class="nf">c</span><span class="p">(</span><span class="n">gene_ID</span><span class="p">))</span>
+
+  <span class="nf">return</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>I use a simple <code>lapply</code> loop to finally generate the <code>countsDfsList</code> object, which is a list of 12 data frames, each with the necessary samples for each distinct <span class="caps">DEA</span> as mentioned&nbsp;above.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">### src/prepareData.R ###</span>
+<span class="c1"># Split count data into 12 dataframes for differential expression analysis with edgeR ----</span>
+<span class="n">countsDfsList</span> <span class="o">&lt;-</span> <span class="nf">lapply</span><span class="p">(</span><span class="nf">seq_along</span><span class="p">(</span><span class="n">allAnalysesList</span><span class="p">),</span> <span class="nf">function</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="n">df</span> <span class="o">&lt;-</span> <span class="n">allAnalysesList</span><span class="p">[[</span><span class="n">index</span><span class="p">]]</span>
+
+  <span class="n">cIdx</span> <span class="o">&lt;-</span> <span class="n">df</span><span class="o">$</span><span class="n">columnIndex</span>
+
+  <span class="nf">makeCountsDf</span><span class="p">(</span><span class="n">dataFrame</span> <span class="o">=</span> <span class="n">countData</span><span class="p">,</span> <span class="n">columnIndexes</span> <span class="o">=</span> <span class="n">cIdx</span><span class="p">)</span>
+
+<span class="p">})</span>
+</code></pre></div>
+
+<p>To keep track of each analysis, I named each element with a string contaning the disease, cortex and cell type by creating a string column combining the corresponding <code>sampleInfo</code> columns and <code>pull</code>ing it to create a simple vector. With the vector, I set the <code>countsDfsList</code> element&nbsp;names:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">### src/prepareData.R ###</span>
+<span class="n">allAnalysesNames</span> <span class="o">&lt;-</span> <span class="n">sampleInfo</span> <span class="o">%&gt;%</span>
+  <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">outcome</span> <span class="o">!=</span> <span class="s">&quot;Control&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">cellType</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">distinct</span><span class="p">()</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">names</span> <span class="o">=</span> <span class="nf">glue</span><span class="p">(</span><span class="s">&quot;{outcome}_{location}_{cellType}&quot;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">pull</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+
+<span class="nf">names</span><span class="p">(</span><span class="n">countsDfsList</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">allAnalysesNames</span>
+</code></pre></div>
+
+<p><em>In summary</em>: I got the gene counts <code>countData</code>, and split it into 12 distinct data frames, stratifying by disease, cortex and cell type. Each one will allow a <span class="caps">DEA</span> with the <code>edgeR</code> package.</p>
+<h2>The <code>runParallelDEA()</code> function</h2>
+<p>By executing the <code>sourceFromGitHub.R</code> script, I sourced my <code>edgeR_setup</code> function directly from my GitHub&nbsp;portfolio:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">### src/functions/sourceFromGitHub.R ###</span>
+<span class="n">URLs</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="s">&quot;https://raw.githubusercontent.com/antoniocampos13/portfolio/master/R/2020_10_22_DEA_with_edgeR/src/edgeR_setup.R&quot;</span><span class="p">)</span>
+
+<span class="nf">lapply</span><span class="p">(</span><span class="n">URLs</span><span class="p">,</span> <span class="n">devtools</span><span class="o">::</span><span class="n">source_url</span><span class="p">)</span>
+</code></pre></div>
+
+<p>In a <a href="https://antoniocampos13.github.io/differential-expression-analysis-with-edger-in-r.html">previous post</a> I demonstrated the <code>edger_setup</code> custom function that uses <code>edgeR</code> package to perform differential expression&nbsp;analysis.</p>
+<p>Since I have 12 <strong>independent</strong> DEAs to perform, I surmised I could parallelize the computation, so I created the <code>run</code> function to demonstrate that sometimes parallel computation allows us to complete some tasks faster than if we executed them sequentially. Check the function&nbsp;code:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">### src/functions/runParallelDEA.R ###</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">glue</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">furrr</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">future.callr</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">tictoc</span><span class="p">)</span>
+
+<span class="n">runParallelDEA</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">nWorkers</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="nf">plan</span><span class="p">(</span><span class="n">callr</span><span class="p">,</span> <span class="n">gc</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">workers</span> <span class="o">=</span> <span class="n">nWorkers</span><span class="p">)</span>
+
+  <span class="n">opts</span> <span class="o">&lt;-</span> <span class="nf">furrr_options</span><span class="p">(</span><span class="n">scheduling</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+
+  <span class="n">parallelFileNames</span> <span class="o">&lt;-</span> <span class="nf">glue</span><span class="p">(</span><span class="s">&quot;{names(countsDfsList)}_parallel_{nWorkers}_workers.xlsx&quot;</span><span class="p">)</span>
+
+  <span class="n">logMessage</span> <span class="o">&lt;-</span> <span class="nf">ifelse</span><span class="p">(</span><span class="n">nWorkers</span> <span class="o">==</span> <span class="m">1</span><span class="p">,</span> <span class="s">&quot;Sequential execution&quot;</span><span class="p">,</span> <span class="nf">glue</span><span class="p">(</span><span class="s">&quot;Parallel execution with {nWorkers} workers&quot;</span><span class="p">))</span>
+
+  <span class="nf">tic</span><span class="p">(</span><span class="n">logMessage</span><span class="p">)</span>
+  <span class="nf">future_walk2</span><span class="p">(</span>
+    <span class="n">.x</span> <span class="o">=</span> <span class="n">parallelFileNames</span><span class="p">,</span>
+    <span class="n">.y</span> <span class="o">=</span> <span class="n">countsDfsList</span><span class="p">,</span>
+    <span class="o">~</span> <span class="nf">edger_setup</span><span class="p">(</span>
+      <span class="n">name</span> <span class="o">=</span> <span class="nf">as.character</span><span class="p">(</span><span class="nf">which</span><span class="p">(</span><span class="n">parallelFileNames</span> <span class="o">==</span> <span class="n">.x</span><span class="p">)),</span>
+      <span class="n">counts</span> <span class="o">=</span> <span class="n">.y</span><span class="p">,</span>
+      <span class="n">gene_id</span> <span class="o">=</span> <span class="s">&quot;ENSEMBL&quot;</span><span class="p">,</span>
+      <span class="n">output_path</span> <span class="o">=</span> <span class="nf">here</span><span class="p">(</span><span class="s">&quot;outputs&quot;</span><span class="p">,</span> <span class="n">.x</span><span class="p">)</span>
+    <span class="p">),</span>
+    <span class="n">.options</span> <span class="o">=</span> <span class="n">opts</span>
+  <span class="p">)</span>
+  <span class="nf">toc</span><span class="p">(</span><span class="n">log</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+  <span class="n">parallelTime</span> <span class="o">&lt;-</span> <span class="nf">unlist</span><span class="p">(</span><span class="nf">tic.log</span><span class="p">(</span><span class="n">format</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">))</span>
+  <span class="nf">tic.clearlog</span><span class="p">()</span>
+
+  <span class="n">parallelTime</span> <span class="o">%&gt;%</span> <span class="nf">write_lines</span><span class="p">(</span><span class="nf">here</span><span class="p">(</span><span class="s">&quot;outputs&quot;</span><span class="p">,</span> <span class="s">&quot;tictoc_log.txt&quot;</span><span class="p">),</span> <span class="n">append</span> <span class="o">=</span> <span class="nf">file.exists</span><span class="p">(</span><span class="nf">here</span><span class="p">(</span><span class="s">&quot;outputs&quot;</span><span class="p">,</span> <span class="s">&quot;tictoc_log.txt&quot;</span><span class="p">)))</span>
+
+<span class="p">}</span>
+</code></pre></div>
+
+<p>It is a convenient function around the execution of <code>furrr</code><span class="quo">&#8216;</span>s <code>future_walk2</code> function based on the number of parallel workers (<span class="caps">CPU</span> cores). First, let me explain <code>future_walk2</code>: it applies a function (in this case, <code>edger_setup</code>) to each element of two vectors of the same length in parallel using the <code>futures</code> package backend. The number of <strong>simultaneous, parallel executions</strong> of <code>edger_setup</code> is controlled by the <code>nWorkers</code> parameter, which is passed over to the <code>plan()</code> function, which will use the <code>future.callr</code> <span class="caps">API</span> to finetune the <code>futures</code> package&nbsp;backend.</p>
+<p>I chose <code>future_walk2</code> because <code>edger_setup</code> does not return any value to the console; it just writes a spreadsheet with results directly to disk. Thus, I am interested in the &#8220;side-effect&#8221; of the function, which is exactly the purpose of <code>walk</code>-like&nbsp;functions.</p>
+<p><code>edger_setup</code> has three required inputs: <code>name</code>, <code>counts</code> and <code>output_path</code>. The <code>counts</code> parameter will receive each data frame stored in the <code>countsDfsList</code> list. With the <code>parallelFileNames</code> vector inside the function, I could satisfy both the <code>name</code> and <code>output_path</code> parameters.</p>
+<p><em>In summary:</em> the <code>future_walk2</code> will map over two vectors (<code>countsDfsList</code> and <code>parallelFileNames</code>) and pass each element of both vectors simultaneously over to <code>edger_setup</code>.</p>
+<h2>Performing differential expression analysis (<span class="caps">DEA</span>) sequentially and in&nbsp;parallel</h2>
+<p>Now that I explained the logic behind the <code>runParallelDEA()</code> function, I can finally demonstrate how parallelization may accelerate the completion time of certain tasks. To this end, I created a numerical&nbsp;vector:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">### main.R ###</span>
+<span class="c1"># Run DEA  ----</span>
+<span class="n">nWorkers</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">4</span><span class="p">,</span> <span class="m">6</span><span class="p">)</span>
+
+<span class="nf">lapply</span><span class="p">(</span><span class="n">nWorkers</span><span class="p">,</span> <span class="n">runParallelDEA</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Each number represents the number of workers (<span class="caps">CPU</span> cores) that I will loop over with <code>lapply</code> to pass over to <code>runParallelDEA()</code>. Six is the maximum number in the vector because my <span class="caps">PC</span> has this many&nbsp;cores.</p>
+<p>Observe that the first element is <code>1</code>: it will boil over to a sequential execution, since <code>future_walk2</code> will use a single worker to process all 12 DEAs with <code>edger_setup</code>. The <code>runParallelDEA()</code> will count the number of seconds elapsed to complete all 12 DEAs and save it to the <code>outputs/tictoc_log.txt</code> file, displayed&nbsp;below:</p>
+<div class="highlight"><pre><span></span><code>### outputs/tictoc_log.txt ###
+Sequential execution: 52.57 sec elapsed
+Parallel execution with 2 workers: 35.78 sec elapsed
+Parallel execution with 4 workers: 28.98 sec elapsed
+Parallel execution with 6 workers: 26.89 sec elapsed
+</code></pre></div>
+
+<p>Notice how with six cores, the elapsed time to produce all 12 result spreadsheets is cut short by half! Now imagine the time gained in the calculation of more complex tasks, provided plenty of <span class="caps">CPU</span> cores and <span class="caps">RAM</span> size. Tasks that would run for several days or weeks if done sequentially can be performed in much shorter times if they are amenable to&nbsp;parallelization.</p>
+<p>You can check the 12 spreadsheets and the <code>tictoc</code> log at the <code>outputs</code> folder (I included just only the set of spreadsheets produced by the 6 workers to avoid duplicate files on my GitHub&nbsp;portfolio).</p>
+<p>Now that you know about the <code>furrr</code> package through my post, you can use it as a inspiration to try parallel computing with your use&nbsp;cases.</p>
+<h2>Conclusion</h2>
+<ul>
+<li>I demonstrated the <code>furrr</code> package for easy parallelization of tasks within&nbsp;R.</li>
+<li>The <code>future.callr</code> package finetunes the <code>future</code> backend used by <code>furrr</code></li>
+<li>Some tasks are completed quicker if they are amenable to&nbsp;parallelization</li>
+</ul>
+<p><em>Subscribe to my <a href="https://antoniocampos13.github.io/feeds/all.rss.xml"><span class="caps">RSS</span> feed</a>, <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom feed</a> or <a href="https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg">Telegram channel</a> to keep you updated whenever I post new&nbsp;content.</em></p>
+<h2>References</h2>
+<p><a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE219278"><span class="caps">GEO</span> Accession viewer | <span class="caps">GSE219278</span></a></p>
+<p><a href="https://antoniocampos13.github.io/differential-expression-analysis-with-edger-in-r.html">Differential Expression Analysis with edgeR in&nbsp;R</a></p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://antoniocampos13.github.io/tag/bioinformatics.html">Bioinformatics</a>
+      <a href="https://antoniocampos13.github.io/tag/gene-expression.html">gene expression</a>
+      <a href="https://antoniocampos13.github.io/tag/edger.html">edgeR</a>
+      <a href="https://antoniocampos13.github.io/tag/furrr.html">furrr</a>
+    </p>
+  </div>
+
+
+
+
+
+</article>
+
+    <footer>
+<p>
+  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike</a>
+</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+           src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Antonio's Portfolio ",
+  "url" : "https://antoniocampos13.github.io",
+  "image": "https://avatars.githubusercontent.com/antoniocampos13",
+  "description": "Data Science Portfolio by Antonio Victor Campos Coelho"
+}
+</script>
+
+</body>
+</html>
