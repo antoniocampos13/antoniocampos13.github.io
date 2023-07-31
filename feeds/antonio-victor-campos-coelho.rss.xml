@@ -88,7 +88,7 @@
 
 &lt;p&gt;&lt;img alt="sampleInfo data frame view" src="https://antoniocampos13.github.io/images/sampleInfo_C9orf72.png?raw=true"&gt;&lt;/p&gt;
 &lt;p&gt;With the &lt;code&gt;columnIndex&lt;/code&gt; column I created on the &lt;code&gt;sampleInfo&lt;/code&gt;, I can extract the necessary cases/control combinations to generate 12 distinct data frames, by splitting the &lt;code&gt;countData&lt;/code&gt; data&amp;nbsp;frame.&lt;/p&gt;
-&lt;p&gt;By observing this table, I surmised they recruited three outcome groups: &amp;#8220;&lt;span class="caps"&gt;C9ALS&lt;/span&gt;&amp;#8221;, &amp;#8220;&lt;span class="caps"&gt;C9FTD&lt;/span&gt;&amp;#8221; and &amp;#8220;Control&amp;#8221;, with six, seven, and six individuals in each group, respectively. Since they collect three cell types from two cerebral cortices, we have six cortex/cell type combinations. Coupling with two distinct diseases, we can perform two &lt;strong&gt;case vs. control comparisons&lt;/strong&gt; per combination. Therefore, we can perform $3 \times 2 \times 2 = 12$ &lt;strong&gt;distinct DEAs&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;By observing this table, I surmised they recruited three outcome groups: &amp;#8220;&lt;span class="caps"&gt;C9ALS&lt;/span&gt;&amp;#8221;, &amp;#8220;&lt;span class="caps"&gt;C9FTD&lt;/span&gt;&amp;#8221; and &amp;#8220;Control&amp;#8221;, with six, seven, and six individuals in each group, respectively. Since they collect three cell types from two cerebral cortices, we have six cortex/cell type combinations. Coupling with two distinct diseases, we can perform two &lt;strong&gt;case vs. control comparisons&lt;/strong&gt; per combination. Therefore, we can perform &lt;span class="math"&gt;\(3 \times 2 \times 2 = 12\)&lt;/span&gt; &lt;strong&gt;distinct DEAs&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;To keep track of the samples in each of the 12 analyses, I created two lists of data frames, containing cases and controls, stratified by cortex and cell&amp;nbsp;type:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;### src/prepareData.R ###&lt;/span&gt;
 &lt;span class="n"&gt;alsDfsList&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;sampleInfo&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
@@ -233,7 +233,69 @@ Parallel execution with 6 workers: 26.89 sec elapsed
 &lt;p&gt;&lt;em&gt;Subscribe to my &lt;a href="https://antoniocampos13.github.io/feeds/all.rss.xml"&gt;&lt;span class="caps"&gt;RSS&lt;/span&gt; feed&lt;/a&gt;, &lt;a href="https://antoniocampos13.github.io/feeds/all.atom.xml"&gt;Atom feed&lt;/a&gt; or &lt;a href="https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg"&gt;Telegram channel&lt;/a&gt; to keep you updated whenever I post new&amp;nbsp;content.&lt;/em&gt;&lt;/p&gt;
 &lt;h2&gt;References&lt;/h2&gt;
 &lt;p&gt;&lt;a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE219278"&gt;&lt;span class="caps"&gt;GEO&lt;/span&gt; Accession viewer | &lt;span class="caps"&gt;GSE219278&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href="https://antoniocampos13.github.io/differential-expression-analysis-with-edger-in-r.html"&gt;Differential Expression Analysis with edgeR in&amp;nbsp;R&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Antonio Victor Campos Coelho</dc:creator><pubDate>Mon, 31 Jul 2023 10:00:00 -0300</pubDate><guid isPermaLink="false">tag:antoniocampos13.github.io,2023-07-31:/parallelization-with-r.html</guid><category>R</category><category>Bioinformatics</category><category>gene expression</category><category>edgeR</category><category>furrr</category></item><item><title>Genomic plots with circlize</title><link>https://antoniocampos13.github.io/genomic-plots-with-circlize.html</link><description>&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://antoniocampos13.github.io/differential-expression-analysis-with-edger-in-r.html"&gt;Differential Expression Analysis with edgeR in&amp;nbsp;R&lt;/a&gt;&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Antonio Victor Campos Coelho</dc:creator><pubDate>Mon, 31 Jul 2023 10:00:00 -0300</pubDate><guid isPermaLink="false">tag:antoniocampos13.github.io,2023-07-31:/parallelization-with-r.html</guid><category>R</category><category>Bioinformatics</category><category>gene expression</category><category>edgeR</category><category>furrr</category></item><item><title>Genomic plots with circlize</title><link>https://antoniocampos13.github.io/genomic-plots-with-circlize.html</link><description>&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;Genomics is undoubtedly a complex science. The human genome is huge, with more than 3 billion base pairs, about 20,000 protein-coding genes, several millions of variants, and many more interesting characteristics. The visualization of genomic/omics data is challenging due to the sheer volume of information. Circular plots are a popular way to extract information at a glance from omics-level&amp;nbsp;information.&lt;/p&gt;
 &lt;p&gt;In this post, I will demonstrate the &lt;a href="https://jokergoo.github.io/circlize_book/book/"&gt;&lt;code&gt;circlize&lt;/code&gt; package&lt;/a&gt; from R software, a versatile tool with applications in&amp;nbsp;Genomics.&lt;/p&gt;
 &lt;p&gt;As always, I will post the code of this demo in my &lt;a href="https://github.com/antoniocampos13/portfolio/tree/master/R/2023_04_21_Genomic_plots_with_circlize"&gt;portfolio&lt;/a&gt;.&lt;/p&gt;
