@@ -1,5 +1,634 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Antonio's Portfolio - Antonio Victor Campos Coelho</title><link href="https://antoniocampos13.github.io/" rel="alternate"></link><link href="https://antoniocampos13.github.io/feeds/antonio-victor-campos-coelho.atom.xml" rel="self"></link><id>https://antoniocampos13.github.io/</id><updated>2023-07-31T10:00:00-03:00</updated><subtitle>PhD in Genetics</subtitle><entry><title>Parallelization with R</title><link href="https://antoniocampos13.github.io/parallelization-with-r.html" rel="alternate"></link><published>2023-07-31T10:00:00-03:00</published><updated>2023-07-31T10:00:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2023-07-31:/parallelization-with-r.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Antonio's Portfolio - Antonio Victor Campos Coelho</title><link href="https://antoniocampos13.github.io/" rel="alternate"></link><link href="https://antoniocampos13.github.io/feeds/antonio-victor-campos-coelho.atom.xml" rel="self"></link><id>https://antoniocampos13.github.io/</id><updated>2024-04-10T09:19:00-03:00</updated><subtitle>PhD in Genetics</subtitle><entry><title>Analyzing scRNA-Seq data with XGBoost</title><link href="https://antoniocampos13.github.io/analyzing-scrna-seq-data-with-xgboost.html" rel="alternate"></link><published>2024-04-10T09:19:00-03:00</published><updated>2024-04-10T09:19:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2024-04-10:/analyzing-scrna-seq-data-with-xgboost.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;Breast cancer is one of the most important morbidity and mortality cases around the world. In 2022, 2.3 million women were diagnosed with breast cancer and about 670,000 died from the disease, according to the &lt;a href="https://www.who.int/news-room/fact-sheets/detail/breast-cancer#:~:text=Overview,producing%20lobules%20of%20the%20breast."&gt;World Health Organization&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Traditional breast cancer treatment with chemotherapy may be complicated …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;Breast cancer is one of the most important morbidity and mortality cases around the world. In 2022, 2.3 million women were diagnosed with breast cancer and about 670,000 died from the disease, according to the &lt;a href="https://www.who.int/news-room/fact-sheets/detail/breast-cancer#:~:text=Overview,producing%20lobules%20of%20the%20breast."&gt;World Health Organization&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Traditional breast cancer treatment with chemotherapy may be complicated by inherent characteristics of the tumor. Some women develop inflammatory breast cancer, a type of tumor with a high risk of metastasis and resistance to drugs such as doxorubicin and paclitaxel (&lt;a href="https://pubmed.ncbi.nlm.nih.gov/36409824/"&gt;Stevens et al. 2023&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;Usually, tumors are a heterogeneous collection of cells. Some cells may be treatment-susceptible whereas others may have full-blown resistance to drugs. Imagine that would be a way to tell the cells apart and perhaps predict a prognosis for the patient, or change treatment options. With &lt;strong&gt;single-cell &lt;span class="caps"&gt;RNA&lt;/span&gt;-Seq&lt;/strong&gt; (scRNA-Seq) studies, we may be one step closer to this objective. With scRNA-Seq data, we may assess gene expression patterns and use this information to differentiate cell&amp;nbsp;identity.&lt;/p&gt;
+&lt;p&gt;Therefore, I decided to experiment with &lt;a href="https://xgboost.readthedocs.io/en/stable/python/python_intro.html"&gt;XGBoost&lt;/a&gt;, a &lt;a href="https://arxiv.org/pdf/1603.02754.pdf"&gt;popular machine-learning model&lt;/a&gt; used in classification and regression problems. Since I am interested in the differences between susceptible and resistant tumor cells at the gene expression level, I am dealing with a &lt;strong&gt;classification&lt;/strong&gt; problem. Thus, I will train an XGBoost model with previous data and test with independent data to see if it can correctly predict the identity of a single cell based on its transcriptome. To this end, I will use raw data publicly available at the &lt;a href="https://www.ncbi.nlm.nih.gov/geo/"&gt;Gene Expression Omnibus (&lt;span class="caps"&gt;GEO&lt;/span&gt;) Datasets portal&lt;/a&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Train data&lt;/strong&gt;: &lt;a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE163836"&gt;&lt;span class="caps"&gt;GSE163836&lt;/span&gt; series by Peluffo et al.&amp;nbsp;(2023)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Test data&lt;/strong&gt;: (part of) &lt;a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE131135"&gt;&lt;span class="caps"&gt;GSE131135&lt;/span&gt; series by Shu et al.&amp;nbsp;(2020)&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;As always, the code of this demo will be deposited into my &lt;a href="https://github.com/antoniocampos13/portfolio/tree/master/R/2024_04_04_scRNA-Seq_XGBoost"&gt;portfolio&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Installing&amp;nbsp;packages&lt;/h2&gt;
+&lt;p&gt;Install the following packages into your R library with the &lt;code&gt;src/install_packages.R&lt;/code&gt; file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/install_packages.R&lt;/span&gt;
+&lt;span class="n"&gt;packages&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
+  &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;span class="c1"&gt;#&amp;quot;here&amp;quot;,&lt;/span&gt;
+&lt;span class="c1"&gt;#&amp;quot;tidyverse&amp;quot;,&lt;/span&gt;
+&lt;span class="c1"&gt;#&amp;quot;glue&amp;quot;,&lt;/span&gt;
+&lt;span class="c1"&gt;#&amp;quot;reticulate&amp;quot;,&lt;/span&gt;
+&lt;span class="c1"&gt;#&amp;quot;R.utils&amp;quot;,&lt;/span&gt;
+&lt;span class="c1"&gt;#&amp;quot;Seurat&amp;quot;&lt;/span&gt;
+  &lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;lapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;packages&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pkg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nf"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;pkg&lt;/span&gt; &lt;span class="o"&gt;%in%&lt;/span&gt; &lt;span class="nf"&gt;rownames&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;installed.packages&lt;/span&gt;&lt;span class="p"&gt;()))&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;#install.packages(pkg)&lt;/span&gt;
+
+&lt;span class="p"&gt;})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Code&amp;nbsp;outline&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;main.R&lt;/code&gt; file contains the outline of this demonstration. First. let&amp;#8217;s import some&amp;nbsp;packages:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;here&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tidyverse&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;glue&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Seurat&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;reticulate&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Next, I will set the folder structure of this demo&amp;nbsp;project:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# main.R&lt;/span&gt;
+&lt;span class="n"&gt;folders&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
+  &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;src&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;input&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;intermediate&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;output&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;output/xgboost&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;output/plot&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;lapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;folders&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;folder&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;path&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;do.call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;here&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;as.list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;folder&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+  &lt;span class="nf"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="nf"&gt;dir.exists&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="c1"&gt;#dir.create(path, recursive = TRUE)&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The next lines are all the steps I&amp;nbsp;executed:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# main.R&lt;/span&gt;
+&lt;span class="c1"&gt;# Scripts ----&lt;/span&gt;
+&lt;span class="c1"&gt;## Prepare train data ----&lt;/span&gt;
+&lt;span class="nf"&gt;source&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;src&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;prepare_train_data.R&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="c1"&gt;## Prepare test data ----&lt;/span&gt;
+&lt;span class="nf"&gt;source&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;src&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;prepare_test_data.R&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="c1"&gt;## Gene (features) refinement ----&lt;/span&gt;
+&lt;span class="n"&gt;final_gene_list&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
+  &lt;span class="nf"&gt;tibble&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;rownames&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test_counts_transformed_scaled&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;inner_join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test_gene_names_df&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;by&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;inner_join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;tibble&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;train_gene_names&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;by&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;index&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;final_gene_list&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="nf"&gt;select&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="nf"&gt;write_tsv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;intermediate&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;final_gene_list.tsv&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Run XGBoost on Python ----&lt;/span&gt;
+&lt;span class="nf"&gt;source_python&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;src&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;run_xgboost.py&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Make plots ----&lt;/span&gt;
+&lt;span class="nf"&gt;source&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;src&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;make_plots.R&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;First, I will explain how I prepared the datasets for training and&amp;nbsp;testing.&lt;/p&gt;
+&lt;h2&gt;Preparing the&amp;nbsp;data&lt;/h2&gt;
+&lt;h3&gt;Train&amp;nbsp;dataset&lt;/h3&gt;
+&lt;p&gt;I saved the &lt;span class="caps"&gt;HTTPS&lt;/span&gt; &lt;span class="caps"&gt;URL&lt;/span&gt; containing the raw scRNA-Seq objects into an object named &lt;code&gt;URL_TRAIN&lt;/code&gt; and passed it as the first argument of the base R function &lt;code&gt;download.file()&lt;/code&gt;, while saving it into the &lt;code&gt;input&lt;/code&gt; folder with a sensible&amp;nbsp;name:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/prepare_train_data.R&lt;/span&gt;
+&lt;span class="c1"&gt;# Download data from GSE163836 project (Peluffo et al. 2023) (train dataset)&lt;/span&gt;
+&lt;span class="n"&gt;URL_TRAIN&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
+  &lt;span class="s"&gt;&amp;quot;https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE163836&amp;amp;format=file&amp;amp;file=GSE163836%5FIBC%5Fsc10x%5Fraw%5Fcounts%2ERData%2Egz&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;train_data_path&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;input&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;raw_count_matrix_train.RData.gz&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;file.exists&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;train_data_path&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nf"&gt;load&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;train_data_path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="n"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nf"&gt;download.file&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;URL_TRAIN&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;destfile&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;train_data_path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+  &lt;span class="nf"&gt;load&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;train_data_path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Since the file is an &lt;code&gt;RData&lt;/code&gt; file, I loaded it into the working environment. It contained two objects: &lt;code&gt;rawCounts&lt;/code&gt; and &lt;code&gt;rawCounts.grp&lt;/code&gt; produced by the &lt;a href="https://satijalab.org/seurat/"&gt;&lt;code&gt;Seurat&lt;/code&gt; package&lt;/a&gt;. &lt;code&gt;Seurat&lt;/code&gt;is a package designed to process single-cell genomics data. I believe it is (fittingly) named after the French &lt;a href="https://en.wikipedia.org/wiki/Pointillism"&gt;pointillist&lt;/a&gt; painter &lt;a href="https://en.wikipedia.org/wiki/Georges_Seurat"&gt;Georges Seurat&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;rawCounts&lt;/code&gt; object is a transcript count matrix, whereas the &lt;code&gt;rawCounts.grp&lt;/code&gt; is a factor vector containing the cell culture name of each&amp;nbsp;cell:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;head&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rawCounts&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="c1"&gt;# 6 x 17202 sparse Matrix of class &amp;quot;dgCMatrix&amp;quot;&lt;/span&gt;
+
+&lt;span class="nf"&gt;levels&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rawCounts.grp&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="c1"&gt;# [1] &amp;quot;FCIBC02&amp;quot;   &amp;quot;FCIBC02PR&amp;quot; &amp;quot;SUM149PR&amp;quot; &lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I utilized the &lt;code&gt;rawCounts.grp&lt;/code&gt; object to create a simplified vector, in which paclitaxel-resistant cells (whose names had the &amp;#8220;&lt;span class="caps"&gt;PR&lt;/span&gt;&amp;#8221; suffix) would be represented by the integer &lt;code&gt;1&lt;/code&gt;, and paclitaxel-susceptible cells would be &lt;code&gt;0&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/prepare_train_data.R&lt;/span&gt;
+&lt;span class="c1"&gt;# Prepare single-cell data labels (train dataset) ----&lt;/span&gt;
+&lt;span class="n"&gt;train_labels&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
+  &lt;span class="nf"&gt;ifelse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;str_detect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rawCounts.grp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;PR&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;span class="c1"&gt;#     1,&lt;/span&gt;
+&lt;span class="c1"&gt;#     0)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Then, I converted the count matrix into a Seurat object named &lt;code&gt;train_counts&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/prepare_train_data.R&lt;/span&gt;
+&lt;span class="n"&gt;train_counts&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
+  &lt;span class="nf"&gt;CreateSeuratObject&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;counts&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;rawCounts&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="c1"&gt;#                 project = &amp;quot;GSE163836&amp;quot;)&lt;/span&gt;
+
+&lt;span class="n"&gt;train_counts&lt;/span&gt;
+&lt;span class="c1"&gt;# An object of class Seurat &lt;/span&gt;
+&lt;span class="c1"&gt;# 32738 features across 17202 samples within 1 assay &lt;/span&gt;
+&lt;span class="c1"&gt;# Active assay: RNA (32738 features, 0 variable features)&lt;/span&gt;
+&lt;span class="c1"&gt;#  1 layer present: counts&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Thus, we can see the training dataset contains the transcriptomic quantification of 32738 transcripts among 17202 breast cancer&amp;nbsp;cells.&lt;/p&gt;
+&lt;p&gt;After this step, the matrix is now amenable to transformation and metadata storage. With the next lines, which are provided by the &lt;a href="https://satijalab.org/seurat/articles/sctransform_vignette"&gt;Seurat documentation&lt;/a&gt;, I&amp;nbsp;will:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;transform the transcript&amp;nbsp;counts;&lt;/li&gt;
+&lt;li&gt;perform quality control based on the percentage of mitochondrial transcript&amp;nbsp;contamination;&lt;/li&gt;
+&lt;li&gt;scale and standardize transcript&amp;nbsp;counts;&lt;/li&gt;
+&lt;li&gt;perform dimensionality reduction through &lt;span class="caps"&gt;PCA&lt;/span&gt; and &lt;span class="caps"&gt;UMAP&lt;/span&gt;, keeping the 3,000 most informative&amp;nbsp;genes;&lt;/li&gt;
+&lt;li&gt;assign cells to&amp;nbsp;clusters.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/prepare_train_data.R&lt;/span&gt;
+&lt;span class="n"&gt;train_counts_transformed&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;train_counts&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;PercentageFeatureSet&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pattern&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;^MT-&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;col.name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;percent.mt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;SCTransform&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vars.to.regress&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;percent.mt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;RunPCA&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;FindNeighbors&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dims&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;30&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;RunUMAP&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dims&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;30&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;FindClusters&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="n"&gt;train_counts_transformed&lt;/span&gt;
+&lt;span class="c1"&gt;# An object of class Seurat &lt;/span&gt;
+&lt;span class="c1"&gt;# 51656 features across 17202 samples within 2 assays &lt;/span&gt;
+&lt;span class="c1"&gt;# Active assay: SCT (18918 features, 3000 variable features)&lt;/span&gt;
+&lt;span class="c1"&gt;#  3 layers present: counts, data, scale.data&lt;/span&gt;
+&lt;span class="c1"&gt;#  1 other assay present: RNA&lt;/span&gt;
+&lt;span class="c1"&gt;#  2 dimensional reductions calculated: pca, umap&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;After a while, I can store the transformed and scale for further&amp;nbsp;use:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/prepare_train_data.R&lt;/span&gt;
+&lt;span class="c1"&gt;# Save scaled data for future use ----&lt;/span&gt;
+&lt;span class="n"&gt;train_counts_transformed_scaled&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;train_counts_transformed&lt;/span&gt;&lt;span class="p"&gt;[[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;SCT&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]]&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;scale.data&lt;/span&gt;
+
+&lt;span class="n"&gt;train_gene_names&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;rownames&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;train_counts_transformed_scaled&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;train_counts_transformed_scaled&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span class="nf"&gt;as_tibble&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span class="nf"&gt;mutate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;train_gene_names&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span class="nf"&gt;relocate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;write_tsv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;intermediate&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;train_counts_transformed_scaled.tsv.gz&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I do the same with a data frame containing&amp;nbsp;metadata:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/prepare_train_data.R&lt;/span&gt;
+&lt;span class="n"&gt;train_metadata&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;tibble&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+  &lt;span class="n"&gt;umi&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;names&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;as_tibble&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;train_counts_transformed_scaled&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+  &lt;span class="n"&gt;original_label&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;rawCounts.grp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;label&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;train_labels&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;train_metadata&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="nf"&gt;write_tsv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;intermediate&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;train_metadata.tsv&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="nf"&gt;head&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;train_metadata&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="c1"&gt;# A tibble: 6 x 3&lt;/span&gt;
+&lt;span class="c1"&gt;#   umi                          original_label label&lt;/span&gt;
+&lt;span class="c1"&gt;#   &amp;lt;chr&amp;gt;                        &amp;lt;chr&amp;gt;          &amp;lt;dbl&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;# 1 sample_10_AAACCTGAGCCAACAG-1 FCIBC02            0&lt;/span&gt;
+&lt;span class="c1"&gt;# 2 sample_10_AAACCTGAGTGCGATG-1 FCIBC02            0&lt;/span&gt;
+&lt;span class="c1"&gt;# 3 sample_10_AAACCTGCATTACCTT-1 FCIBC02            0&lt;/span&gt;
+&lt;span class="c1"&gt;# 4 sample_10_AAACCTGTCAAGATCC-1 FCIBC02            0&lt;/span&gt;
+&lt;span class="c1"&gt;# 5 sample_10_AAACGGGCACAAGTAA-1 FCIBC02            0&lt;/span&gt;
+&lt;span class="c1"&gt;# 6 sample_10_AAACGGGCATGGGAAC-1 FCIBC02            0&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Now, I will perform similar steps with the test&amp;nbsp;dataset.&lt;/p&gt;
+&lt;h3&gt;Test&amp;nbsp;dataset&lt;/h3&gt;
+&lt;p&gt;The test dataset comes from an independent study that used the same cell lines contained in the experiments that generated the train datasets. The authors also saved their raw data within an RData&amp;nbsp;file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/prepare_test_data.R&lt;/span&gt;
+&lt;span class="c1"&gt;# Download data from GSE131135 project (Shu et al. 2020) (test dataset) ----&lt;/span&gt;
+&lt;span class="n"&gt;URL_TEST&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE131135&amp;amp;format=file&amp;amp;file=GSE131135%5FBRD4JQ1%5Fsc10x%5Fraw%5Fcounts%2ERData%2Egz&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;test_data_path&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;input&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;raw_count_matrix_test.RData&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;file.exists&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test_data_path&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nf"&gt;load&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test_data_path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="n"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nf"&gt;download.file&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;URL_TEST&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;destfile&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;glue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;{test_data_path}.gz&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+  &lt;span class="n"&gt;R.utils&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="nf"&gt;gunzip&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;glue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;{test_data_path}.gz&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+  &lt;span class="nf"&gt;load&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test_data_path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;In this case, the RData file contained three objects instead of two: &lt;code&gt;rawCounts&lt;/code&gt; (the gene count matrix, similar to its training equivalent), &lt;code&gt;rawCounts.grp&lt;/code&gt; (the cell identities, also similar to its training equivalent) and &lt;code&gt;rawCounts.ann&lt;/code&gt; (a data frame containing gene symbol&amp;nbsp;annotations):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;head&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rawCounts.ann&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="c1"&gt;#                              id        symbol&lt;/span&gt;
+&lt;span class="c1"&gt;# ENSG00000243485 ENSG00000243485  RP11-34P13.3&lt;/span&gt;
+&lt;span class="c1"&gt;# ENSG00000237613 ENSG00000237613       FAM138A&lt;/span&gt;
+&lt;span class="c1"&gt;# ENSG00000186092 ENSG00000186092         OR4F5&lt;/span&gt;
+&lt;span class="c1"&gt;# ENSG00000238009 ENSG00000238009  RP11-34P13.7&lt;/span&gt;
+&lt;span class="c1"&gt;# ENSG00000239945 ENSG00000239945  RP11-34P13.8&lt;/span&gt;
+&lt;span class="c1"&gt;# ENSG00000239906 ENSG00000239906 RP11-34P13.14&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;However, the authors used other cell lines in their study, so I had to keep the data regarding the &lt;span class="caps"&gt;SUM149&lt;/span&gt; cell line only. Similarly to the train dataset experiment, the authors worked with parental (identified as &amp;#8220;&lt;span class="caps"&gt;SUM149DMSO&lt;/span&gt;&amp;#8221;) and paclitaxel-resistant cultures (&amp;#8220;&lt;span class="caps"&gt;SUM149RDMSO&lt;/span&gt;&amp;#8221;). I created a metadata dataset to keep track of this information and used it to subset the original count matrix (also named &lt;code&gt;rawCounts&lt;/code&gt;)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/prepare_test_data.R&lt;/span&gt;
+&lt;span class="c1"&gt;# Subset data to keep specific samples ----&lt;/span&gt;
+&lt;span class="n"&gt;test_counts&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;CreateSeuratObject&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;counts&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;rawCounts&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="c1"&gt;#                              project = &amp;quot;GSE131135&amp;quot;)&lt;/span&gt;
+
+&lt;span class="n"&gt;test_metadata_filtered&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;tibble&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+  &lt;span class="n"&gt;umi&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;as.vector&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;names&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test_counts&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;orig.ident&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+  &lt;span class="n"&gt;original_label&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;rawCounts.grp&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;original_label&lt;/span&gt; &lt;span class="o"&gt;%in%&lt;/span&gt; &lt;span class="nf"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;SUM149DMSO&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;SUM149RDMSO&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;mutate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;label&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;ifelse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;str_detect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;original_label&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;R&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="n"&gt;test_metadata_filtered&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="nf"&gt;write_tsv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;intermediate&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;test_metadata_filtered.tsv&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="n"&gt;test_counts&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;subset&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test_counts&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cells&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;test_metadata_filtered&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;umi&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;test_counts&lt;/span&gt;
+&lt;span class="c1"&gt;# An object of class Seurat &lt;/span&gt;
+&lt;span class="c1"&gt;# 33694 features across 1636 samples within 1 assay &lt;/span&gt;
+&lt;span class="c1"&gt;# Active assay: RNA (33694 features, 0 variable features)&lt;/span&gt;
+&lt;span class="c1"&gt;#  1 layer present: counts&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Then, I applied the same &lt;span class="caps"&gt;QC&lt;/span&gt;/transformation steps and saved the&amp;nbsp;results:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/prepare_test_data.R&lt;/span&gt;
+&lt;span class="c1"&gt;## Transform, normalize, and reduce dimensionality ----&lt;/span&gt;
+&lt;span class="c1"&gt;### https://satijalab.org/seurat/articles/sctransform_vignette&lt;/span&gt;
+&lt;span class="n"&gt;test_counts_transformed&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;test_counts&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;PercentageFeatureSet&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pattern&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;^MT-&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;col.name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;percent.mt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;SCTransform&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vars.to.regress&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;percent.mt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;RunPCA&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;FindNeighbors&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dims&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;30&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;RunUMAP&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dims&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;30&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;FindClusters&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Save scaled data for future use ----&lt;/span&gt;
+&lt;span class="n"&gt;test_counts_transformed_scaled&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;test_counts_transformed&lt;/span&gt;&lt;span class="p"&gt;[[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;SCT&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]]&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;scale.data&lt;/span&gt;
+
+&lt;span class="n"&gt;test_gene_names&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;rownames&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test_counts_transformed_scaled&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;test_gene_names_df&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;as_tibble&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rawCounts.ann&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;rename&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;index&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;symbol&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;test_counts_transformed_scaled&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span class="nf"&gt;as_tibble&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span class="nf"&gt;mutate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;test_gene_names&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;left_join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test_gene_names_df&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;by&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;relocate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;select&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;write_tsv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;intermediate&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;test_counts_transformed_scaled.tsv.gz&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="n"&gt;test_counts_transformed&lt;/span&gt;
+&lt;span class="c1"&gt;# An object of class Seurat &lt;/span&gt;
+&lt;span class="c1"&gt;# 48790 features across 1636 samples within 2 assays &lt;/span&gt;
+&lt;span class="c1"&gt;# Active assay: SCT (15096 features, 3000 variable features)&lt;/span&gt;
+&lt;span class="c1"&gt;#  3 layers present: counts, data, scale.data&lt;/span&gt;
+&lt;span class="c1"&gt;#  1 other assay present: RNA&lt;/span&gt;
+&lt;span class="c1"&gt;#  2 dimensional reductions calculated: pca, umap&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Refine features (gene)&amp;nbsp;list&lt;/h3&gt;
+&lt;p&gt;To guarantee that train and test datasets had the same features (genes), I created a data frame holding the intersection of gene names contained in the scaled&amp;nbsp;matrices:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# main.R&lt;/span&gt;
+&lt;span class="c1"&gt;## Gene (features) refinement ----&lt;/span&gt;
+&lt;span class="n"&gt;final_gene_list&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;
+  &lt;span class="nf"&gt;tibble&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;rownames&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test_counts_transformed_scaled&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;inner_join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test_gene_names_df&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;by&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;id&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;inner_join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;tibble&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;train_gene_names&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;by&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;index&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;final_gene_list&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="nf"&gt;select&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="nf"&gt;write_tsv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;intermediate&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;final_gene_list.tsv&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This step concluded the data preparation. I saved all XGBoost input files into the &lt;code&gt;intermediate&lt;/code&gt; folder:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;.
+├── input/
+│   ├── raw_count_matrix_test.RData
+│   └── raw_count_matrix_train.RData.gz
+├── intermediate/
+│   ├── final_gene_list.tsv
+│   ├── train_metadata.tsv
+│   ├── train_counts_transformed_scaled.tsv.gz
+│   ├── test_metadata_filtered.tsv
+│   └── test_counts_transformed_scaled.tsv.gz
+├── output/
+├── src/
+│   ├── install_packages.R
+│   ├── make_plots.R
+│   ├── prepare_test_data.R
+│   ├── prepare_train_data.R
+│   └── run_xgboost.py
+└── main.R
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Run&amp;nbsp;XGBoost&lt;/h2&gt;
+&lt;p&gt;Then, I proceeded to train and evaluate an XGBoost model. I used the Python &lt;span class="caps"&gt;API&lt;/span&gt;. You can run Python scripts from R sessions using the &lt;code&gt;reticulate&lt;/code&gt; package, as I demonstrated &lt;a href="https://antoniocampos13.github.io/integrating-r-and-python-with-reticulate.html"&gt;before&lt;/a&gt;. Just remember to install the required Python modules via &lt;code&gt;pip&lt;/code&gt;, and indicate any &lt;code&gt;conda&lt;/code&gt; or &lt;code&gt;virtualenv&lt;/code&gt; environments to reticulate with &lt;code&gt;use_condaenv()&lt;/code&gt; or &lt;code&gt;use_virtualenv()&lt;/code&gt; functions.&lt;/p&gt;
+&lt;p&gt;With &lt;code&gt;reticulate&lt;/code&gt; all set, you can source Python scripts directly from&amp;nbsp;R:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# main.R&lt;/span&gt;
+&lt;span class="c1"&gt;# Run XGBoost on Python ----&lt;/span&gt;
+&lt;span class="nf"&gt;source_python&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;src&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;run_xgboost.py&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Let me walk through the &lt;code&gt;src/run_xgboost.py&lt;/code&gt; script. First, I import all the required&amp;nbsp;modules:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;json&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pathlib&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Path&lt;/span&gt;
+
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;matplotlib.pyplot&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;plt&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;pandas&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;pd&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;shap&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;hyperopt&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;STATUS_OK&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fmin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;hp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;tpe&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;hyperopt.pyll&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;scope&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;sklearn.metrics&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;roc_auc_score&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;xgboost&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;XGBClassifier&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;plot_importance&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Next, with the help of &lt;code&gt;pathlib&lt;/code&gt;, I set all file&amp;nbsp;paths:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/run_xgboost.py&lt;/span&gt;
+&lt;span class="c1"&gt;# %% Set up paths&lt;/span&gt;
+&lt;span class="n"&gt;ROOT_DIR&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cwd&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;TRAIN_METADATA_PATH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ROOT_DIR&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;intermediate/train_metadata.tsv&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;TEST_METADATA_PATH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ROOT_DIR&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;intermediate/test_metadata_filtered.tsv&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;TRAIN_COUNT_MATRIX_PATH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+&lt;span class="c1"&gt;#ROOT_DIR / &amp;quot;intermediate/train_counts_transformed_scaled.tsv.gz&amp;quot;&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;TEST_COUNT_MATRIX_PATH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ROOT_DIR&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;intermediate/test_counts_transformed_scaled.tsv.gz&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;FINAL_GENE_LIST_PATH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ROOT_DIR&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;intermediate/final_gene_list.tsv&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;XGBOOST_DIR&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ROOT_DIR&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;output&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;xgboost&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Load&amp;nbsp;data&lt;/h3&gt;
+&lt;p&gt;Then, I load the gene list data frame into a &lt;code&gt;pandas.DataFrame&lt;/code&gt; and saved the gene list into a Python&amp;nbsp;list:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# run_xgboost.py&lt;/span&gt;
+&lt;span class="c1"&gt;# %% Import refined gene list&lt;/span&gt;
+&lt;span class="n"&gt;gene_list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pd&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read_csv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;FINAL_GENE_LIST_PATH&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\t&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;gene_list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;gene_list&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;index&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;to_list&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Next, I imported train and test datasets into &lt;code&gt;pandas.DataFrame&lt;/code&gt;, treating the first column (the gene name) as the&amp;nbsp;index:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# run_xgboost.py&lt;/span&gt;
+&lt;span class="n"&gt;train_count_matrix&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pd&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read_csv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;TRAIN_COUNT_MATRIX_PATH&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\t&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;index_col&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Then, I filtered rows using the gene index to include only the genes in the &lt;code&gt;gene_list&lt;/code&gt; object:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# run_xgboost.py&lt;/span&gt;
+&lt;span class="n"&gt;train_count_matrix&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;train_count_matrix&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;train_count_matrix&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;isin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gene_list&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Sorted the index lexicographically (so train and test datasets have the same columns in the same&amp;nbsp;order):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# run_xgboost.py&lt;/span&gt;
+&lt;span class="n"&gt;train_count_matrix&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;train_count_matrix&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sort_index&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Finally, I transpose the &lt;code&gt;pandas.DataFrame&lt;/code&gt;, to convert the rows into columns and vice-versa, so the features (genes) become columns, and rows become data points (single-cells). I also load the metadata&amp;nbsp;file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# run_xgboost.py&lt;/span&gt;
+&lt;span class="n"&gt;test_count_matrix&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;test_count_matrix&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;transpose&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="n"&gt;test_metadata&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pd&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read_csv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;TEST_METADATA_PATH&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\t&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I perform the same steps with the test&amp;nbsp;dataset:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# run_xgboost.py&lt;/span&gt;
+&lt;span class="c1"&gt;# %% Import test dataset&lt;/span&gt;
+&lt;span class="n"&gt;test_count_matrix&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pd&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read_csv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;TEST_COUNT_MATRIX_PATH&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\t&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;index_col&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;test_count_matrix&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;test_count_matrix&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;test_count_matrix&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;isin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gene_list&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;span class="n"&gt;test_count_matrix&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;test_count_matrix&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sort_index&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;test_count_matrix&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;test_count_matrix&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;transpose&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="n"&gt;test_metadata&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pd&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read_csv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;TEST_METADATA_PATH&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\t&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I have everything in place for running XGBoost. The next step is to find which hyperparameter configuration would provide me with a model with the best performance&amp;nbsp;possible.&lt;/p&gt;
+&lt;h3&gt;Hyperparameter&amp;nbsp;optimization&lt;/h3&gt;
+&lt;p&gt;XGBoost is a rather complex machine learning model, with several hyperparameters. The predictions of any  XGBoost model are influenced by its hyperparameters, so it is recommended to spend some time optimizing them before training. See &lt;a href="https://towardsdatascience.com/the-notorious-xgboost-c7f7adc4c183"&gt;Carlos Rodriguez&amp;#8217;s post&lt;/a&gt; for a brief review of XGBoost&amp;#8217;s&amp;nbsp;hyperparameters.&lt;/p&gt;
+&lt;p&gt;There are a few ways to obtain optimized hyperparameters, such as grid search and random search. See &lt;a href="https://medium.com/@rithpansanga/optimizing-xgboost-a-guide-to-hyperparameter-tuning-77b6e48e289d"&gt;Rith Pansanga&amp;#8217;s post&lt;/a&gt; for a brief review of some techniques. Based on this post, I decided to try a Bayesian optimization algorithm. First, I define a Python dictionary object named &lt;code&gt;space&lt;/code&gt; with all hyperparameters as keys. For some of the keys, I define a range of values (a lower and an upper bound) with the help of the &lt;a href="https://github.com/hyperopt/hyperopt"&gt;&lt;code&gt;hyperopt&lt;/code&gt; module&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/run_xgboost.py&lt;/span&gt;
+&lt;span class="c1"&gt;# %% Hyperparameter space for Bayesian optimization. Based on Rith Pansangas&amp;#39; tutorial available at https://medium.com/@rithpansanga/optimizing-xgboost-a-guide-to-hyperparameter-tuning-77b6e48e289d&lt;/span&gt;
+&lt;span class="n"&gt;space&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;max_depth&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;scope&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;hp&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;quniform&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;max_depth&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;min_child_weight&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;scope&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;hp&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;quniform&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;min_child_weight&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;subsample&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;hp&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;uniform&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;subsample&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;colsample_bytree&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;hp&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;uniform&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;colsample_bytree&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;learning_rate&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;hp&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;loguniform&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;learning_rate&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;gamma&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;hp&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;uniform&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;gamma&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;objective&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;binary:logistic&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;n_estimators&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1000&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;early_stopping_rounds&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;50&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;eval_metric&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;auc&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Observe that &lt;code&gt;scope.int()&lt;/code&gt; must be placed around parameters that must be integers. Next, I define a function for score minimization. Here I set one minus the area under the receiver operating characteristic curve &lt;a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic"&gt;&lt;span class="caps"&gt;ROC&lt;/span&gt; &lt;span class="caps"&gt;AUC&lt;/span&gt;&lt;/a&gt; (1 - ROC_AUC) as the objective so &lt;code&gt;hyperopt&lt;/code&gt; could provide, in reality, the hyperparameters associated with the &lt;strong&gt;maximum&lt;/strong&gt; &lt;span class="caps"&gt;ROC&lt;/span&gt; &lt;span class="caps"&gt;AUC&lt;/span&gt;. Note that any other suitable metric could be used here. The function was named &lt;code&gt;objective()&lt;/code&gt; and its input is a dictionary of hyperparameter&amp;nbsp;space:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/run_xgboost.py&lt;/span&gt;
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;objective&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;params&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;xgb_model&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;XGBClassifier&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;params&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;xgb_model&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="n"&gt;train_count_matrix&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;train_metadata&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;label&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+        &lt;span class="n"&gt;eval_set&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;
+            &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;train_count_matrix&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;train_metadata&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;label&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]),&lt;/span&gt;
+            &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test_count_matrix&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;test_metadata&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;label&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]),&lt;/span&gt;
+        &lt;span class="p"&gt;],&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;y_pred&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;xgb_model&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;predict_proba&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test_count_matrix&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;score&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;roc_auc_score&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;y_true&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;test_metadata&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;label&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;y_score&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;y_pred&lt;/span&gt;&lt;span class="p"&gt;[:,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;loss&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;score&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;status&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;STATUS_OK&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Next, I pass the &lt;code&gt;objective()&lt;/code&gt; function and the &lt;code&gt;space&lt;/code&gt; dictionary as the inputs to the &lt;code&gt;hyperopt&lt;/code&gt;&lt;span class="quo"&gt;&amp;#8216;&lt;/span&gt;s &lt;a href="https://github.com/hyperopt/hyperopt/wiki/FMin"&gt;&lt;code&gt;fmin()&lt;/code&gt; function&lt;/a&gt;. This function will then test several combinations of hyperparameters (up to &lt;code&gt;max_evals&lt;/code&gt; iterations), and through Bayesian statistics, find an optimized set of hyperparameters based on how any combination improves the &lt;span class="caps"&gt;AUC&lt;/span&gt; score. The output is assigned to the &lt;code&gt;best_params&lt;/code&gt; object, which is a simple Python dictionary. After &lt;code&gt;fmin()&lt;/code&gt; finishes running, I save the &lt;code&gt;best_params&lt;/code&gt; into a &lt;span class="caps"&gt;JSON&lt;/span&gt; file for&amp;nbsp;backup:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# run_xgboost.py&lt;/span&gt;
+&lt;span class="c1"&gt;# %% Perform Bayesian optimization&lt;/span&gt;
+&lt;span class="n"&gt;best_params&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;fmin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;objective&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;space&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;algo&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;tpe&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;suggest&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;max_evals&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;100&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# %% Save best params dictonary as a JSON file&lt;/span&gt;
+&lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;XGBOOST_DIR&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;best_params.json&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;w&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;json&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dump&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;best_params&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Here are the &lt;code&gt;output/best_params.json&lt;/code&gt; file&amp;nbsp;contents:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;colsample_bytree&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;0.7879636151039555&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;gamma&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;1.8549947746359572&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;learning_rate&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;0.009073051650774098&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;max_depth&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;min_child_weight&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;subsample&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;0.7536343387772634&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Training and evaluating the&amp;nbsp;model&lt;/h3&gt;
+&lt;p&gt;I can finally train the model with the optimized hyperparameters. I repeat the model definition, this time passing the &lt;code&gt;best_params&lt;/code&gt; dictionary and complementing with the constant&amp;nbsp;arguments:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/run_xgboost.py&lt;/span&gt;
+&lt;span class="c1"&gt;# %% Repeat model fit, this time with the best hyperparameters&lt;/span&gt;
+&lt;span class="n"&gt;xgb_model&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;XGBClassifier&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;best_params&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;n_estimators&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1000&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;early_stopping_rounds&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;50&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;eval_metric&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;auc&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;After that, I run the &lt;code&gt;fit()&lt;/code&gt; method, passing as inputs the count matrix and the train&amp;nbsp;labels:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/run_xgboost.py&lt;/span&gt;
+&lt;span class="n"&gt;xgb_model&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="n"&gt;train_count_matrix&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;train_metadata&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;label&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+    &lt;span class="n"&gt;eval_set&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;
+        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;train_count_matrix&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;train_metadata&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;label&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]),&lt;/span&gt;
+        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test_count_matrix&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;test_metadata&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;label&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]),&lt;/span&gt;
+    &lt;span class="p"&gt;],&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;After a while, the fitting process finishes, and then I can obtain the &lt;span class="caps"&gt;ROC&lt;/span&gt; &lt;span class="caps"&gt;AUC&lt;/span&gt; score of the model. First, I use the &lt;code&gt;predict_proba()&lt;/code&gt; method to obtain the individual cell probabilities for paclitaxel resistance. Next, I compare the predicted probabilities of the test dataset with the true test labels, and then save the resulting value into a text&amp;nbsp;file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/run_xgboost.py&lt;/span&gt;
+&lt;span class="n"&gt;y_pred&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;xgb_model&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;predict_proba&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test_count_matrix&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;roc_auc&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;roc_auc_score&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;y_true&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;test_metadata&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;label&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;y_score&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;y_pred&lt;/span&gt;&lt;span class="p"&gt;[:,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+
+&lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;XGBOOST_DIR&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;roc_auc.txt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;w&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;{&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;roc_auc&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This is the resulting &lt;span class="caps"&gt;AUC&lt;/span&gt;&amp;nbsp;score:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;roc_auc&lt;/span&gt;
+&lt;span class="c1"&gt;# 0.6949359307013692&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;It is not a perfect score, but I was not expecting much, since it is a demonstration, without much&amp;nbsp;sophistication.&lt;/p&gt;
+&lt;h2&gt;Interpreting the model&amp;nbsp;outputs&lt;/h2&gt;
+&lt;p&gt;With the model in my hands, I can then collect the features&amp;#8217; importance metrics to see which genes were most informative for the classification. I collected &lt;strong&gt;gain&lt;/strong&gt; and &lt;strong&gt;weight&lt;/strong&gt; metrics for all informative genes into a &lt;code&gt;pandas.DataFrame&lt;/code&gt; and saved it as a &lt;span class="caps"&gt;TSV&lt;/span&gt;&amp;nbsp;file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/run_xgboost.py&lt;/span&gt;
+&lt;span class="c1"&gt;# %% Collect importance metrics into a dataframe&lt;/span&gt;
+&lt;span class="n"&gt;feature_importance_df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="n"&gt;pd&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DataFrame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="p"&gt;[&lt;/span&gt;
+            &lt;span class="n"&gt;xgb_model&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_booster&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_score&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;importance_type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;gain&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+            &lt;span class="n"&gt;xgb_model&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_booster&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_fscore&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;
+        &lt;span class="p"&gt;],&lt;/span&gt;
+        &lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;gain&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;weight&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;transpose&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;reset_index&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;rename&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;columns&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;index&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;gene&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;
+    &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sort_values&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;weight&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ascending&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;feature_importance_df&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;to_csv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="n"&gt;XGBOOST_DIR&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;feature_importance.tsv&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\t&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;False&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I also saved the top 15 most important features (by weight) with the help of &lt;code&gt;matplotlib&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/run_xgboost.py&lt;/span&gt;
+&lt;span class="c1"&gt;# %% Save importance (weight metric) plot with top 15 genes&lt;/span&gt;
+&lt;span class="n"&gt;plot_importance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;xgb_model&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;max_num_features&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;savefig&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;XGBOOST_DIR&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;top15_feature_importance_weight.png&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img alt="Top 15 features (weight metric)" src="https://antoniocampos13.github.io/images/top15_feature_importance_weight.png"&gt;&lt;/p&gt;
+&lt;p&gt;I also used the module &lt;a href="https://github.com/shap/shap"&gt;&lt;code&gt;shap&lt;/code&gt;&lt;/a&gt; to create a &lt;a href="https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/beeswarm.html"&gt;&lt;strong&gt;beeswarm plot&lt;/strong&gt;&lt;/a&gt; to display a quantification of how much the top features in a dataset impact the model&amp;nbsp;output:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/run_xgboost.py&lt;/span&gt;
+&lt;span class="c1"&gt;# %% Use shap to help interpretation of the model&lt;/span&gt;
+&lt;span class="n"&gt;explainer&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;shap&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Explainer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;xgb_model&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;shap_values&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;explainer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;train_count_matrix&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# %% Beeswarm plot&lt;/span&gt;
+&lt;span class="n"&gt;shap&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;plots&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;beeswarm&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;shap_values&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;show&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;tight_layout&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;savefig&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;XGBOOST_DIR&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;beeswarm_plot.png&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img alt="shap Beeswarm plot" src="https://antoniocampos13.github.io/images/beeswarm_plot.png"&gt;&lt;/p&gt;
+&lt;p&gt;Observing the two plots, it seems that the expression of &lt;em&gt;&lt;span class="caps"&gt;TPT1&lt;/span&gt;&lt;/em&gt;, &lt;em&gt;&lt;span class="caps"&gt;JUND&lt;/span&gt;&lt;/em&gt;, &lt;em&gt;&lt;span class="caps"&gt;KRT81&lt;/span&gt;&lt;/em&gt;, and &lt;em&gt;&lt;span class="caps"&gt;CYBA&lt;/span&gt;&lt;/em&gt; differ between parental and paclitaxel-resistant cells. Looking at the beeswarm plot, &lt;em&gt;&lt;span class="caps"&gt;CYBA&lt;/span&gt;&lt;/em&gt; and &lt;em&gt;&lt;span class="caps"&gt;KRT81&lt;/span&gt;&lt;/em&gt; appear to be downregulated in parental cells, since low expression values have negative impacts on the model output, diminishing the probability of being tagged by the model as paclitaxel-resistant, whereas for &lt;em&gt;&lt;span class="caps"&gt;JUND1&lt;/span&gt;&lt;/em&gt; the opposite is true: the higher its expression, the higher the positive impact on the model output, contributing to higher probability of being tagged by the model as&amp;nbsp;paclitaxel-resistant.&lt;/p&gt;
+&lt;p&gt;Just to be sure, I went back to the data stored on the Seurat object and created more plots to assess the expression behavior of those genes. First, I created two lists containing the cells&amp;#8217; unique molecular identifiers (&lt;span class="caps"&gt;UMI&lt;/span&gt;):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/make_plots.R&lt;/span&gt;
+&lt;span class="c1"&gt;# Get list of cells according to identity ----&lt;/span&gt;
+&lt;span class="n"&gt;parental_cells&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;train_metadata&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;label&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;pull&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;umi&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;ptx_resistant_cells&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;train_metadata&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;label&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span class="nf"&gt;pull&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;umi&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Then, I used the two vectors to annotate the cells on the object, storing the identities in the metadata&amp;nbsp;slot:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/make_plots.R&lt;/span&gt;
+&lt;span class="c1"&gt;# Set cells identities ----&lt;/span&gt;
+&lt;span class="nf"&gt;Idents&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;object&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;train_counts_transformed&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cells&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;parental_cells&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Parental&amp;quot;&lt;/span&gt;
+&lt;span class="nf"&gt;Idents&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;object&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;train_counts_transformed&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cells&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ptx_resistant_cells&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Paclitaxel-resistant&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Then, I loaded the top 15&amp;nbsp;genes:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/make_plots.R&lt;/span&gt;
+&lt;span class="c1"&gt;# Retrieve top 15 genes by importance metric (weight) ----&lt;/span&gt;
+&lt;span class="n"&gt;importance_df&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;read_tsv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;output&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;xgboost&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;feature_importance.tsv&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="c1"&gt;## The TSV is ordered by descending weight values, take the first 15 rows&lt;/span&gt;
+&lt;span class="n"&gt;top15&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;importance_df&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="nf"&gt;slice&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="m"&gt;15&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; &lt;span class="nf"&gt;pull&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gene&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Finally, I could plot ridge plots and &lt;span class="caps"&gt;UMAP&lt;/span&gt;&amp;nbsp;plots:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/make_plots.R&lt;/span&gt;
+&lt;span class="c1"&gt;# Make ridge and UMAP feature plots ----&lt;/span&gt;
+&lt;span class="nf"&gt;RidgePlot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;train_counts_transformed&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;features&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;top15&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ncol&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;ggsave&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;filename&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;output&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;plot&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;ridge_plot.png&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;width&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;45&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;height&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;20&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;FeaturePlot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;train_counts_transformed&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;features&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;top15&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;ggsave&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;filename&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;output&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;plot&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;feature_plot.png&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;width&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;45&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;height&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;20&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Ridge&amp;nbsp;plot:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Ridge plot, 15 top genes" src="https://antoniocampos13.github.io/images/ridge_plot.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class="caps"&gt;UMAP&lt;/span&gt; feature&amp;nbsp;plot:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Feature plot, 15 top genes" src="https://antoniocampos13.github.io/images/feature_plot.png"&gt;&lt;/p&gt;
+&lt;p&gt;Observing the ridge and feature plots, it indeed seems that &lt;em&gt;&lt;span class="caps"&gt;CYBA&lt;/span&gt;&lt;/em&gt; is lowly expressed by the parental cells, with some paclitaxel-resistant cells having higher expression. Regarding &lt;em&gt;&lt;span class="caps"&gt;KRT81&lt;/span&gt;&lt;/em&gt;, some paclitaxel-resistant cells have low expression, but others have expression revolving around tens of thousands of copies (the expression scale is logarithmic). The shape of the expression distribution of &lt;em&gt;&lt;span class="caps"&gt;JUND1&lt;/span&gt;&lt;/em&gt; is similar between parental and paclitaxel-resistant cells, but in the resistant cells, the tail is heavier: more resistant cells have higher expression in comparison with their parental counterparts. In summary, I believe the XGBoost model indeed captured these nuances of the&amp;nbsp;data.&lt;/p&gt;
+&lt;h3&gt;Mitochondrial transcript percentage&amp;nbsp;plot&lt;/h3&gt;
+&lt;p&gt;It is possible to obtain a violin plot to examine the proportion of mitochondrial transcripts (remember that the &lt;code&gt;percent.mt&lt;/code&gt; metadata column was created during the data preparation&amp;nbsp;step):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/make_plots.R&lt;/span&gt;
+&lt;span class="c1"&gt;# Plot mitochondrial transcripts percent violin plot ----&lt;/span&gt;
+&lt;span class="c1"&gt;## Save the cells identities as metadata column&lt;/span&gt;
+&lt;span class="n"&gt;train_counts_transformed&lt;/span&gt;&lt;span class="p"&gt;[[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;identity&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]]&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;Idents&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;object&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;train_counts_transformed&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nf"&gt;VlnPlot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;train_counts_transformed&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;features&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;percent.mt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;split.by&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;identity&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;ggsave&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;filename&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;here&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;output&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;plot&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;percent_mt_violin_plot.png&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;width&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;height&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img alt="Proportion of mitochondrial transcripts." src="https://antoniocampos13.github.io/images/percent_mt_violin_plot.png"&gt;&lt;/p&gt;
+&lt;p&gt;For whatever reason, paclitaxel-resistant cells had higher levels of mitochondrial transcripts in comparison with parental cells. Further investigations can be performed to understand the reasons behind this&amp;nbsp;difference.&lt;/p&gt;
+&lt;h2&gt;Model&amp;nbsp;backup&lt;/h2&gt;
+&lt;p&gt;The trained model can be saved as a text&amp;nbsp;file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# src/run_xgboost.py&lt;/span&gt;
+&lt;span class="c1"&gt;# %% Save model as text file&lt;/span&gt;
+&lt;span class="n"&gt;xgb_model&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;save_model&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;XGBOOST_DIR&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;xgb_model.txt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;In this post, I&amp;nbsp;demonstrated:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A workflow to perform &lt;span class="caps"&gt;QC&lt;/span&gt;, transformation, standardization and dimensionality reduction of scRNA-Seq data with the Seurat R&amp;nbsp;package;&lt;/li&gt;
+&lt;li&gt;How to perform Bayesian optimization of XGBoost&amp;nbsp;hyperparameters;&lt;/li&gt;
+&lt;li&gt;Train and evaluate an XGBoost&amp;nbsp;model;&lt;/li&gt;
+&lt;li&gt;Plots to help the model&amp;nbsp;interpretation.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Subscribe to my &lt;a href="https://antoniocampos13.github.io/feeds/all.rss.xml"&gt;&lt;span class="caps"&gt;RSS&lt;/span&gt; feed&lt;/a&gt;, &lt;a href="https://antoniocampos13.github.io/feeds/all.atom.xml"&gt;Atom feed&lt;/a&gt; or &lt;a href="https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg"&gt;Telegram channel&lt;/a&gt; to keep you updated whenever I post new&amp;nbsp;content.&lt;/em&gt;&lt;/p&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://www.who.int/news-room/fact-sheets/detail/breast-cancer#:~:text=Overview,producing%20lobules%20of%20the%20breast."&gt;Breast&amp;nbsp;cancer&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://pubmed.ncbi.nlm.nih.gov/36409824/"&gt;&lt;span class="caps"&gt;JAK&lt;/span&gt;-&lt;span class="caps"&gt;STAT&lt;/span&gt; Signaling in Inflammatory Breast Cancer Enables Chemotherapy-Resistant Cell States -&amp;nbsp;PubMed&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://xgboost.readthedocs.io/en/stable/python/python_intro.html"&gt;Python Package Introduction — xgboost 2.0.3&amp;nbsp;documentation&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://arxiv.org/pdf/1603.02754.pdf"&gt;XGBoost: A Scalable Tree Boosting&amp;nbsp;System&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.ncbi.nlm.nih.gov/geo/"&gt;Home - &lt;span class="caps"&gt;GEO&lt;/span&gt; - &lt;span class="caps"&gt;NCBI&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE163836"&gt;&lt;span class="caps"&gt;GSE163836&lt;/span&gt; series | &lt;span class="caps"&gt;GEO&lt;/span&gt; - &lt;span class="caps"&gt;NCBI&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE131135"&gt;&lt;span class="caps"&gt;GSE131135&lt;/span&gt; series | &lt;span class="caps"&gt;GEO&lt;/span&gt; - &lt;span class="caps"&gt;NCBI&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://satijalab.org/seurat/"&gt;Seurat&amp;nbsp;package&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://en.wikipedia.org/wiki/Pointillism"&gt;Pointillism |&amp;nbsp;Wikipedia&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://en.wikipedia.org/wiki/Georges_Seurat"&gt;Georges_Seurat |&amp;nbsp;Wikipedia&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://satijalab.org/seurat/articles/sctransform_vignette"&gt;Using sctransform in&amp;nbsp;Seurat&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://towardsdatascience.com/the-notorious-xgboost-c7f7adc4c183"&gt;The Notorious XGBoost |&amp;nbsp;Medium&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://medium.com/@rithpansanga/optimizing-xgboost-a-guide-to-hyperparameter-tuning-77b6e48e289d"&gt;Optimizing XGBoost: A Guide to Hyperparameter Tuning |&amp;nbsp;Medium&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/hyperopt/hyperopt"&gt;hyperopt&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic"&gt;Receiver operating characteristic curve |&amp;nbsp;Wikipedia&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/hyperopt/hyperopt/wiki/FMin"&gt;FMin |&amp;nbsp;hyperopt&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/shap/shap"&gt;shap&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/beeswarm.html"&gt;Beeswarm plots |&amp;nbsp;shap&lt;/a&gt;&lt;/p&gt;</content><category term="R"></category><category term="Bioinformatics"></category><category term="gene expression"></category></entry><entry><title>Parallelization with R</title><link href="https://antoniocampos13.github.io/parallelization-with-r.html" rel="alternate"></link><published>2023-07-31T10:00:00-03:00</published><updated>2023-07-31T10:00:00-03:00</updated><author><name>Antonio Victor Campos Coelho</name></author><id>tag:antoniocampos13.github.io,2023-07-31:/parallelization-with-r.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;Sometimes, some computations can be carried out in parallel. Certain large tasks can be divided into independent ones, allowing them to be solved at the same time, rather than waiting for each task to be solved&amp;nbsp;sequentially.&lt;/p&gt;
 &lt;p&gt;I find the native R parallel functions such as &lt;code&gt;mclapply()&lt;/code&gt;, or those …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;Sometimes, some computations can be carried out in parallel. Certain large tasks can be divided into independent ones, allowing them to be solved at the same time, rather than waiting for each task to be solved&amp;nbsp;sequentially.&lt;/p&gt;
