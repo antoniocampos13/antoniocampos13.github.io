@@ -190,7 +190,8 @@
 </code></pre></div>
 
 <p>Next, I will set the folder structure of this demo&nbsp;project:</p>
-<div class="highlight"><pre><span></span><code><span class="n">folders</span> <span class="o">&lt;-</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># main.R</span>
+<span class="n">folders</span> <span class="o">&lt;-</span>
   <span class="nf">c</span><span class="p">(</span><span class="s">&quot;src&quot;</span><span class="p">,</span> <span class="s">&quot;input&quot;</span><span class="p">,</span> <span class="s">&quot;intermediate&quot;</span><span class="p">,</span> <span class="s">&quot;output&quot;</span><span class="p">,</span> <span class="s">&quot;output/xgboost&quot;</span><span class="p">,</span> <span class="s">&quot;output/plot&quot;</span><span class="p">)</span>
 
 <span class="nf">lapply</span><span class="p">(</span><span class="n">folders</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span> <span class="p">{</span>
@@ -203,7 +204,8 @@
 </code></pre></div>
 
 <p>The next lines are all the steps I&nbsp;executed:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Scripts ----</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># main.R</span>
+<span class="c1"># Scripts ----</span>
 <span class="c1">## Prepare train data ----</span>
 <span class="nf">source</span><span class="p">(</span><span class="nf">here</span><span class="p">(</span><span class="s">&quot;src&quot;</span><span class="p">,</span> <span class="s">&quot;prepare_train_data.R&quot;</span><span class="p">))</span>
 
@@ -304,8 +306,8 @@
 </code></pre></div>
 
 <p>After a while, I can store the transformed and scale for further&nbsp;use:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Save scaled data for future use ----</span>
-<span class="c1"># src/prepare_train_data.R</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/prepare_train_data.R</span>
+<span class="c1"># Save scaled data for future use ----</span>
 <span class="n">train_counts_transformed_scaled</span> <span class="o">&lt;-</span> <span class="n">train_counts_transformed</span><span class="p">[[</span><span class="s">&quot;SCT&quot;</span><span class="p">]]</span><span class="o">$</span><span class="n">scale.data</span>
 
 <span class="n">train_gene_names</span> <span class="o">&lt;-</span> <span class="nf">rownames</span><span class="p">(</span><span class="n">train_counts_transformed_scaled</span><span class="p">)</span>
@@ -371,7 +373,8 @@
 </code></pre></div>
 
 <p>However, the authors used other cell lines in their study, so I had to keep the data regarding the <span class="caps">SUM149</span> cell line only. Similarly to the train dataset experiment, the authors worked with parental (identified as &#8220;<span class="caps">SUM149DMSO</span>&#8221;) and paclitaxel-resistant cultures (&#8220;<span class="caps">SUM149RDMSO</span>&#8221;). I created a metadata dataset to keep track of this information and used it to subset the original count matrix (also named <code>rawCounts</code>)</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Subset data to keep specific samples ----</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/prepare_test_data.R</span>
+<span class="c1"># Subset data to keep specific samples ----</span>
 <span class="n">test_counts</span> <span class="o">&lt;-</span> <span class="nf">CreateSeuratObject</span><span class="p">(</span><span class="n">counts</span> <span class="o">=</span> <span class="n">rawCounts</span><span class="p">,</span>
 <span class="c1">#                              project = &quot;GSE131135&quot;)</span>
 
@@ -394,7 +397,8 @@
 </code></pre></div>
 
 <p>Then, I applied the same <span class="caps">QC</span>/transformation steps and saved the&nbsp;results:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">## Transform, normalize, and reduce dimensionality ----</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/prepare_test_data.R</span>
+<span class="c1">## Transform, normalize, and reduce dimensionality ----</span>
 <span class="c1">### https://satijalab.org/seurat/articles/sctransform_vignette</span>
 <span class="n">test_counts_transformed</span> <span class="o">&lt;-</span> <span class="n">test_counts</span> <span class="o">%&gt;%</span>
   <span class="nf">PercentageFeatureSet</span><span class="p">(</span><span class="n">pattern</span> <span class="o">=</span> <span class="s">&quot;^MT-&quot;</span><span class="p">,</span> <span class="n">col.name</span> <span class="o">=</span> <span class="s">&quot;percent.mt&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
@@ -442,7 +446,7 @@
 </code></pre></div>
 
 <p>This step concluded the data preparation. I saved all XGBoost input files into the <code>intermediate</code> folder:</p>
-<p>.
+<div class="highlight"><pre><span></span><code>.
 ├── input/
 │   ├── raw_count_matrix_test.RData
 │   └── raw_count_matrix_train.RData.gz
@@ -459,7 +463,9 @@
 │   ├── prepare_test_data.R
 │   ├── prepare_train_data.R
 │   └── run_xgboost.py
-└──&nbsp;main.R</p>
+└── main.R
+</code></pre></div>
+
 <h2>Run&nbsp;XGBoost</h2>
 <p>Then, I proceeded to train and evaluate an XGBoost model. I used the Python <span class="caps">API</span>. You can run Python scripts from R sessions using the <code>reticulate</code> package, as I demonstrated <a href="https://antoniocampos13.github.io/integrating-r-and-python-with-reticulate.html">before</a>. Just remember to install the required Python modules via <code>pip</code>, and indicate any <code>conda</code> or <code>virtualenv</code> environments to reticulate with <code>use_condaenv()</code> or <code>use_virtualenv()</code> functions.</p>
 <p>With <code>reticulate</code> all set, you can source Python scripts directly from&nbsp;R:</p>
@@ -482,7 +488,8 @@
 </code></pre></div>
 
 <p>Next, with the help of <code>pathlib</code>, I set all file&nbsp;paths:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># %% Set up paths</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/run_xgboost.py</span>
+<span class="c1"># %% Set up paths</span>
 <span class="n">ROOT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
 <span class="n">TRAIN_METADATA_PATH</span> <span class="o">=</span> <span class="n">ROOT_DIR</span> <span class="o">/</span> <span class="s2">&quot;intermediate/train_metadata.tsv&quot;</span>
 <span class="n">TEST_METADATA_PATH</span> <span class="o">=</span> <span class="n">ROOT_DIR</span> <span class="o">/</span> <span class="s2">&quot;intermediate/test_metadata_filtered.tsv&quot;</span>
@@ -599,14 +606,16 @@
 
 <h3>Training and evaluating the&nbsp;model</h3>
 <p>I can finally train the model with the optimized hyperparameters. I repeat the model definition, this time passing the <code>best_params</code> dictionary and complementing with the constant&nbsp;arguments:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># %% Repeat model fit, this time with the best hyperparameters</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/run_xgboost.py</span>
+<span class="c1"># %% Repeat model fit, this time with the best hyperparameters</span>
 <span class="n">xgb_model</span> <span class="o">=</span> <span class="n">XGBClassifier</span><span class="p">(</span>
     <span class="o">**</span><span class="n">best_params</span><span class="p">,</span> <span class="n">n_estimators</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">early_stopping_rounds</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">eval_metric</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;auc&quot;</span><span class="p">]</span>
 <span class="p">)</span>
 </code></pre></div>
 
 <p>After that, I run the <code>fit()</code> method, passing as inputs the count matrix and the train&nbsp;labels:</p>
-<div class="highlight"><pre><span></span><code><span class="n">xgb_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/run_xgboost.py</span>
+<span class="n">xgb_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
     <span class="n">train_count_matrix</span><span class="p">,</span>
     <span class="n">train_metadata</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">],</span>
     <span class="n">eval_set</span><span class="o">=</span><span class="p">[</span>
@@ -656,14 +665,16 @@
 </code></pre></div>
 
 <p>I also saved the top 15 most important features (by weight) with the help of <code>matplotlib</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># %% Save importance (weight metric) plot with top 15 genes</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/run_xgboost.py</span>
+<span class="c1"># %% Save importance (weight metric) plot with top 15 genes</span>
 <span class="n">plot_importance</span><span class="p">(</span><span class="n">xgb_model</span><span class="p">,</span> <span class="n">max_num_features</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">XGBOOST_DIR</span> <span class="o">/</span> <span class="s2">&quot;top15_feature_importance_weight.png&quot;</span><span class="p">))</span>
 </code></pre></div>
 
 <p><img alt="Top 15 features (weight metric)" src="https://antoniocampos13.github.io/images/top15_feature_importance_weight.png"></p>
 <p>I also used the module <a href="https://github.com/shap/shap"><code>shap</code></a> to create a <a href="https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/beeswarm.html"><strong>beeswarm plot</strong></a> to display a quantification of how much the top features in a dataset impact the model&nbsp;output:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># %% Use shap to help interpretation of the model</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/run_xgboost.py</span>
+<span class="c1"># %% Use shap to help interpretation of the model</span>
 <span class="n">explainer</span> <span class="o">=</span> <span class="n">shap</span><span class="o">.</span><span class="n">Explainer</span><span class="p">(</span><span class="n">xgb_model</span><span class="p">)</span>
 <span class="n">shap_values</span> <span class="o">=</span> <span class="n">explainer</span><span class="p">(</span><span class="n">train_count_matrix</span><span class="p">)</span>
 
@@ -713,9 +724,11 @@
 <span class="nf">ggsave</span><span class="p">(</span><span class="n">filename</span> <span class="o">=</span> <span class="nf">here</span><span class="p">(</span><span class="s">&quot;output&quot;</span><span class="p">,</span> <span class="s">&quot;plot&quot;</span><span class="p">,</span> <span class="s">&quot;feature_plot.png&quot;</span><span class="p">),</span> <span class="n">width</span> <span class="o">=</span> <span class="m">45</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="m">20</span><span class="p">)</span>
 </code></pre></div>
 
+<p>Ridge&nbsp;plot:</p>
 <p><img alt="Ridge plot, 15 top genes" src="https://antoniocampos13.github.io/images/ridge_plot.png"></p>
+<p><span class="caps">UMAP</span> feature&nbsp;plot:</p>
 <p><img alt="Feature plot, 15 top genes" src="https://antoniocampos13.github.io/images/feature_plot.png"></p>
-<p>Observing the ridge and feature plot, it indeed seems that <em><span class="caps">CYBA</span></em> is lowly expressed by the parental cells, with some paclitaxel-resistant cells having higher expression. Regarding <em><span class="caps">KRT81</span></em>, some paclitaxel-resistant cells have low expression, but others have expression revolving around tens of thousands of copies (the expression scale is logarithmic). The shape of the expression distribution of <em><span class="caps">JUND1</span></em> is similar between parental and paclitaxel-resistant cells, but in the resistant cells, the tail is heavier: more resistant cells have higher expression in comparison with their parental counterparts. In summary, I believe the XGBoost model indeed captured these nuances of the&nbsp;data.</p>
+<p>Observing the ridge and feature plots, it indeed seems that <em><span class="caps">CYBA</span></em> is lowly expressed by the parental cells, with some paclitaxel-resistant cells having higher expression. Regarding <em><span class="caps">KRT81</span></em>, some paclitaxel-resistant cells have low expression, but others have expression revolving around tens of thousands of copies (the expression scale is logarithmic). The shape of the expression distribution of <em><span class="caps">JUND1</span></em> is similar between parental and paclitaxel-resistant cells, but in the resistant cells, the tail is heavier: more resistant cells have higher expression in comparison with their parental counterparts. In summary, I believe the XGBoost model indeed captured these nuances of the&nbsp;data.</p>
 <h3>Mitochondrial transcript percentage&nbsp;plot</h3>
 <p>It is possible to obtain a violin plot to examine the proportion of mitochondrial transcripts (remember that the <code>percent.mt</code> metadata column was created during the data preparation&nbsp;step):</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># src/make_plots.R</span>
@@ -744,6 +757,7 @@
 <li>Train and evaluate an XGBoost&nbsp;model;</li>
 <li>Plots to help the model&nbsp;interpretation.</li>
 </ul>
+<p><em>Subscribe to my <a href="https://antoniocampos13.github.io/feeds/all.rss.xml"><span class="caps">RSS</span> feed</a>, <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom feed</a> or <a href="https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg">Telegram channel</a> to keep you updated whenever I post new&nbsp;content.</em></p>
 <h2>References</h2>
 <p><a href="https://www.who.int/news-room/fact-sheets/detail/breast-cancer#:~:text=Overview,producing%20lobules%20of%20the%20breast.">Breast&nbsp;cancer</a></p>
 <p><a href="https://pubmed.ncbi.nlm.nih.gov/36409824/"><span class="caps">JAK</span>-<span class="caps">STAT</span> Signaling in Inflammatory Breast Cancer Enables Chemotherapy-Resistant Cell States -&nbsp;PubMed</a></p>
