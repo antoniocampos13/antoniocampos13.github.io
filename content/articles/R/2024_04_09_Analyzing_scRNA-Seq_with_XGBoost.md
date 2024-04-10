@@ -1,7 +1,7 @@
 ---
 Title: Analyzing scRNA-Seq data with XGBoost
-Status: draft
-Date: 2024-04-10 10:00
+Status: published
+Date: 2024-04-10 09:19
 Author: Antonio Victor Campos Coelho
 Categories: R, Python
 Tags: Bioinformatics, gene expression
@@ -752,9 +752,9 @@ In this post, I demonstrated:
 
 [Home - GEO - NCBI](https://www.ncbi.nlm.nih.gov/geo/)
 
-[GSE163836 series| GEO - NCBI](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE163836)
+[GSE163836 series | GEO - NCBI](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE163836)
 
-[GSE131135 series| GEO - NCBI](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE131135)
+[GSE131135 series | GEO - NCBI](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE131135)
 
 [Seurat package](https://satijalab.org/seurat/)
 
