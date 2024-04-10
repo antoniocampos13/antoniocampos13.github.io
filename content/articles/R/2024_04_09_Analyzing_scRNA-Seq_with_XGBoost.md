@@ -61,6 +61,7 @@ library(reticulate)
 Next, I will set the folder structure of this demo project:
 
 ```r
+# main.R
 folders <-
   c("src", "input", "intermediate", "output", "output/xgboost", "output/plot")
 
@@ -76,6 +77,7 @@ lapply(folders, function(folder) {
 The next lines are all the steps I executed:
 
 ```r
+# main.R
 # Scripts ----
 ## Prepare train data ----
 source(here("src", "prepare_train_data.R"))
@@ -193,8 +195,8 @@ train_counts_transformed
 After a while, I can store the transformed and scale for further use:
 
 ```r
-# Save scaled data for future use ----
 # src/prepare_train_data.R
+# Save scaled data for future use ----
 train_counts_transformed_scaled <- train_counts_transformed[["SCT"]]$scale.data
 
 train_gene_names <- rownames(train_counts_transformed_scaled)
@@ -270,6 +272,7 @@ head(rawCounts.ann)
 However, the authors used other cell lines in their study, so I had to keep the data regarding the SUM149 cell line only. Similarly to the train dataset experiment, the authors worked with parental (identified as "SUM149DMSO") and paclitaxel-resistant cultures ("SUM149RDMSO"). I created a metadata dataset to keep track of this information and used it to subset the original count matrix (also named `rawCounts`)
 
 ```r
+# src/prepare_test_data.R
 # Subset data to keep specific samples ----
 test_counts <- CreateSeuratObject(counts = rawCounts,
 #                              project = "GSE131135")
@@ -295,6 +298,7 @@ test_counts
 Then, I applied the same QC/transformation steps and saved the results:
 
 ```r
+# src/prepare_test_data.R
 ## Transform, normalize, and reduce dimensionality ----
 ### https://satijalab.org/seurat/articles/sctransform_vignette
 test_counts_transformed <- test_counts %>%
@@ -347,6 +351,7 @@ final_gene_list %>% select(index) %>% write_tsv(here("intermediate", "final_gene
 
 This step concluded the data preparation. I saved all XGBoost input files into the `intermediate` folder:
 
+```txt
 .
 ├── input/
 │   ├── raw_count_matrix_test.RData
@@ -365,6 +370,7 @@ This step concluded the data preparation. I saved all XGBoost input files into t
 │   ├── prepare_train_data.R
 │   └── run_xgboost.py
 └── main.R
+```
 
 ## Run XGBoost
 
@@ -396,6 +402,7 @@ from xgboost import XGBClassifier, plot_importance
 Next, with the help of `pathlib`, I set all file paths:
 
 ```python
+# src/run_xgboost.py
 # %% Set up paths
 ROOT_DIR = Path.cwd()
 TRAIN_METADATA_PATH = ROOT_DIR / "intermediate/train_metadata.tsv"
@@ -540,6 +547,7 @@ Here are the `output/best_params.json` file contents:
 I can finally train the model with the optimized hyperparameters. I repeat the model definition, this time passing the `best_params` dictionary and complementing with the constant arguments:
 
 ```python
+# src/run_xgboost.py
 # %% Repeat model fit, this time with the best hyperparameters
 xgb_model = XGBClassifier(
     **best_params, n_estimators=1000, early_stopping_rounds=50, eval_metric=["auc"]
@@ -549,6 +557,7 @@ xgb_model = XGBClassifier(
 After that, I run the `fit()` method, passing as inputs the count matrix and the train labels:
 
 ```python
+# src/run_xgboost.py
 xgb_model.fit(
     train_count_matrix,
     train_metadata["label"],
@@ -609,6 +618,7 @@ feature_importance_df.to_csv(
 I also saved the top 15 most important features (by weight) with the help of `matplotlib`:
 
 ```python
+# src/run_xgboost.py
 # %% Save importance (weight metric) plot with top 15 genes
 plot_importance(xgb_model, max_num_features=15)
 plt.savefig(str(XGBOOST_DIR / "top15_feature_importance_weight.png"))
@@ -619,6 +629,7 @@ plt.savefig(str(XGBOOST_DIR / "top15_feature_importance_weight.png"))
 I also used the module [`shap`](https://github.com/shap/shap) to create a [**beeswarm plot**](https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/beeswarm.html) to display a quantification of how much the top features in a dataset impact the model output:
 
 ```python
+# src/run_xgboost.py
 # %% Use shap to help interpretation of the model
 explainer = shap.Explainer(xgb_model)
 shap_values = explainer(train_count_matrix)
@@ -679,11 +690,15 @@ FeaturePlot(train_counts_transformed, features = top15)
 ggsave(filename = here("output", "plot", "feature_plot.png"), width = 45, height = 20)
 ```
 
+Ridge plot:
+
 ![Ridge plot, 15 top genes]({static}/images/ridge_plot.png)
+
+UMAP feature plot:
 
 ![Feature plot, 15 top genes]({static}/images/feature_plot.png)
 
-Observing the ridge and feature plot, it indeed seems that *CYBA* is lowly expressed by the parental cells, with some paclitaxel-resistant cells having higher expression. Regarding *KRT81*, some paclitaxel-resistant cells have low expression, but others have expression revolving around tens of thousands of copies (the expression scale is logarithmic). The shape of the expression distribution of *JUND1* is similar between parental and paclitaxel-resistant cells, but in the resistant cells, the tail is heavier: more resistant cells have higher expression in comparison with their parental counterparts. In summary, I believe the XGBoost model indeed captured these nuances of the data.
+Observing the ridge and feature plots, it indeed seems that *CYBA* is lowly expressed by the parental cells, with some paclitaxel-resistant cells having higher expression. Regarding *KRT81*, some paclitaxel-resistant cells have low expression, but others have expression revolving around tens of thousands of copies (the expression scale is logarithmic). The shape of the expression distribution of *JUND1* is similar between parental and paclitaxel-resistant cells, but in the resistant cells, the tail is heavier: more resistant cells have higher expression in comparison with their parental counterparts. In summary, I believe the XGBoost model indeed captured these nuances of the data.
 
 ### Mitochondrial transcript percentage plot
 
@@ -721,6 +736,8 @@ In this post, I demonstrated:
 - How to perform Bayesian optimization of XGBoost hyperparameters;
 - Train and evaluate an XGBoost model;
 - Plots to help the model interpretation.
+
+*Subscribe to my [RSS feed](https://antoniocampos13.github.io/feeds/all.rss.xml), [Atom feed](https://antoniocampos13.github.io/feeds/all.atom.xml) or [Telegram channel](https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg) to keep you updated whenever I post new content.*
 
 ## References
 
