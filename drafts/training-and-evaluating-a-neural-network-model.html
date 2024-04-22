@@ -1,0 +1,684 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/stylesheet/style.min.css">
+
+
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+          href="https://antoniocampos13.github.io/theme/pygments/vs.min.css">
+
+
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://antoniocampos13.github.io/theme/font-awesome/css/solid.css">
+
+
+    <link href="https://antoniocampos13.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Antonio's Portfolio Atom">
+
+    <link href="https://antoniocampos13.github.io/feeds/all.rss.xml" type="application/rss+xml" rel="alternate" title="Antonio's Portfolio RSS">
+
+
+  
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Microsoft EDGE -->
+    <meta name="msapplication-TileColor" content="#333333">
+
+ 
+
+<meta name="author" content="Antonio Victor Campos Coelho" />
+<meta name="description" content="Introduction In my previous post, I trained an XGBoost machine-learning model with single-cell RNA-Seq (scRNA-Seq) data to differentiate cell identity (parental cells versus paclitaxel-resistant cells) based on transcriptomic patterns. As an exercise, I decided to use the same input data to experiment with other machine-learning models. In this post …" />
+<meta name="keywords" content="PyTorch, machine learning, transcriptomics">
+
+
+  <meta property="og:site_name" content="Antonio's Portfolio"/>
+  <meta property="og:title" content="Training and Evaluating a Neural Network Model"/>
+  <meta property="og:description" content="Introduction In my previous post, I trained an XGBoost machine-learning model with single-cell RNA-Seq (scRNA-Seq) data to differentiate cell identity (parental cells versus paclitaxel-resistant cells) based on transcriptomic patterns. As an exercise, I decided to use the same input data to experiment with other machine-learning models. In this post …"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="https://antoniocampos13.github.io/drafts/training-and-evaluating-a-neural-network-model.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2024-04-22 14:30:00-03:00"/>
+  <meta property="article:modified_time" content=""/>
+  <meta property="article:author" content="https://antoniocampos13.github.io/author/antonio-victor-campos-coelho.html">
+  <meta property="article:section" content="Python"/>
+  <meta property="article:tag" content="PyTorch"/>
+  <meta property="article:tag" content="machine learning"/>
+  <meta property="article:tag" content="transcriptomics"/>
+  <meta property="og:image" content="https://avatars.githubusercontent.com/antoniocampos13">
+
+  <title>Antonio's Portfolio &ndash; Training and Evaluating a Neural Network Model</title>
+
+</head>
+<body class="light-theme">
+  <aside>
+    <div>
+      <a href="https://antoniocampos13.github.io/">
+        <img src="https://avatars.githubusercontent.com/antoniocampos13" alt="Antonio's Portfolio" title="Antonio's Portfolio">
+      </a>
+
+      <h1>
+        <a href="https://antoniocampos13.github.io/">Antonio's Portfolio</a>
+      </h1>
+
+<p>PhD in Genetics</p>
+
+      <nav>
+        <ul class="list">
+
+
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/about.html#about">
+                  About
+                </a>
+              </li>
+              <li>
+                <a target="_self"
+                   href="https://antoniocampos13.github.io/pages/contact.html#contact">
+                  Contact
+                </a>
+              </li>
+
+            <li>
+              <a target="_self" href="http://lattes.cnpq.br/2986394950644755" >Brazilian Lattes CV</a>
+            </li>
+            <li>
+              <a target="_self" href="https://scholar.google.com.br/citations?user=d2ij4wUAAAAJ&hl" >Google Scholar</a>
+            </li>
+            <li>
+              <a target="_self" href="https://orcid.org/0000-0003-2143-9701" >ORCID</a>
+            </li>
+            <li>
+              <a target="_self" href="http://www.webofscience.com/wos/author/record/E-6795-2015" >ResearcherID Profile</a>
+            </li>
+        </ul>
+      </nav>
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/antoniocampos13/portfolio" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/antonio-coelho-9aa338164" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://antoniocampos13.github.io/">Home</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom</a>
+
+      <a href="https://antoniocampos13.github.io/feeds/all.rss.xml">RSS</a>
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="training-and-evaluating-a-neural-network-model">Training and Evaluating a Neural Network&nbsp;Model</h1>
+    <p>
+      Posted on Mon 22 April 2024 in <a href="https://antoniocampos13.github.io/category/python.html">Python</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h2>Introduction</h2>
+<p>In my <a href="https://antoniocampos13.github.io/analyzing-scrna-seq-data-with-xgboost.html#analyzing-scrna-seq-data-with-xgboost">previous post</a>, I trained an XGBoost machine-learning model with single-cell <span class="caps">RNA</span>-Seq (scRNA-Seq) data to differentiate cell identity (parental cells versus paclitaxel-resistant cells) based on transcriptomic&nbsp;patterns.</p>
+<p>As an exercise, I decided to use the same input data to experiment with other machine-learning models. In this post, I will demonstrate how I trained a neural network model with the <a href="https://pytorch.org/"><code>PyTorch</code></a> framework. <code>PyTorch</code> is a module designed for the development of deep learning using GPUs and CPUs in&nbsp;Python.</p>
+<p>As usual, the code is available on my <a href="https://github.com/antoniocampos13/portfolio/tree/master/Python/2024_04_19_Training_and_Evaluating_a_Neural_Network_Model">code portfolio at GitHub</a>.</p>
+<h2>Code&nbsp;outline</h2>
+<p>The code for the demonstration is divided into two files: <code>src/pytorch_nn_demo.py</code> and <code>main.py</code>. The first contains classes, function definitions, and overall configurations, whereas the second contains the data import and actual execution of the code. If you would like to recap concepts about machine learning and neural networks before continuing, you may check the Appendix&nbsp;section.</p>
+<p>Let&#8217;s start with <code>src/pytorch_nn_demo.py</code>.</p>
+<h3><code>src/pytorch_nn_demo.py</code></h3>
+<p>I recommend setting up a Python <a href="https://docs.python.org/3/library/venv.html">virtual environment</a>. After you create the environment, install the required modules listed in the <code>requirements.txt</code> file. Install <a href="https://developer.nvidia.com/cuda-downloads"><span class="caps">CUDA</span></a> for your platform. I used version 12.4.1. I believe the code will work without <span class="caps">CUDA</span>, but I have not tested the code in this&nbsp;situation.</p>
+<p>I start the script by importing all necessary&nbsp;modules:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/pytorch_nn_demo.py</span>
+<span class="c1"># %% Python 3.10.4 | Pytorch 1.12.1 | CUDA 12.4.1</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Type</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_auc_score</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+</code></pre></div>
+
+<p>Next, I set the computation device depending on the available&nbsp;hardware:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/pytorch_nn_demo.py</span>
+<span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>If a <span class="caps">GPU</span> is present and is compatible with <span class="caps">CUDA</span>, then all computations will be performed with it, and if not, the <span class="caps">CPU</span> will be used&nbsp;instead.</p>
+<p>Next, I configured the neural network model, which I named <code>NeuralNetwork</code>, which inherits from a base module from&nbsp;PyTorch:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/pytorch_nn_demo.py</span>
+<span class="k">class</span> <span class="nc">NeuralNetwork</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">n_features</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">n_neurons</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">n_output</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">activation_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">],</span>
+        <span class="n">dropout</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">],</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_features</span> <span class="o">=</span> <span class="n">n_features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_neurons</span> <span class="o">=</span> <span class="n">n_neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_output</span> <span class="o">=</span> <span class="n">n_output</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation_function</span> <span class="o">=</span> <span class="n">activation_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_features</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_output</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigmoid</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">double</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">:</span>
+        <span class="n">fwd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer1</span><span class="p">(</span><span class="nb">input</span><span class="p">))</span>
+        <span class="n">fwd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">fwd</span><span class="p">)</span>
+        <span class="n">fwd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer2</span><span class="p">(</span><span class="n">fwd</span><span class="p">))</span>
+        <span class="n">fwd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">fwd</span><span class="p">)</span>
+        <span class="n">fwd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer3</span><span class="p">(</span><span class="n">fwd</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">fwd</span>
+</code></pre></div>
+
+<p>You can see that I defined two methods for the class: <code>__init__()</code> and <code>forward()</code>. The first serves to instantiate both the base module (see the <code>super().__init__()</code> snippet) and our modified module. The <code>__init__()</code> takes as&nbsp;arguments:</p>
+<ul>
+<li>n_features: the number of independent variables (columns of the dataset&nbsp;matrix);</li>
+<li>n_neurons: the desired number of neurons on the hidden&nbsp;layers;</li>
+<li>n_output: the dimensionality the of output (dependent&nbsp;variable);</li>
+<li>activation_function: one of several activation functions available in&nbsp;PyTorch;</li>
+<li>dropout: a proportion of neurons to be randomly discarded in each layer&nbsp;independently.</li>
+</ul>
+<p>The <code>__init__()</code> instantiates all given arguments as attributes of the class. Additionally, I&nbsp;instantiate:</p>
+<ul>
+<li>a series of linear functions that will compose the layers of my&nbsp;model.</li>
+<li>the <a href="https://en.wikipedia.org/wiki/Sigmoid_function">sigmoid</a> function: it takes the output of the last hidden layer (which is a matrix) and converts it to a vector/matrix of probabilities, depending on the number of output classes. For binary classification problems (which is my case), there are two classes: parental tumor cells and paclitaxel-resistant tumor cells. Then, the analysts can choose between <a href="https://datascience.stackexchange.com/a/54606">soft and hard classification</a>. In soft classification, you have a continuous distribution on the two classes (a vector with <span class="math">\(S\)</span> rows <span class="math">\(\times\)</span> 1 column with the probabilities, which is my case), whereas in hard classification the output is a matrix with <span class="math">\(S\)</span> rows <span class="math">\(\times\)</span> <span class="math">\(C\)</span> columns, where <span class="math">\(S\)</span> is the number of samples and <span class="math">\(C\)</span> the number of classes (2 or&nbsp;more).</li>
+</ul>
+<p>The <code>forward()</code> method is responsible for performing the neural network forward pass calculations. See that it follows a specific order: the first two layers are my hidden layers, whereas the final one is my output layer. The first hidden layer takes the input and performs the linear combination of feature values and weights. The linear output is then handed over to the activation function, which is a non-linear function. The output of the first activation function is handed over to the second hidden layer, which performs the same steps, and, finally, the output layer takes the non-linear output of the second layer and converts it to a vector of probabilities with the help of the sigmoid&nbsp;function.</p>
+<p>Notice the <code>self.dropout(fwd)</code> <span class="dquo">&#8220;</span>sandwiched&#8221; between the layer&#8217;s calls. This indicates to the model that some of the weights set for each layer should be discarded. Since there are two dropout calls, they are performed on the weights of the first and second hidden layers. By the way, since my model contains two hidden layers, technically, we may call it a <strong>deep learning</strong>&nbsp;model.</p>
+<p>Now, I will skip ahead to the core training/testing function I devised, the <code>model_train_eval()</code> function:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/pytorch_nn_demo.py</span>
+<span class="k">def</span> <span class="nf">model_train_eval</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">NeuralNetwork</span><span class="p">],</span>
+    <span class="n">n_epochs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">train_dataloader</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">],</span>
+    <span class="n">test_dataloader</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">],</span>
+    <span class="n">loss_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="n">optimizer</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">],</span>
+    <span class="n">output_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">complementary_prob</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+
+    <span class="n">best_roc_auc</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+    <span class="n">best_weights</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_epochs</span><span class="p">):</span>
+        <span class="n">train_loss</span><span class="p">,</span> <span class="n">model_weights</span> <span class="o">=</span> <span class="n">train</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">train_dataloader</span><span class="o">=</span><span class="n">train_dataloader</span><span class="p">,</span>
+            <span class="n">loss_function</span><span class="o">=</span><span class="n">loss_function</span><span class="p">,</span>
+            <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">test_loss</span><span class="p">,</span> <span class="n">roc_auc</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">model_weights</span><span class="o">=</span><span class="n">model_weights</span><span class="p">,</span>
+            <span class="n">test_dataloader</span><span class="o">=</span><span class="n">test_dataloader</span><span class="p">,</span>
+            <span class="n">loss_function</span><span class="o">=</span><span class="n">loss_function</span><span class="p">,</span>
+            <span class="n">complementary_prob</span><span class="o">=</span><span class="n">complementary_prob</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">n_epochs</span><span class="si">}</span><span class="s2">. Train loss: </span><span class="si">{</span><span class="n">train_loss</span><span class="si">}</span><span class="s2">. Test loss: </span><span class="si">{</span><span class="n">test_loss</span><span class="si">}</span><span class="s2">. ROC AUC: </span><span class="si">{</span><span class="n">roc_auc</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">roc_auc</span> <span class="o">&gt;</span> <span class="n">best_roc_auc</span><span class="p">:</span>
+            <span class="n">best_roc_auc</span> <span class="o">=</span> <span class="n">roc_auc</span>
+            <span class="n">best_weights</span> <span class="o">=</span> <span class="n">model_weights</span>
+
+            <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">best_weights</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span> <span class="o">/</span> <span class="s2">&quot;best_weights.pth&quot;</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current best epoch: </span><span class="si">{</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>This functions take as&nbsp;inputs:</p>
+<ul>
+<li>our configured neural network/deep learning&nbsp;model;</li>
+<li>the number of training/testing iterations&nbsp;(epochs);</li>
+<li>two <strong>dataloaders</strong>: two objects for handling the datasets, one for training and another for testing dataset (more on that&nbsp;later);</li>
+<li>the desired loss&nbsp;function;</li>
+<li>the desired weight&nbsp;optimizer;</li>
+<li>an output path to save the final model weights after finishing&nbsp;training;</li>
+<li>a Boolean to indicate if complementary probabilities of the predictions should be used during testing (more on that later). Defaults to <code>False</code>.</li>
+</ul>
+<p>The gist of this function is that, during the specified number of epochs, it will train the model, calculate the loss metric, and update the weights for each hidden layer. At the end of each epoch, it will then evaluate the current state of the model to assess the performance of the model, by producing predictions with the testing dataset and then comparing with the actual labels. Then, it will save the weights of the best model achieved at the desired output path. The model will print to standard output the current training and testing loss metrics, the current <span class="caps">ROC</span> <span class="caps">AUC</span>, and the epoch with the current best&nbsp;performance.</p>
+<p>What happens during each epoch? In each epoch, the <code>DataLoader</code> object will take a subset, a batch, of samples from the dataset in use and perform the forward and backward pass calculations, as well as update the weights of each sample in the batch. In this way, models may be efficiently trained with large datasets without loading everything at once on memory. Thus, an epoch consists of a series of iterations on the dataset, until all computations are performed on all samples. In other words, an epoch is an iteration of&nbsp;iterations.</p>
+<p>Now that I presented the overall function, I will then show the subfunctions: <code>train()</code> and <code>test()</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/pytorch_nn_demo.py</span>
+<span class="k">def</span> <span class="nf">train</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">NeuralNetwork</span><span class="p">],</span>
+    <span class="n">train_dataloader</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">],</span>
+    <span class="n">loss_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="n">optimizer</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">]:</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+    <span class="n">running_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">train_dataloader</span><span class="p">:</span>
+        <span class="n">features</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">batch</span>
+        <span class="n">features</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">outputs</span><span class="p">),</span> <span class="n">labels</span><span class="p">)</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="n">running_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">*</span> <span class="n">labels</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">train_loss</span> <span class="o">=</span> <span class="n">running_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+
+    <span class="n">model_weights</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">train_loss</span><span class="p">,</span> <span class="n">model_weights</span>
+</code></pre></div>
+
+<p>This <code>train()</code> function was inspired by <a href="https://www.kaggle.com/code/robikscube/train-your-first-pytorch-model-card-classifier/notebook">Rob Mulla&#8217;s tutorial</a>, with modifications. The function performs one round of training (one epoch), by taking one batch from the training dataset at a time and performing the forward pass calculations with our model definition (<code>outputs = model(features)</code>) and the loss metric calculation (by comparing the predictions with actual labels). PyTorch&#8217;s methods <code>backward()</code> and <code>step()</code> are responsible for automatically calculating optimized weights for all previous layers. The function then returns the loss metric and the current model weights and biases for one round of training. As you probably noticed, we simply had to configure the forward pass calculations, since PyTorch handles most of the more complicated calculations&nbsp;automatically.</p>
+<p>Now let&#8217;s see the <code>train()</code> function:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/pytorch_nn_demo.py</span>
+<span class="k">def</span> <span class="nf">test</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">NeuralNetwork</span><span class="p">],</span>
+    <span class="n">model_weights</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">,</span>
+    <span class="n">test_dataloader</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">],</span>
+    <span class="n">loss_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="n">complementary_prob</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+
+    <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">model_weights</span><span class="p">)</span>
+
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="n">running_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">labels_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">predictions_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">test_dataloader</span><span class="p">:</span>
+            <span class="n">features</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">batch</span>
+            <span class="n">labels_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+
+            <span class="n">y_preds</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+            <span class="n">predictions_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_preds</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">outputs</span><span class="p">),</span> <span class="n">labels</span><span class="p">)</span>
+            <span class="n">running_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">*</span> <span class="n">labels</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">test_loss</span> <span class="o">=</span> <span class="n">running_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+
+    <span class="n">labels_flat</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">labels_list</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">complementary_prob</span><span class="p">:</span>
+        <span class="n">predictions_flat</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="mi">1</span> <span class="o">-</span> <span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">predictions_list</span><span class="p">))</span>
+        <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">predictions_flat</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">predictions_list</span><span class="p">))</span>
+
+    <span class="n">roc_auc</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">labels_flat</span><span class="p">,</span> <span class="n">y_score</span><span class="o">=</span><span class="n">predictions_flat</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">test_loss</span><span class="p">,</span> <span class="n">roc_auc</span>
+</code></pre></div>
+
+<p>The train function loads the weights and biases produced during the training round and loads them into the model class object. For each batch of the testing dataset, the function stores the actual labels and the predicted labels in two separate lists, <code>labels_list</code> and <code>predictions_list</code>, respectively. The predictions are generated by using the features of the batch as input for the model. The function then returns the loss metric of the model and the <span class="caps">ROC</span> <span class="caps">AUC</span> performance&nbsp;metric.</p>
+<p>Thus, by chaining <code>train()</code> and <code>test()</code> into <code>model_train_eval()</code>, I can perform any number of epochs and keep track of how the model performs. Next, let&#8217;s put the code to&nbsp;work.</p>
+<h3><code>main.py</code></h3>
+<p>As usual, I start by importing all necessary modules, including the objects defined in <code>src/pytorch_nn_demo.py</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># main.py</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_auc_score</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data.dataset</span> <span class="kn">import</span> <span class="n">TensorDataset</span>
+
+<span class="kn">from</span> <span class="nn">src.pytorch_nn_demo</span> <span class="kn">import</span> <span class="n">NeuralNetwork</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">model_train_eval</span>
+</code></pre></div>
+
+<p>Next, I set up the file&nbsp;paths:</p>
+<div class="highlight"><pre><span></span><code><span class="n">ROOT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+<span class="n">TRAIN_METADATA_PATH</span> <span class="o">=</span> <span class="n">ROOT_DIR</span> <span class="o">/</span> <span class="s2">&quot;input/train_metadata.tsv&quot;</span>
+<span class="n">TEST_METADATA_PATH</span> <span class="o">=</span> <span class="n">ROOT_DIR</span> <span class="o">/</span> <span class="s2">&quot;input/test_metadata_filtered.tsv&quot;</span>
+<span class="n">TRAIN_COUNT_MATRIX_PATH</span> <span class="o">=</span> <span class="n">ROOT_DIR</span> <span class="o">/</span> <span class="s2">&quot;input/train_counts_transformed_scaled.tsv.gz&quot;</span>
+<span class="n">TEST_COUNT_MATRIX_PATH</span> <span class="o">=</span> <span class="n">ROOT_DIR</span> <span class="o">/</span> <span class="s2">&quot;input/test_counts_transformed_scaled.tsv.gz&quot;</span>
+<span class="n">FINAL_GENE_LIST_PATH</span> <span class="o">=</span> <span class="n">ROOT_DIR</span> <span class="o">/</span> <span class="s2">&quot;input/final_gene_list.tsv&quot;</span>
+<span class="n">OUTPUT_DIR</span> <span class="o">=</span> <span class="n">ROOT_DIR</span> <span class="o">/</span> <span class="s2">&quot;output&quot;</span>
+</code></pre></div>
+
+<p>Remember that the input files come from my <a href="https://antoniocampos13.github.io/analyzing-scrna-seq-data-with-xgboost.html">previous post</a>. Therefore, I will re-use some code, with little modifications to load all dataset objects into <code>pandas.DataFrame</code> objects:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># main.py</span>
+<span class="c1"># %% Import refined gene list</span>
+<span class="n">gene_list</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">FINAL_GENE_LIST_PATH</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">gene_list</span> <span class="o">=</span> <span class="n">gene_list</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+
+<span class="c1"># %% Import train dataset</span>
+<span class="n">train_count_matrix</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">TRAIN_COUNT_MATRIX_PATH</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">train_count_matrix</span> <span class="o">=</span> <span class="n">train_count_matrix</span><span class="p">[</span><span class="n">train_count_matrix</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">gene_list</span><span class="p">)]</span>
+<span class="n">train_count_matrix</span> <span class="o">=</span> <span class="n">train_count_matrix</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+<span class="n">train_count_matrix</span> <span class="o">=</span> <span class="n">train_count_matrix</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+<span class="n">train_metadata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">TRAIN_METADATA_PATH</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">train_metadata</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">train_metadata</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+<span class="c1"># %% Import test dataset</span>
+<span class="n">test_count_matrix</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">TEST_COUNT_MATRIX_PATH</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">test_count_matrix</span> <span class="o">=</span> <span class="n">test_count_matrix</span><span class="p">[</span><span class="n">test_count_matrix</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">gene_list</span><span class="p">)]</span>
+<span class="n">test_count_matrix</span> <span class="o">=</span> <span class="n">test_count_matrix</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+<span class="n">test_count_matrix</span> <span class="o">=</span> <span class="n">test_count_matrix</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+<span class="n">test_metadata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">TEST_METADATA_PATH</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">test_metadata</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_metadata</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Remember that the datasets have the samples (single breast tumor cells) as rows and features as columns (in this case, gene expression). Therefore, our trained neural network/deep learning model will differentiate (classify) between parental and paclitaxel-resistant&nbsp;cells.</p>
+<p>To work with PyTorch, our data must be transformed into the <code>torch</code> tensor format. In my case, I will convert the two datasets into two <code>TensorDataset</code> objects:</p>
+<div class="highlight"><pre><span></span><code><span class="n">train_tensor_dataset</span> <span class="o">=</span> <span class="n">TensorDataset</span><span class="p">(</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">train_count_matrix</span><span class="o">.</span><span class="n">values</span><span class="p">),</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">train_metadata</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">test_tensor_dataset</span> <span class="o">=</span> <span class="n">TensorDataset</span><span class="p">(</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">test_count_matrix</span><span class="o">.</span><span class="n">values</span><span class="p">),</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">test_metadata</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">),</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Finally, I can generate two <code>DataLoader</code> objects so the datasets are amenable for batching during training and testing&nbsp;rounds:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># main.py</span>
+<span class="c1"># %% Prepare datasets for batching</span>
+<span class="n">train_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train_tensor_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">test_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">test_tensor_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Notice that <code>batch_size</code> argument controls the size of the batch. Thus, I defined 512 observations per batch. Notice as well that the training dataset may be shuffled because it helps prevent the model from memorizing the order of the data. See Hengtao Tantai&#8217;s review and tips <a href="https://medium.com/@zergtant/improving-control-and-reproducibility-of-pytorch-dataloader-with-sampler-instead-of-shuffle-7f795490256e">here</a>. No shuffling is necessary on the testing&nbsp;dataset.</p>
+<p>Next, I configured the neural network/deep learning&nbsp;model:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># main.py</span>
+<span class="c1"># %% Configure neural network</span>
+<span class="n">n_features</span> <span class="o">=</span> <span class="n">train_count_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">n_output</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">n_neurons</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">n_features</span> <span class="o">+</span> <span class="n">n_output</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="p">))</span>  <span class="c1"># rule of thumb</span>
+<span class="n">dropout_rate</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">activation_function</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">()</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">NeuralNetwork</span><span class="p">(</span>
+    <span class="n">n_features</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span>
+    <span class="n">n_neurons</span><span class="o">=</span><span class="n">n_neurons</span><span class="p">,</span>
+    <span class="n">n_output</span><span class="o">=</span><span class="n">n_output</span><span class="p">,</span>
+    <span class="n">activation_function</span><span class="o">=</span><span class="n">activation_function</span><span class="p">,</span>
+    <span class="n">dropout</span><span class="o">=</span><span class="n">dropout_rate</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The datasets have 1253 features (gene expression columns) and have two classes: parental or paclitaxel-resistant, therefore, it can by represented by a single column of probabilities varying between 0 and 1. The higher the probability, the higher the chance that the tumor cells is&nbsp;paclitaxel-resistant.</p>
+<p>There a few rules of thumb to determine the number of neurons in the hidden layers. See <a href="https://medium.com/geekculture/introduction-to-neural-network-2f8b8221fbd3">Sandhya Krishan&#8217;s post</a> for a review. Here, I chose to use two thirds of the sum of inputs plus outputs (<span class="math">\((1253 + 1) \times 2/3 = 836\)</span>). I could have set different number of neurons for each layer, but to keep the model simple, they will have the same number of&nbsp;neurons.</p>
+<p>I chose the rectified linear activation function or <strong>ReLU</strong> as the activation function of the hidden layers. Briefly, the ReLU is a non-linear function that returns the input as is only if its is higher than zero. Otherwise, if the input is zero or less, it will always return zero. See a brief review about ReLU <a href="https://machinelearningmastery.com/rectified-linear-activation-function-for-deep-learning-neural-networks/">here</a> and why its characteristics are desirable during neural networks&nbsp;training.</p>
+<p>Next, I defined the adaptive moment estimation algorithm (<a href="https://medium.com/@francescofranco_39234/adam-optimization-in-machine-learning-cfeb10a27a86"><span class="caps">ADAM</span></a>) with its default learning rateas the weights and bias optimizer, and the binary cross-entropy (<a href="https://www.analyticsvidhya.com/blog/2021/03/binary-cross-entropy-log-loss-for-binary-classification/"><span class="caps">BCE</span></a>) as the loss&nbsp;function:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># main.py</span>
+<span class="c1"># %% Run training/evaluation iterations</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+<span class="n">loss_function</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BCELoss</span><span class="p">()</span>
+</code></pre></div>
+
+<p>Finally, I can train/test the model for 250 epochs, and saving the best weights during all epochs into the <code>output</code> folder:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># main.py</span>
+<span class="n">model_train_eval</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">n_epochs</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
+    <span class="n">train_dataloader</span><span class="o">=</span><span class="n">train_dataloader</span><span class="p">,</span>
+    <span class="n">test_dataloader</span><span class="o">=</span><span class="n">test_dataloader</span><span class="p">,</span>
+    <span class="n">loss_function</span><span class="o">=</span><span class="n">loss_function</span><span class="p">,</span>
+    <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+    <span class="n">output_path</span><span class="o">=</span><span class="s2">&quot;output&quot;</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>While the training is occurring, summary of each epoch is printed to the standard&nbsp;output:</p>
+<p><img alt="Printing epochs summary during training of the neural network model" src="https://antoniocampos13.github.io/images/training_neural_network.png"></p>
+<p>As you may see on the image above, the <span class="caps">ROC</span> <span class="caps">AUC</span> was trending around 0.23 during the epochs. Since it is <span class="math">\(&lt;\)</span> 0.50, the model is actualy a bad predictor for the positive class (paclitaxel-resistant cells). Apparently, it captured the patterns from parental cells better than the resistant ones. However, if we invert the model output by using their complementary probabilities, we can achieve <span class="caps">ROC</span> <span class="caps">AUC</span> <span class="math">\(&gt;\)</span>&nbsp;0.50:</p>
+<div class="highlight"><pre><span></span><code><span class="n">main</span><span class="o">.</span><span class="n">py</span>
+<span class="c1"># %% Check evaluation using complementary probabilities</span>
+<span class="n">model_train_eval</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">n_epochs</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
+    <span class="n">train_dataloader</span><span class="o">=</span><span class="n">train_dataloader</span><span class="p">,</span>
+    <span class="n">test_dataloader</span><span class="o">=</span><span class="n">test_dataloader</span><span class="p">,</span>
+    <span class="n">loss_function</span><span class="o">=</span><span class="n">loss_function</span><span class="p">,</span>
+    <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+    <span class="n">output_path</span><span class="o">=</span><span class="s2">&quot;output&quot;</span><span class="p">,</span>
+    <span class="n">complementary_prob</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>During the new training, we see the <span class="caps">AUC</span> <span class="caps">ROC</span> score&nbsp;improved:</p>
+<p><img alt="Printing epochs summary during training of the neural network model (complementary probability of the output)" src="https://antoniocampos13.github.io/images/training_neural_network_comp_prob.png"></p>
+<p>As I mentioned above, the weights and biases of the best model were saved in the <code>output</code> folder. To load them into the model and perform predictions, follow the steps&nbsp;below:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># main.py</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+<span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;output/best_weights.pth&quot;</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+</code></pre></div>
+
+<p>The model is now ready and loaded. Let&#8217;s evaluate the model. Obtain predictions by running the model with a feature matrix. For this example, I will use again the features from test dataset, after converting them to a PyTorch&nbsp;tensor:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># main.py</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">test_count_matrix</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+
+<span class="n">predictions_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># %% Convert PyTorch Tensor to Python list</span>
+<span class="n">y_preds</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+<span class="n">predictions_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_preds</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+<span class="c1">## Use Complementary probabilities (this step is specific for this demonstration only. Do not perform on your data, unless you know what you are doing)</span>
+<span class="n">predictions_flat</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">predictions_list</span><span class="p">))]</span>
+
+<span class="c1"># %% Calculate ROC AUC score</span>
+<span class="n">eval_roc_score</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">test_metadata</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">],</span> <span class="n">y_score</span><span class="o">=</span><span class="n">predictions_flat</span><span class="p">)</span>
+
+<span class="n">eval_roc_score</span>
+<span class="c1"># 0.7445068061155242</span>
+</code></pre></div>
+
+<p>So I can see the final <span class="caps">ROC</span> <span class="caps">AUC</span> score converged to around 0.74. You may obtain a slightly different number due to the randomness introduced during shuffling of the drain dataset during&nbsp;epochs.</p>
+<h2>Conclusion</h2>
+<p>In this post I demonstrated how to configure a neural network/deep learning model through PyTorch, as well as how to configure a simple function to perform training and testing rounds of the&nbsp;model.</p>
+<p><em>Subscribe to my <a href="https://antoniocampos13.github.io/feeds/all.rss.xml"><span class="caps">RSS</span> feed</a>, <a href="https://antoniocampos13.github.io/feeds/all.atom.xml">Atom feed</a> or <a href="https://t.me/joinchat/AAAAAEYrNCLK80Fh1w8nAg">Telegram channel</a> to keep you updated whenever I post new&nbsp;content.</em></p>
+<h2><span class="caps">APPENDIX</span> - Neural network and deep learning models: a brief&nbsp;recap</h2>
+<p>Machine-learning models, in general, aim to capture patterns in a dataset composed of <strong>features</strong> (independent variables) to predict the behavior of another variable, the <strong>output</strong>, <strong>dependent</strong> or <strong>status</strong> variable. Usually, we select a series of examples of <strong>labeled</strong> observations (samples) of those features (i.e. we know the status for each sample) and apply the desired model. This dataset is called the <strong>training dataset</strong>, and because of that, this rationale is called <strong>supervised learning</strong>. The objective of supervised learning is to obtain a statistical model capable of predicting the status of any other observation. We assess the model by applying the model to a <strong>test dataset</strong>, a completely separate collection of observations to ensure that the model works even with samples not previously&nbsp;encountered.</p>
+<p>We assess the utility of the model during both phases: training and testing. During training, we compare the predictions of the model with the actual labels and calculate a <strong>loss (or cost) metric</strong>, which is a global metric that denotes how wrong was the model. Thus, all machine learning models strive to <strong>minimize</strong> this loss metric as much as possible during training. With neural networks/deep learning models, this is performed iteratively via a <a href="https://medium.com/@yennhi95zz/4-a-beginners-guide-to-gradient-descent-in-machine-learning-773ba7cd3dfe">gradient descent algorithm</a>.</p>
+<p>Briefly, the gradient descent algorithm works by optimizing a series of <strong>weights</strong>, i.e., <strong>parameters (or coefficients)</strong> (usually represented by the symbols <span class="math">\(\beta\)</span> or <span class="math">\(w\)</span>) for each observation. As a simple example, suppose that <span class="math">\(y\)</span> represents a probability and <span class="math">\(\{x_1, x_2, x_3, ..., x_n\}\)</span> represent the values of <span class="math">\(n\)</span> features. Therefore, the&nbsp;formula:</p>
+<div class="math">$$y = w_1 \times x_1 + w_1 \times x_2 + w_3 \times x_3 + ... + w_n \times x_n$$</div>
+<p>relates the influence (hence the name <em>weight</em>) of each feature over the final probability. Thus, at each iteration, the model updates those weights based on the loss metric of the last iteration. Typically, we choose a number of iterations, or <strong>epochs</strong>, and assess at each epoch (or every few epochs, given a pre-specified interval), if the loss metric is satisfactorily decreasing. Neural network models also optimize <strong>biases</strong>, which are numeric constants that represent systematic errors in the data. The biases are added to each feature/weight multiplication product. For the sake of simplicity, I will not explore biases further, but keep in mind that whenever I mention weights, assume that biases are also&nbsp;involved.</p>
+<p>How do neural networks derive those weights? We may conceptualize a neural network model as a series of sets of mathematical functions chained together, where the outputs of one set of functions are passed to the next set, and so on, until the last step, in which the loss metric is calculated (hence the name <em>neural network</em>, each set of functions are connected and share information in the same way that biological neurons do). Each set of functions is called a <strong>layer</strong>. Usually, each layer contains a linear combination (multiplication) of feature values times the weights. This combination is then handed over to a non-linear function, called the <strong>activation</strong> function. The activation function processes the input and hands it over to the next layer of the model. After the weights of all layers are computed (the <strong>forward pass</strong> computation), then we take the partial derivatives of the loss function with respect to all other operations (the <strong>backward pass</strong> computation). The result is a matrix of <strong>gradients</strong>, numerical values representing the influence of each weight on the final value of the loss function. Since the derivative of a function helps to find the minimum value of the original function, the model can update the starting weights for all layers in the next epoch, adjusting each weight in the direction that will minimize the loss metric, as mentioned above. Rinse and repeat until the pre-specified epochs end or the analyst is satisfied with the loss metric&nbsp;achieved.</p>
+<p>The layers of a neural network are usually&nbsp;called:</p>
+<ul>
+<li><strong>Input layer</strong>: contains the feature&nbsp;matrix</li>
+<li><strong>Hidden layer(s)</strong>: contain(s) neurons, activation functions work here. Each layer has its particular weight&nbsp;matrix.</li>
+<li><strong>Output layer</strong>: the loss metric calculation takes place here. The start of the backward pass takes place here. The weights for each previous layer are then&nbsp;updated.</li>
+</ul>
+<p>The input layer is the &#8220;zeroeth&#8221; layer: it is represented by the feature values matrix, and no operations are performed&nbsp;here.</p>
+<p>The hidden layers are the core of the model. All linear and activation functions are set at the hidden layers. They are called hidden layers because, usually, we do not check the numbers generated there, they are simply intermediate values for the output layer. The hidden layers operate by setting weight matrices with the <a href="https://www.oreilly.com/library/view/deep-learning-from/9781492041405/">dimensionality of the vector</a> that represents each observation in the layer&#8217;s output. The number that represents this dimensionality is called the <strong>neurons</strong>. For example, imagine a neural network with one input layer, one hidden layer and one output layer. If we say that the input layer is a <span class="math">\(S\)</span> (samples) X <span class="math">\(F\)</span> (features) matrix, the output of the first hidden layer will have <span class="math">\(N\)</span> (neurons) X <span class="math">\(F\)</span> (features) dimensions. The number of neurons is pre-specified by the analyst. There are some <a href="https://medium.com/geekculture/introduction-to-neural-network-2f8b8221fbd3">rules of thumb</a> for choosing the number of neurons in each layer, because too few neurons may result in suboptimal training, whereas too many neurons may cause overfitting of the model. The analyst may choose to apply neuron <strong>dropout</strong> rates. By pre-specifying a dropout rate (<span class="caps">DR</span>, in %), the analyst randomly discards the weights of <span class="caps">DR</span>% of the neurons at each layer independently (usually). Discard means the weights receive a value of zero. The neuron dropout is one of the most frequently used methods to reduce the risk of&nbsp;overfitting.</p>
+<p>The output layer aggregates the computations from the previous layers and calculates the loss metric, which is used to update the weights. The weights are updated with the help of functions called <strong>optimizers</strong>, which use a <strong>learning rate</strong> to gauge how strongly the update in the value of the weights will be. A learning rate too small will result in a model taking longer to converge to a minimum value of the loss function, whereas a learning rate too large may find suboptimal results during&nbsp;training.</p>
+<p>A neural network with two or more layers is called a <strong>deep learning model</strong>.</p>
+<p>During testing, we assess <strong>performance metrics</strong>. Those metrics include, for example, <a href="https://en.wikipedia.org/wiki/Accuracy_and_precision">accuracy</a>, <a href="https://neptune.ai/blog/performance-metrics-in-machine-learning-complete-guide">regression metrics</a>, and the area under the receiver operating characteristic curve <a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic"><span class="caps">ROC</span> <span class="caps">AUC</span></a>. We can even evaluate the model performance at each epoch (or every few epochs, given a pre-specified interval), in pace with the training&nbsp;procedure.</p>
+<p>In summary, neural networks are nothing more than a series of linear matrix multiplication operations interspersed with non-linear operations. These procedural steps help capture linear and non-linear patterns in the data. The final result is a matrix of weights. The linear combination of feature values and weights (multiplication) captures all those patterns, helping predictions. We assess those predictions by using a separate dataset to evaluate if the model can correctly predict most of the previously known&nbsp;labels.</p>
+<h2>References</h2>
+<p><a href="https://pytorch.org/">PyTorch</a></p>
+<p><a href="https://docs.python.org/3/library/venv.html">venv — Creation of virtual&nbsp;environments</a></p>
+<p><a href="https://developer.nvidia.com/cuda-downloads"><span class="caps">CUDA</span> Toolkit 12.1&nbsp;Downloads</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Sigmoid_function">Sigmoid function |&nbsp;Wikipedia</a></p>
+<p><a href="https://datascience.stackexchange.com/a/54606">Data Science Exchange | Answer to &#8220;Binary classification as a 2-class classification&nbsp;problem&#8221;</a></p>
+<p><a href="https://www.kaggle.com/code/robikscube/train-your-first-pytorch-model-card-classifier/notebook">Train Your first PyTorch Model [Card Classifier] | Rob&nbsp;Mulla</a></p>
+<p><a href="https://medium.com/@zergtant/improving-control-and-reproducibility-of-pytorch-dataloader-with-sampler-instead-of-shuffle-7f795490256e">Improving Control and Reproducibility of PyTorch DataLoader with Sampler Instead of Shuffle | Hengtao&nbsp;Tantai</a></p>
+<p><a href="https://medium.com/geekculture/introduction-to-neural-network-2f8b8221fbd3">How do determine the number of layers and neurons in the hidden layer? | Sandhya&nbsp;Krishnan</a></p>
+<p><a href="https://machinelearningmastery.com/rectified-linear-activation-function-for-deep-learning-neural-networks/">A Gentle Introduction to the Rectified Linear Unit (ReLU) | Jason&nbsp;Brownlee</a></p>
+<p><a href="https://medium.com/@francescofranco_39234/adam-optimization-in-machine-learning-cfeb10a27a86"><span class="caps">ADAM</span> optimization in machine learning | Francesco&nbsp;Franco</a></p>
+<p><a href="https://www.analyticsvidhya.com/blog/2021/03/binary-cross-entropy-log-loss-for-binary-classification/">Binary Cross Entropy/Log Loss for Binary Classification | Shipra&nbsp;Saxena</a></p>
+<p><a href="https://medium.com/@yennhi95zz/4-a-beginners-guide-to-gradient-descent-in-machine-learning-773ba7cd3dfe">A Beginner’s Guide to Gradient Descent in Machine Learning | Yenn&nbsp;Hi</a></p>
+<p><a href="https://www.oreilly.com/library/view/deep-learning-from/9781492041405/">Deep Learning from Scratch | Seth&nbsp;Weidman</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Accuracy_and_precision">Accuracy and precision |&nbsp;Wikipedia</a></p>
+<p><a href="https://neptune.ai/blog/performance-metrics-in-machine-learning-complete-guide">Performance Metrics in Machine Learning [Complete Guide] |&nbsp;neptune.ai</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic">Receiver operating characteristic |&nbsp;Wikipedia</a></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://antoniocampos13.github.io/tag/pytorch.html">PyTorch</a>
+      <a href="https://antoniocampos13.github.io/tag/machine-learning.html">machine learning</a>
+      <a href="https://antoniocampos13.github.io/tag/transcriptomics.html">transcriptomics</a>
+    </p>
+  </div>
+
+
+
+
+
+</article>
+
+    <footer>
+<p>
+  &copy; 2020 Antonio Victor Campos Coelho - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike</a>
+</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+           src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Antonio's Portfolio ",
+  "url" : "https://antoniocampos13.github.io",
+  "image": "https://avatars.githubusercontent.com/antoniocampos13",
+  "description": "Data Science Portfolio by Antonio Victor Campos Coelho"
+}
+</script>
+
+</body>
+</html>
