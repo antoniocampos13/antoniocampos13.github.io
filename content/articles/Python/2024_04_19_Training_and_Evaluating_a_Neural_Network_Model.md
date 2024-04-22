@@ -1,6 +1,6 @@
 ---
 Title: Training and Evaluating a Neural Network Model
-Status: draft
+Status: published
 Date: 2024-04-22 14:30
 Author: Antonio Victor Campos Coelho
 Categories: Python
